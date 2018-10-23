@@ -162,6 +162,4 @@ export default class NearDB {
       })
     })
   }
-
-  update() {}
 }

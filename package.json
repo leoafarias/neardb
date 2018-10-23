@@ -9,10 +9,10 @@
   "files": [
     "dist"
   ],
-  "author": "Leo Farias <leo@fanhero.com>",
+  "author": "leoafarias <leokcta@gmail.com>",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/leoafarias/neardb"
   },
   "license": "MIT",
   "engines": {

@@ -1,6 +1,15 @@
 export interface IConfig {
-  storage?: any
+  type: string
+  cloudStorage?: {
+    endPoint: string
+    useSSL: boolean
+    port: number
+    accessKey: string
+    secretKey: string
+  }
+
   database: string
+  storage: any
 }
 
 export type PathList = PathItem[]

@@ -2,8 +2,18 @@ import NearDB from '../src/neardb'
 import { IConfig, PathList } from '../src/types'
 
 const config: IConfig = {
+  type: 'cloud',
+  database: 'testdb',
+  cloudStorage: {
+    endPoint: '192.168.86.24',
+    port: 9000,
+    useSSL: false,
+    accessKey: 'LC02CKR2P36U9098AQ98',
+    secretKey: 'e9WMdVjn_XtbrjjBEbdGg5kUEphmTIVhNgoBEKpT'
+  },
   storage: {}
 }
+
 const setDB = () => {
   return NearDB.database(config)
 }
@@ -22,7 +32,7 @@ describe('NearDB Init', () => {
   })
 
   it('Config is set properly', () => {
-    expect(config.storage).toBe(newInstance.config.storage)
+    expect(config).toEqual(newInstance.config)
   })
 })
 

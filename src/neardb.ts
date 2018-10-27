@@ -1,9 +1,18 @@
 import { IConfig, PathItem, PathList, ISetOptions } from './types'
 import { uuid } from './utils'
+import cloud from './adapter/cloud'
 
 const defaultConfig: IConfig = {
-  storage: {},
-  database: 'testDB'
+  type: 'cloud',
+  database: 'testdb',
+  cloudStorage: {
+    endPoint: '192.168.86.24',
+    port: 9000,
+    useSSL: false,
+    accessKey: 'LC02CKR2P36U9098AQ98',
+    secretKey: 'e9WMdVjn_XtbrjjBEbdGg5kUEphmTIVhNgoBEKpT'
+  },
+  storage: {}
 }
 
 export default class NearDB {
@@ -21,9 +30,12 @@ export default class NearDB {
     /** Check if config exists */
     if (!config) throw new Error('No config passed to NearDB')
     /** Check if there is a storage set up */
-    if (!config.storage) throw new Error('No Storage driver')
+    if (!config.storage) {
+      throw new Error('No Storage adapter')
+    }
     /** Overwrites config param with default configuration */
     this.config = Object.assign(defaultConfig, config)
+
     // Sets empty path type
     if (!path) path = []
     this.path = path

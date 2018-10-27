@@ -2,23 +2,21 @@ import { IStorage, IConfig } from '../types'
 
 import * as Minio from 'minio'
 
-const client = new Minio.Client({
-  endPoint: '192.168.86.24',
-  port: 9000,
-  useSSL: false,
-  accessKey: 'LC02CKR2P36U9098AQ98',
-  secretKey: 'e9WMdVjn_XtbrjjBEbdGg5kUEphmTIVhNgoBEKpT'
-})
-
 export default class CloudStorage {
   config: IConfig
+  client: Minio.Client
 
   constructor(config: IConfig) {
     if (!config) throw new Error('No config was passed to cloudstorage')
     if (!config.database) {
       throw new Error('No config was passed to cloudstorage')
     }
+    if (!config.cloudStorage) {
+      throw new Error('No cloudstorage options in the config')
+    }
     this.config = config
+
+    this.client = new Minio.Client(config.cloudStorage)
   }
 
   static init(config: IConfig) {
@@ -29,16 +27,38 @@ export default class CloudStorage {
     try {
       console.log('its in')
       let exists = await this.dbExists()
-      console.log(exists)
       if (!exists) await this.dbCreate()
     } catch (err) {
       throw new Error(err)
     }
   }
 
+  save() {
+    return new Promise((resolve, reject) => {
+      let data = {
+        test: true,
+        anotherData: 'string'
+      }
+      let metaData = {
+        'Content-Type': 'application/json'
+      }
+      this.client.putObject(
+        this.config.database,
+        'data.json',
+        JSON.stringify(data),
+        Object.keys(data).length,
+        metaData,
+        function(err, etag) {
+          if (err) reject(err)
+          resolve(etag)
+        }
+      )
+    })
+  }
+
   dbExists() {
     return new Promise((resolve, reject) => {
-      client
+      this.client
         .bucketExists(this.config.database)
         .then(exists => {
           console.log(exists)
@@ -53,7 +73,7 @@ export default class CloudStorage {
 
   dbCreate() {
     return new Promise((resolve, reject) => {
-      client
+      this.client
         .makeBucket(this.config.database, 'us-east-1')
         .then(result => {
           console.log('Bucket created successfully in "us-east-1".')

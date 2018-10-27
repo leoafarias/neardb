@@ -2,7 +2,8 @@ import { IConfig, PathItem, PathList, ISetOptions } from './types'
 import { uuid } from './utils'
 
 const defaultConfig: IConfig = {
-  storage: {}
+  storage: {},
+  database: 'testDB'
 }
 
 export default class NearDB {
@@ -62,6 +63,12 @@ export default class NearDB {
     return new NearDB(this.config, newPath)
   }
 
+  /**
+   * Sets a doc within the path
+   * @param key expects key for document
+   * @returns an instance of NearDB with the new path and existing config
+   */
+
   doc(key: string) {
     // Copy value of path before passing, to avoid poluting this scope
     let newPath = [...this.path]
@@ -80,6 +87,10 @@ export default class NearDB {
     return new NearDB(this.config, newPath)
   }
 
+  /**
+   * Gets document data from the path provided in the scope.
+   * @returns payload of the document requested
+   */
   get() {
     return new Promise((resolve, reject) => {
       let { storage } = this.config
@@ -87,8 +98,8 @@ export default class NearDB {
 
       const lastPathIndex = this.path[this.path.length - 1]
       // Cannot get a sub-collection of a collection
-      if (lastPathIndex && lastPathIndex.type === 'collection') {
-        throw new Error('Cannot get collections')
+      if (lastPathIndex && lastPathIndex.type !== 'doc') {
+        throw new Error('Can only use get() method for documents')
       }
 
       // Traverse the path to set the value
@@ -108,6 +119,13 @@ export default class NearDB {
     })
   }
 
+  /**
+   * Gets document data from the path provided in the scope.
+   * @param value expects payload to be stored for the document
+   * @param options that can be passed on how you want to store the data
+   * options.merge will merge the data into existing document instead of overwriting.
+   * @returns payload of the document requested
+   */
   set(value: object, options?: ISetOptions) {
     return new Promise((resolve, reject) => {
       let { storage } = this.config
@@ -135,6 +153,16 @@ export default class NearDB {
     })
   }
 
+  /**
+   * Update some fields of the document without overwriting entire document
+   * @param value expects payload to be stored for the document
+   * @returns payload of the document requested
+   */
+  update(value: object) {
+    // TODO: add ability to delete specific fields
+    return this.set(value, { merge: true })
+  }
+
   add(value: object) {
     return new Promise((resolve, reject) => {
       let { storage } = this.config
@@ -157,6 +185,28 @@ export default class NearDB {
         if (index === this.path.length - 1) {
           storageRef = storageRef[item.key][uuid()] = value
 
+          resolve(storageRef)
+        }
+      })
+    })
+  }
+
+  delete() {
+    return new Promise((resolve, reject) => {
+      let { storage } = this.config
+      let storageRef = storage
+
+      // Traverse the path to set the value
+      this.path.forEach((item, index) => {
+        // Check if key exists in storage, or set as an empty value
+        if (storageRef && storageRef[item.key]) {
+          storageRef = storageRef[item.key]
+        } else {
+          storageRef = storageRef[item.key] = {}
+        }
+        // If its the last item on path set the value and return
+        if (index === this.path.length - 1) {
+          delete storageRef[item.key]
           resolve(storageRef)
         }
       })

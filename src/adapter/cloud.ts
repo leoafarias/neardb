@@ -33,7 +33,7 @@ export default class CloudStorage {
     }
   }
 
-  save() {
+  put() {
     return new Promise((resolve, reject) => {
       let data = {
         test: true,
@@ -42,6 +42,7 @@ export default class CloudStorage {
       let metaData = {
         'Content-Type': 'application/json'
       }
+      console.log(Object.keys(data).length)
       this.client.putObject(
         this.config.database,
         'data.json',
@@ -53,6 +54,59 @@ export default class CloudStorage {
           resolve(etag)
         }
       )
+    })
+  }
+
+  get() {
+    return new Promise((resolve, reject) => {
+      let size = 0
+      let data = ''
+
+      this.client.getObject(this.config.database, 'data.json', function(
+        err,
+        dataStream
+      ) {
+        if (err) {
+          return console.log(err)
+        }
+        dataStream.on('data', function(chunk) {
+          size += chunk.length
+          data += chunk
+        })
+        dataStream.on('end', function() {
+          resolve(JSON.parse(data))
+        })
+        dataStream.on('error', function(err) {
+          reject(err)
+        })
+      })
+    })
+  }
+
+  remove() {
+    return new Promise((resolve, reject) => {
+      this.client.removeObject(this.config.database, 'data.json', function(
+        err
+      ) {
+        if (err) {
+          reject(err)
+        }
+        resolve()
+      })
+    })
+  }
+
+  stat() {
+    return new Promise((resolve, reject) => {
+      this.client.statObject(this.config.database, 'data.json', function(
+        err,
+        stat
+      ) {
+        if (err) {
+          reject(err)
+        }
+        resolve(stat)
+      })
     })
   }
 

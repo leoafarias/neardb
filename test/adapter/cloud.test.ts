@@ -18,13 +18,26 @@ jest.setTimeout(30000)
 
 describe('cloudstorage', () => {
   const cs = CloudStorage.init(config)
+
+  let savedData: any
+
   it('Could not init CloudStorage', () => {
     expect(cs).toBeInstanceOf(CloudStorage)
   })
+
   it('Could save json file', () => {
     expect.assertions(1)
-    return cs.save().then(data => {
+    return cs.put().then(data => {
+      savedData = data
       expect(data).toBe('peanut butter')
+    })
+  })
+
+  it('Can get file as json object', () => {
+    expect.assertions(1)
+    return cs.get().then(data => {
+      expect(data).toEqual(savedData)
+      expect(typeof data).toBe('object')
     })
   })
 })

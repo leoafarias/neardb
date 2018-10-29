@@ -1,6 +1,7 @@
 import { IStorage, IConfig } from '../types'
 
 import * as Minio from 'minio'
+import { setupMaster } from 'cluster'
 
 export default class CloudStorage {
   config: IConfig
@@ -17,6 +18,14 @@ export default class CloudStorage {
     this.config = config
 
     this.client = new Minio.Client(config.cloudStorage)
+
+    this.setup()
+      .then(() => {
+        return
+      })
+      .catch(err => {
+        throw new Error(err)
+      })
   }
 
   static init(config: IConfig) {
@@ -25,7 +34,6 @@ export default class CloudStorage {
 
   async setup() {
     try {
-      console.log('its in')
       let exists = await this.dbExists()
       if (!exists) await this.dbCreate()
     } catch (err) {
@@ -42,7 +50,7 @@ export default class CloudStorage {
       let metaData = {
         'Content-Type': 'application/json'
       }
-      console.log(Object.keys(data).length)
+
       this.client.putObject(
         this.config.database,
         'data.json',
@@ -115,7 +123,6 @@ export default class CloudStorage {
       this.client
         .bucketExists(this.config.database)
         .then(exists => {
-          console.log(exists)
           resolve(exists)
         })
         .catch(err => {

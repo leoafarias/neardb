@@ -5,7 +5,7 @@ const config: IConfig = {
   type: 'cloud',
   database: 'testdb',
   cloudStorage: {
-    endPoint: '192.168.86.24',
+    endPoint: '192.168.1.110',
     port: 9000,
     useSSL: false,
     accessKey: 'LC02CKR2P36U9098AQ98',
@@ -14,28 +14,25 @@ const config: IConfig = {
   storage: {}
 }
 
-jest.setTimeout(30000)
+jest.setTimeout(5000)
 
 describe('cloudstorage', () => {
-  const cs = CloudStorage.init(config)
-
+  const storage = CloudStorage.init(config)
   let savedData: any
-
   it('Could not init CloudStorage', () => {
-    expect(cs).toBeInstanceOf(CloudStorage)
+    expect(storage).toBeInstanceOf(CloudStorage)
   })
 
-  it('Could save json file', () => {
+  it('Could save json file', async () => {
     expect.assertions(1)
-    return cs.put().then(data => {
-      savedData = data
-      expect(data).toBe('peanut butter')
-    })
+    const data = await storage.put()
+    savedData = data
+    expect(data).toBe('peanut butter')
   })
 
   it('Can get file as json object', () => {
     expect.assertions(1)
-    return cs.get().then(data => {
+    return storage.get().then(data => {
       expect(data).toEqual(savedData)
       expect(typeof data).toBe('object')
     })

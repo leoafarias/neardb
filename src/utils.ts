@@ -1,4 +1,4 @@
-import { PathItem } from './types'
+import { PathItem, PathList } from './types'
 
 // export function traversePath(key: string) {
 //   const list = path.key.split('/')
@@ -6,6 +6,21 @@ import { PathItem } from './types'
 //   if (!list[list.length - 1]) list.pop()
 //   return list
 // }
+
+export function buildPath(path: PathList) {
+  let pathArray = path.map((item, index) => {
+    if (path.length === index + 1) {
+      // This is the last item
+      if (item.type === 'document') return item.key + '.json'
+      return item.key
+    } else {
+      // not the last item
+      return item.key
+    }
+  })
+
+  return pathArray.join('/')
+}
 
 export function uuid() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {

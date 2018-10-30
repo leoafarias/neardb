@@ -1,11 +1,11 @@
 import { IStorage, IConfig } from '../types'
 
-import * as Minio from 'minio'
-import { setupMaster } from 'cluster'
+import * as S3 from 'aws-sdk/clients/S3'
+import { runInNewContext } from 'vm'
 
 export default class CloudStorage {
   config: IConfig
-  client: Minio.Client
+  client: S3
 
   constructor(config: IConfig) {
     if (!config) throw new Error('No config was passed to cloudstorage')
@@ -17,132 +17,109 @@ export default class CloudStorage {
     }
     this.config = config
 
-    this.client = new Minio.Client(config.cloudStorage)
-
-    this.setup()
-      .then(() => {
-        return
-      })
-      .catch(err => {
-        throw new Error(err)
-      })
+    this.client = new S3(config.cloudStorage)
   }
 
   static init(config: IConfig) {
     return new CloudStorage(config)
   }
 
-  async setup() {
+  put(value: object, path: string) {
+    return new Promise((resolve, reject) => {
+      let params = {
+        Body: JSON.stringify(value),
+        Bucket: this.config.database,
+        Key: path,
+        Metadata: {
+          ContentType: 'application/json'
+          // ContentEncoding: 'gzip'
+        }
+      }
+      this.client.putObject(params, function(err, data) {
+        if (err) reject(err)
+
+        resolve(data)
+      })
+    })
+  }
+
+  get(path: string) {
+    return new Promise((resolve, reject) => {
+      let params = {
+        Bucket: this.config.database,
+        Key: path
+      }
+      this.client.getObject(params, function(err, data) {
+        if (err) reject(err)
+        let payload = data.Body ? JSON.parse(data.Body.toString()) : {}
+
+        resolve(payload)
+      })
+    })
+  }
+
+  delete(path: string) {
+    return new Promise((resolve, reject) => {
+      let params = {
+        Bucket: this.config.database,
+        Key: path
+      }
+      this.client.deleteObject(params, function(err, data) {
+        if (err) reject(err)
+        resolve(data)
+      })
+    })
+  }
+
+  stat(path: string) {
+    return new Promise((resolve, reject) => {
+      let params = {
+        Bucket: this.config.database,
+        Key: path
+      }
+      this.client.headObject(params, function(err, data) {
+        if (err) reject(err)
+        resolve(data)
+      })
+    })
+  }
+
+  async setupBucket() {
     try {
-      let exists = await this.dbExists()
-      if (!exists) await this.dbCreate()
+      await this.bucketExists()
+      return true
+    } catch (err) {
+      console.error(err)
+    }
+
+    try {
+      await this.createBucket()
     } catch (err) {
       throw new Error(err)
     }
   }
 
-  put() {
+  bucketExists() {
     return new Promise((resolve, reject) => {
-      let data = {
-        test: true,
-        anotherData: 'string'
+      let params = {
+        Bucket: this.config.database
       }
-      let metaData = {
-        'Content-Type': 'application/json'
+      this.client.headBucket(params, function(err, data) {
+        if (err) reject(err)
+        resolve(data)
+      })
+    })
+  }
+
+  createBucket() {
+    return new Promise((resolve, reject) => {
+      let params = {
+        Bucket: this.config.database
       }
-
-      this.client.putObject(
-        this.config.database,
-        'data.json',
-        JSON.stringify(data),
-        Object.keys(data).length,
-        metaData,
-        function(err, etag) {
-          if (err) reject(err)
-          resolve(etag)
-        }
-      )
-    })
-  }
-
-  get() {
-    return new Promise((resolve, reject) => {
-      let size = 0
-      let data = ''
-
-      this.client.getObject(this.config.database, 'data.json', function(
-        err,
-        dataStream
-      ) {
-        if (err) {
-          return console.log(err)
-        }
-        dataStream.on('data', function(chunk) {
-          size += chunk.length
-          data += chunk
-        })
-        dataStream.on('end', function() {
-          resolve(JSON.parse(data))
-        })
-        dataStream.on('error', function(err) {
-          reject(err)
-        })
+      this.client.createBucket(params, function(err, data) {
+        if (err) reject(err)
+        resolve(data)
       })
-    })
-  }
-
-  remove() {
-    return new Promise((resolve, reject) => {
-      this.client.removeObject(this.config.database, 'data.json', function(
-        err
-      ) {
-        if (err) {
-          reject(err)
-        }
-        resolve()
-      })
-    })
-  }
-
-  stat() {
-    return new Promise((resolve, reject) => {
-      this.client.statObject(this.config.database, 'data.json', function(
-        err,
-        stat
-      ) {
-        if (err) {
-          reject(err)
-        }
-        resolve(stat)
-      })
-    })
-  }
-
-  dbExists() {
-    return new Promise((resolve, reject) => {
-      this.client
-        .bucketExists(this.config.database)
-        .then(exists => {
-          resolve(exists)
-        })
-        .catch(err => {
-          console.error(err)
-          reject(err)
-        })
-    })
-  }
-
-  dbCreate() {
-    return new Promise((resolve, reject) => {
-      this.client
-        .makeBucket(this.config.database, 'us-east-1')
-        .then(result => {
-          console.log('Bucket created successfully in "us-east-1".')
-          resolve()
-        })
-        .catch(err => {
-          reject(err)
-        })
     })
   }
 }

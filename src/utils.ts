@@ -11,8 +11,8 @@ export function buildPath(path: PathList) {
   let pathArray = path.map((item, index) => {
     if (path.length === index + 1) {
       // This is the last item
-      if (item.type === 'document') return item.key + '.json'
-      if (item.type === 'collection') return item.key + '.json'
+      if (item.type === 'doc') return item.key + '.json'
+      // if (item.type === 'collection') return item.key + '.json'
       return item.key
     } else {
       // not the last item

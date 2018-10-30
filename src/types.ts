@@ -1,16 +1,15 @@
 export interface IConfig {
   type: string
-  cloudStorage?: {
+  database: string
+  storage: any
+  options?: {
     endpoint: string
-    useSSL: boolean
+    useSSL?: boolean
     accessKeyId: string
     secretAccessKey: string
     signatureVersion?: string
     s3ForcePathStyle?: boolean
   }
-
-  database: string
-  storage: any
 }
 
 export type PathList = PathItem[]

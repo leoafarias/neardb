@@ -1,9 +1,8 @@
 import { IStorage, IConfig } from '../types'
 
 import * as S3 from 'aws-sdk/clients/S3'
-import { runInNewContext } from 'vm'
 
-export default class CloudStorage {
+export default class CloudStorage implements IStorage {
   config: IConfig
   client: S3
 
@@ -12,12 +11,12 @@ export default class CloudStorage {
     if (!config.database) {
       throw new Error('No config was passed to cloudstorage')
     }
-    if (!config.cloudStorage) {
-      throw new Error('No cloudstorage options in the config')
+    if (!config.options) {
+      throw new Error('No options options in the config')
     }
     this.config = config
 
-    this.client = new S3(config.cloudStorage)
+    this.client = new S3(config.options)
   }
 
   static init(config: IConfig) {
@@ -51,7 +50,7 @@ export default class CloudStorage {
       }
       this.client.getObject(params, function(err, data) {
         if (err) reject(err)
-        let payload = data.Body ? JSON.parse(data.Body.toString()) : {}
+        let payload = data && data.Body ? JSON.parse(data.Body.toString()) : {}
 
         resolve(payload)
       })

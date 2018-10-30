@@ -1,18 +1,19 @@
 import NearDB from '../src/neardb'
 import { IConfig, PathList } from '../src/types'
+import CloudStorage from '../src/adapter/cloud'
 
 const config: IConfig = {
   type: 'cloud',
-  database: 'testdb2',
-  cloudStorage: {
+  database: 'testdb',
+  storage: CloudStorage,
+  options: {
     endpoint: 'http://192.168.86.24:9000',
     useSSL: false,
     s3ForcePathStyle: true,
     signatureVersion: 'v4',
     accessKeyId: 'LC02CKR2P36U9098AQ98',
     secretAccessKey: 'e9WMdVjn_XtbrjjBEbdGg5kUEphmTIVhNgoBEKpT'
-  },
-  storage: {}
+  }
 }
 
 const setDB = () => {
@@ -22,6 +23,14 @@ const setDB = () => {
 const handleError = (err: any) => {
   console.error(err)
   throw new Error(err)
+}
+
+const firstColRef = setDB().collection('oneCol')
+const firstDocRef = firstColRef.doc('oneDoc')
+
+const data = {
+  firstValue: 3,
+  secondValue: 'String'
 }
 /**
  * NearDB
@@ -38,186 +47,51 @@ describe('NearDB Init', () => {
 })
 
 describe('.collection', () => {
-  const firstCollection = 'firstCol'
-  const secondCollection = 'secondCol'
-  const colRef = setDB().collection(firstCollection)
-
-  it('Check collection reference is instantiable', () => {
-    expect(colRef).toBeInstanceOf(NearDB)
-  })
-
-  it('Collection path is set properly', () => {
-    const lastPathItem = colRef.path[colRef.path.length - 1]
-
-    expect(lastPathItem.key).toBe(firstCollection)
-    expect(lastPathItem.type).toBe('collection')
-  })
-
-  it('Cannot set collection of a collection', async () => {
-    async function check() {
-      colRef.collection(secondCollection)
-    }
-    await expect(check()).rejects.toThrow(Error)
-  })
-
-  it('Set a sub-collection', () => {
-    const subCol = colRef.doc('docID').collection(secondCollection)
-    const lastPathItem = subCol.path[subCol.path.length - 1]
-
-    expect(lastPathItem.key).toBe(secondCollection)
-    expect(lastPathItem.type).toBe('collection')
-  })
+  return true
 })
 
 describe('.doc', () => {
-  const firstCollection = 'firstCol'
-  const secondCollection = 'secondCol'
-  const firstDoc = 'firstDoc'
-  const secondDoc = 'secondDoc'
+  return true
+})
 
-  const docRef = setDB()
-    .collection(firstCollection)
-    .doc(firstDoc)
-
-  it('Check document reference is instantiable', () => {
-    expect(docRef).toBeInstanceOf(NearDB)
+describe('.set', async () => {
+  it('Value can be set on new document', async () => {
+    expect.assertions(1)
+    let payload: any
+    payload = await firstDocRef.set(data)
+    expect(payload.ETag).toBeTruthy()
   })
 
-  it('Document path is set properly', () => {
-    const lastPathItem = docRef.path[docRef.path.length - 1]
-
-    expect(lastPathItem.key).toBe(firstDoc)
-    expect(lastPathItem.type).toBe('doc')
-  })
-
-  it('Cannot set a document of a document', async () => {
-    async function check() {
-      docRef.doc(secondDoc)
-    }
-    await expect(check()).rejects.toThrow(Error)
-  })
-
-  it('Set a document in a sub-collection', () => {
-    const subCol = docRef.collection(secondCollection).doc(secondDoc)
-    const lastPathItem = subCol.path[subCol.path.length - 1]
-
-    expect(lastPathItem.key).toBe(secondDoc)
-    expect(lastPathItem.type).toBe('doc')
+  it('Value can be set on existing document', async () => {
+    expect.assertions(1)
+    let payload: any
+    payload = await firstDocRef.set(data)
+    expect(payload.ETag).toBeTruthy()
   })
 })
 
-describe('.set', () => {
-  const firstColRef = setDB().collection('firstLevelCol')
-
-  let data = {
-    firstValue: 3,
-    secondValue: 'String'
-  }
-
-  it('Value can be set on new document', () => {
-    firstColRef
-      .doc('newDoc')
-      .set(data)
-      .then(result => {
-        expect(result).toBe(data)
-      })
-  })
-
-  it('Value can be set on existing document', () => {
-    let newData = {
-      firstValue: 4,
-      secondValue: 'Another String'
-    }
-    firstColRef
-      .doc('newDoc')
-      .set(newData)
-      .then(result => {
-        expect(result).toBe(newData)
-      })
-  })
-
-  it('Value can be set on new nested documents', () => {
-    firstColRef
-      .doc('newDoc')
-      .collection('secondLevelCol')
-      .doc('secondLevelDoc')
-      .set(data)
-      .then(result => {
-        expect(result).toBe(data)
-      })
-  })
-
-  it('Value can be set on new nested documents', () => {
-    let newData = {
-      firstValue: 4,
-      secondValue: 'Another String'
-    }
-
-    firstColRef
-      .doc('newDoc')
-      .collection('secondLevelCol')
-      .doc('secondLevelDoc')
-      .set(newData)
-      .then(result => {
-        expect(result).toBe(newData)
-      })
-  })
-
-  it('Does not duplicate path items', () => {
-    const firstColRef = setDB().collection('firstLevelCol')
-    firstColRef.doc('newDoc')
-    firstColRef.doc('newDoc')
-    expect(firstColRef.path[0].key).toBe('firstLevelCol')
+describe('.get', async () => {
+  it('Can get a document', async () => {
+    expect.assertions(1)
+    let payload = await firstDocRef.get()
+    expect(payload).toEqual(data)
   })
 })
 
-describe('.get', () => {
-  const firstDocRef = setDB()
-    .collection('firstLevelCol')
-    .doc('firstLevelDoc')
-
-  let data = {
-    firstValue: 3,
-    secondValue: 'String'
-  }
-
-  it('Can get a document', () => {
-    firstDocRef
-      .set(data)
-      .then(result => {
-        firstDocRef
-          .get()
-          .then(payload => {
-            expect(payload).toBe(data)
-          })
-          .catch(err => {
-            handleError(err)
-          })
-      })
-      .catch(err => {
-        handleError(err)
-      })
-  })
-
-  // it('Cannot .get on collection', () => {
-  //   expect(true).toBe(false)
-  // })
-})
-
-describe('.add', () => {
-  const colRef = setDB().collection('firstLevelCol')
-
+describe('.add', async () => {
   const data = {
     firstValue: 3,
     secondValue: 'String'
   }
 
-  it('Check if value is added to the collection', () => {
-    colRef.add(data)
-    expect(colRef).toBeInstanceOf(NearDB)
+  it('Check if value is added to the collection', async () => {
+    expect.assertions(1)
+    let payload: any
+    payload = await firstColRef.add(data)
+    expect(payload.ETag).toBeTruthy()
   })
 
   it('Cannot use add method on doc', async () => {
-    await expect(colRef.doc('docID').add(data)).rejects.toThrow(Error)
+    return true
   })
 })

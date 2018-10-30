@@ -5,14 +5,14 @@ jest.setTimeout(5000)
 describe('buildPath', () => {
   const docPath = [
     { type: 'collection', key: 'colOne' },
-    { type: 'document', key: 'docOne' },
+    { type: 'doc', key: 'docOne' },
     { type: 'collection', key: 'colTwo' },
-    { type: 'document', key: 'docTwo' }
+    { type: 'doc', key: 'docTwo' }
   ]
 
   const colPath = [
     { type: 'collection', key: 'colOne' },
-    { type: 'document', key: 'docOne' },
+    { type: 'doc', key: 'docOne' },
     { type: 'collection', key: 'colTwo' }
   ]
 

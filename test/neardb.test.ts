@@ -3,13 +3,14 @@ import { IConfig, PathList } from '../src/types'
 
 const config: IConfig = {
   type: 'cloud',
-  database: 'testdb',
+  database: 'testdb2',
   cloudStorage: {
-    endPoint: '192.168.86.24',
-    port: 9000,
+    endpoint: 'http://192.168.86.24:9000',
     useSSL: false,
-    accessKey: 'LC02CKR2P36U9098AQ98',
-    secretKey: 'e9WMdVjn_XtbrjjBEbdGg5kUEphmTIVhNgoBEKpT'
+    s3ForcePathStyle: true,
+    signatureVersion: 'v4',
+    accessKeyId: 'LC02CKR2P36U9098AQ98',
+    secretAccessKey: 'e9WMdVjn_XtbrjjBEbdGg5kUEphmTIVhNgoBEKpT'
   },
   storage: {}
 }

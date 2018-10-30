@@ -12,6 +12,7 @@ export function buildPath(path: PathList) {
     if (path.length === index + 1) {
       // This is the last item
       if (item.type === 'document') return item.key + '.json'
+      if (item.type === 'collection') return item.key + '.json'
       return item.key
     } else {
       // not the last item

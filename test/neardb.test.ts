@@ -20,11 +20,6 @@ const setDB = () => {
   return NearDB.database(config)
 }
 
-const handleError = (err: any) => {
-  console.error(err)
-  throw new Error(err)
-}
-
 const firstColRef = setDB().collection('oneCol')
 const firstDocRef = firstColRef.doc('oneDoc')
 

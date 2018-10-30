@@ -119,7 +119,6 @@ export default class NearDB {
    */
   set(value: object, options?: ISetOptions): Promise<object> {
     let docPath = buildPath(this.path)
-    console.log(docPath)
     return this.adapter.put(value, docPath)
   }
 
@@ -140,7 +139,7 @@ export default class NearDB {
    */
   add(value: object): Promise<object> {
     let newPath = [...this.path]
-    const lastPathIndex = this.path[this.path.length - 1]
+    const lastPathIndex = newPath[newPath.length - 1]
     if (lastPathIndex && lastPathIndex.type !== 'collection') {
       throw new Error('Can only add document to collections')
     }

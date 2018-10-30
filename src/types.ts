@@ -1,11 +1,12 @@
 export interface IConfig {
   type: string
   cloudStorage?: {
-    endPoint: string
+    endpoint: string
     useSSL: boolean
-    port: number
-    accessKey: string
-    secretKey: string
+    accessKeyId: string
+    secretAccessKey: string
+    signatureVersion?: string
+    s3ForcePathStyle?: boolean
   }
 
   database: string

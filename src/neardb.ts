@@ -5,13 +5,6 @@ import cloud from './adapter/cloud'
 const defaultConfig: IConfig = {
   type: 'cloud',
   database: 'testdb',
-  cloudStorage: {
-    endPoint: '192.168.86.24',
-    port: 9000,
-    useSSL: false,
-    accessKey: 'LC02CKR2P36U9098AQ98',
-    secretKey: 'e9WMdVjn_XtbrjjBEbdGg5kUEphmTIVhNgoBEKpT'
-  },
   storage: {}
 }
 

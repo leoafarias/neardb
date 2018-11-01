@@ -1,52 +1,103 @@
 import NearDB from '../src/neardb'
 import { IConfig, PathList } from '../src/types'
 import CloudStorage from '../src/adapter/cloud'
+import { config } from './config'
+import { uuid } from '../src/utils'
 
-const config: IConfig = {
-  type: 'cloud',
-  database: 'testdb',
-  storage: CloudStorage,
-  options: {
-    endpoint: 'http://192.168.86.24:9000',
-    useSSL: false,
-    s3ForcePathStyle: true,
-    signatureVersion: 'v4',
-    accessKeyId: 'LC02CKR2P36U9098AQ98',
-    secretAccessKey: 'e9WMdVjn_XtbrjjBEbdGg5kUEphmTIVhNgoBEKpT'
-  }
-}
+config.database = 'testdb'
 
-const setDB = () => {
-  return NearDB.database(config)
-}
+jest.setTimeout(5000)
 
-const firstColRef = setDB().collection('oneCol')
-const firstDocRef = firstColRef.doc('oneDoc')
+let setDB: any
+let firstColRef: any
+let firstDocRef: any
 
 const data = {
   firstValue: 3,
   secondValue: 'String'
 }
+
+beforeAll(async () => {
+  firstColRef = NearDB.database(config).collection('oneCol')
+  firstDocRef = firstColRef.doc('oneDoc')
+  try {
+    let exists = await config.storage.init(config).bucketExists()
+    return
+  } catch (err) {
+    console.log(err)
+  }
+
+  await config.storage.init(config).createBucket()
+})
+
+afterAll(async () => {
+  // await firstDocRef.delete()
+  // await firstColRef.delete()
+  // return config.storage.init(config).deleteBucket()
+})
+
 /**
  * NearDB
  */
-describe('NearDB Init', () => {
-  const newInstance = setDB()
+describe('.database', () => {
   it('NearDB is instantiable', () => {
-    expect(newInstance).toBeInstanceOf(NearDB)
+    expect(NearDB.database(config)).toBeInstanceOf(NearDB)
   })
 
   it('Config is set properly', () => {
-    expect(config).toEqual(newInstance.config)
+    expect(config).toEqual(NearDB.database(config).config)
+  })
+
+  it('Cannot initialize without storage', () => {
+    const newConfig = Object.assign(config)
+    delete newConfig.storage
+
+    expect.assertions(1)
+
+    try {
+      NearDB.database(newConfig)
+    } catch (err) {
+      expect(err).toEqual(new Error('No storage adapter configured'))
+    }
   })
 })
 
 describe('.collection', () => {
-  return true
+  it('Returns NearDB instance', () => {
+    expect(firstColRef).toBeInstanceOf(NearDB)
+  })
+
+  it('Cannot call collections on collections', () => {
+    const check = () => {
+      firstColRef.collection('newCol')
+    }
+    expect(check).toThrowError('Only documents can have sub-collections')
+  })
+
+  it('Path was set properly', () => {
+    const { path } = firstColRef
+    const lastPathIndex = path[path.length - 1]
+    expect(lastPathIndex).toEqual({ type: 'collection', key: 'oneCol' })
+  })
 })
 
 describe('.doc', () => {
-  return true
+  it('Returns NearDB instance', () => {
+    expect(firstDocRef).toBeInstanceOf(NearDB)
+  })
+
+  it('Cannot call documents on document', () => {
+    const check = () => {
+      firstDocRef.doc('newDoc')
+    }
+    expect(check).toThrowError('Only collections can have documents')
+  })
+
+  it('Path was set properly', () => {
+    const { path } = firstDocRef
+    const lastPathIndex = path[path.length - 1]
+    expect(lastPathIndex).toEqual({ type: 'doc', key: 'oneDoc' })
+  })
 })
 
 describe('.set', async () => {
@@ -71,6 +122,14 @@ describe('.get', async () => {
     let payload = await firstDocRef.get()
     expect(payload).toEqual(data)
   })
+
+  it('Can only .get a document', async () => {
+    try {
+      firstColRef.get()
+    } catch (err) {
+      expect(err).toEqual(new Error('Can only use get() method for documents'))
+    }
+  })
 })
 
 describe('.add', async () => {
@@ -79,14 +138,70 @@ describe('.add', async () => {
     secondValue: 'String'
   }
 
-  it('Check if value is added to the collection', async () => {
+  it('Check if can .add to collection', async () => {
     expect.assertions(1)
     let payload: any
     payload = await firstColRef.add(data)
     expect(payload.ETag).toBeTruthy()
   })
 
-  it('Cannot use add method on doc', async () => {
-    return true
+  it('Can only use .add on collections', async () => {
+    expect.assertions(1)
+
+    try {
+      await firstDocRef.add(data)
+    } catch (err) {
+      expect(err).toEqual(new Error('Can only add document to collections'))
+    }
+  })
+})
+
+describe('.update', async () => {
+  const updateData = {
+    firstValue: 2,
+    thirdValue: 'Third Value'
+  }
+
+  const checkValue = Object.assign(data, updateData)
+
+  it('Updates fields in the document', async () => {
+    expect.assertions(1)
+    await firstDocRef.update(updateData)
+    let payload = await firstDocRef.get()
+    expect(payload).toEqual(checkValue)
+  })
+
+  it('Deletes values from document', async () => {
+    const deleteData = {
+      thirdValue: NearDB.field.deleteValue
+    }
+    expect.assertions(3)
+    await firstDocRef.set(data)
+    await firstDocRef.update(deleteData)
+    let payload = await firstDocRef.get()
+
+    expect(payload).toHaveProperty('firstValue')
+    expect(payload).toHaveProperty('secondValue')
+    expect(payload).not.toHaveProperty('thirdValue')
+  })
+
+  it('Can only update existing documents', async () => {
+    expect.assertions(1)
+
+    try {
+      await firstColRef.doc('newDoc').update(updateData)
+    } catch (err) {
+      expect(err).toEqual(
+        new Error('NearDB.update: NoSuchKey: The specified key does not exist.')
+      )
+    }
+  })
+})
+
+describe('.delete', async () => {
+  it('Can get a document', async () => {
+    expect.assertions(1)
+    let payload = await firstDocRef.delete()
+    expect(payload).toEqual({})
   })
 })

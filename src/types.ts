@@ -19,6 +19,10 @@ export type PathItem = {
   key: string
 }
 
+export type Payload = {
+  [key: string]: any
+}
+
 export interface ISetOptions {
   merge: boolean
 }

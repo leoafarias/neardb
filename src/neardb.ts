@@ -1,4 +1,4 @@
-import { IConfig, PathItem, PathList, ISetOptions, IStorage } from './types'
+import { IConfig, Payload, PathList, ISetOptions, IStorage } from './types'
 import { uuid, buildPath } from './utils'
 
 const defaultConfig = {
@@ -14,6 +14,11 @@ export default class NearDB {
   path: PathList
 
   adapter: any
+
+  static field = {
+    deleteValue: 'NEARDB.FIELD.DELETE'
+  }
+
   /**
    * Constructor to setup config, and path, and required checks.
    * @param config configuration to initiatlize NearDB instance
@@ -24,7 +29,7 @@ export default class NearDB {
     if (!config) throw new Error('No config passed to NearDB')
     /** Check if there is a storage set up */
     if (!config.storage) {
-      throw new Error('No Storage adapter')
+      throw new Error('No storage adapter configured')
     }
 
     /** Overwrites config param with default configuration */
@@ -84,7 +89,7 @@ export default class NearDB {
     const lastPathIndex = newPath[newPath.length - 1]
     // Cannot get a sub-collection of a collection
     if (lastPathIndex && lastPathIndex.type === 'doc') {
-      throw new Error('Cannot add documents to documents')
+      throw new Error('Only collections can have documents')
     }
 
     newPath.push({
@@ -107,6 +112,7 @@ export default class NearDB {
     }
 
     let docPath = buildPath(this.path)
+
     return this.adapter.get(docPath)
   }
 
@@ -117,8 +123,9 @@ export default class NearDB {
    * options.merge will merge the data into existing document instead of overwriting.
    * @returns payload of the document requested
    */
-  set(value: object, options?: ISetOptions): Promise<object> {
+  set(value: Payload, options?: ISetOptions): Promise<object> {
     let docPath = buildPath(this.path)
+    if (options && options.merge) return this.update(value)
     return this.adapter.put(value, docPath)
   }
 
@@ -127,9 +134,25 @@ export default class NearDB {
    * @param value expects payload to be stored for the document
    * @returns a promise for the payload requested
    */
-  update(value: object): Promise<object> {
+  async update(value: Payload): Promise<object> {
     // TODO: add ability to delete specific fields
-    return this.set(value, { merge: true })
+    try {
+      let doc: Payload
+      doc = await this.get()
+
+      for (let prop in value) {
+        if (value && value[prop] === NearDB.field.deleteValue) {
+          delete value[prop]
+          if (doc && doc[prop]) {
+            delete doc[prop]
+          }
+        }
+      }
+
+      return await this.set(Object.assign(doc, value))
+    } catch (err) {
+      throw new Error('NearDB.update: ' + err)
+    }
   }
 
   /**
@@ -137,7 +160,7 @@ export default class NearDB {
    * @param value expects payload to be stored for the document
    * @returns a promise for the payload of the saved doc
    */
-  add(value: object): Promise<object> {
+  add(value: Payload): Promise<object> {
     let newPath = [...this.path]
     const lastPathIndex = newPath[newPath.length - 1]
     if (lastPathIndex && lastPathIndex.type !== 'collection') {
@@ -150,6 +173,10 @@ export default class NearDB {
     return this.adapter.put(value, docPath)
   }
 
+  /**
+   * Removes document store in the path of instance
+   * @returns empty object
+   */
   delete() {
     let newPath = [...this.path]
     let docPath = buildPath(newPath)

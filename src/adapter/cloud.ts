@@ -1,6 +1,6 @@
 import { IStorage, IConfig } from '../types'
 
-import * as S3 from 'aws-sdk/clients/S3'
+import * as S3 from 'aws-sdk/clients/s3'
 
 export default class CloudStorage implements IStorage {
   config: IConfig

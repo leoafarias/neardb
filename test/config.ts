@@ -6,11 +6,11 @@ export const config: IConfig = {
   database: 'testdb',
   storage: CloudStorage,
   options: {
-    endpoint: 'http://192.168.86.24:9000',
-    useSSL: false,
+    endpoint: 'https://play.minio.io:9000',
+    useSSL: true,
     s3ForcePathStyle: true,
     signatureVersion: 'v4',
-    accessKeyId: 'LC02CKR2P36U9098AQ98',
-    secretAccessKey: 'e9WMdVjn_XtbrjjBEbdGg5kUEphmTIVhNgoBEKpT'
+    accessKeyId: 'Q3AM3UQ867SPQQA43P2F',
+    secretAccessKey: 'zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG'
   }
 }

@@ -1,24 +1,9 @@
-import CloudStorage from '../../src/adapter/cloud'
-import { IConfig } from '../../src/types'
-
-const config: IConfig = {
-  type: 'cloud',
-  database: 'testdb',
-  storage: CloudStorage,
-  options: {
-    endpoint: 'http://192.168.86.24:9000',
-    useSSL: false,
-    s3ForcePathStyle: true,
-    signatureVersion: 'v4',
-    accessKeyId: 'LC02CKR2P36U9098AQ98',
-    secretAccessKey: 'e9WMdVjn_XtbrjjBEbdGg5kUEphmTIVhNgoBEKpT'
-  }
-}
+import { config } from '../config'
 
 jest.setTimeout(5000)
 
 describe('cloudstorage', () => {
-  const storage = CloudStorage.init(config)
+  const storage = config.storage.init(config)
 
   let value = {
     test: true,
@@ -28,7 +13,7 @@ describe('cloudstorage', () => {
   let path = 'data.json'
 
   it('Could not init CloudStorage', () => {
-    expect(storage).toBeInstanceOf(CloudStorage)
+    expect(storage).toBeInstanceOf(config.storage)
   })
 
   it('Save document', async () => {

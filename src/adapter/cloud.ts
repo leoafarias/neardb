@@ -9,7 +9,7 @@ export default class CloudStorage implements IStorage {
   constructor(config: IConfig) {
     if (!config) throw new Error('No config was passed to cloudstorage')
     if (!config.database) {
-      throw new Error('No config was passed to cloudstorage')
+      throw new Error('No config database to cloudstorage')
     }
     if (!config.options) {
       throw new Error('No options options in the config')
@@ -116,6 +116,18 @@ export default class CloudStorage implements IStorage {
         Bucket: this.config.database
       }
       this.client.createBucket(params, function(err, data) {
+        if (err) reject(err)
+        resolve(data)
+      })
+    })
+  }
+
+  deleteBucket() {
+    return new Promise((resolve, reject) => {
+      let params = {
+        Bucket: this.config.database
+      }
+      this.client.deleteBucket(params, function(err, data) {
         if (err) reject(err)
         resolve(data)
       })

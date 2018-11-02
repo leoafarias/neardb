@@ -1,8 +1,8 @@
-import { IStorage, IConfig } from '../types'
+import { IConfig } from '../types'
 
 import * as S3 from 'aws-sdk/clients/s3'
 
-export default class CloudStorage implements IStorage {
+export default class CloudStorage {
   config: IConfig
   client: S3
 
@@ -14,6 +14,7 @@ export default class CloudStorage implements IStorage {
     if (!config.options) {
       throw new Error('No options options in the config')
     }
+
     this.config = config
 
     this.client = new S3(config.options)
@@ -23,7 +24,7 @@ export default class CloudStorage implements IStorage {
     return new CloudStorage(config)
   }
 
-  put(value: object, path: string) {
+  put(value: object, path: string): Promise<object> {
     return new Promise((resolve, reject) => {
       let params = {
         Body: JSON.stringify(value),

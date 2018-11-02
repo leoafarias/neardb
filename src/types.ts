@@ -1,7 +1,6 @@
 export interface IConfig {
-  type: string
   database: string
-  storage: any
+  cdnEndpoint?: string
   options?: {
     endpoint: string
     useSSL?: boolean
@@ -21,14 +20,4 @@ export type PathItem = {
 
 export type Payload = {
   [key: string]: any
-}
-
-export interface ISetOptions {
-  merge: boolean
-}
-
-export interface IStorage {
-  // get(): object
-  // set(): object
-  // add(): object
 }

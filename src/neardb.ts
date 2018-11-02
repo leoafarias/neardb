@@ -1,8 +1,9 @@
-import { IConfig, Payload, PathList, ISetOptions, IStorage } from './types'
+import { IConfig, Payload, PathList } from './types'
 import { uuid, buildPath } from './utils'
+import CloudStorage from './adapter/cloud'
+import axios, { AxiosInstance } from 'axios'
 
 const defaultConfig = {
-  type: 'cloud',
   database: 'testdb'
 }
 
@@ -27,16 +28,12 @@ export default class NearDB {
   constructor(config: IConfig, path?: PathList) {
     /** Check if config exists */
     if (!config) throw new Error('No config passed to NearDB')
-    /** Check if there is a storage set up */
-    if (!config.storage) {
-      throw new Error('No storage adapter configured')
-    }
 
     /** Overwrites config param with default configuration */
     this.config = Object.assign(defaultConfig, config)
 
     // TODO: define the type of storage in the config
-    this.adapter = new config.storage(config)
+    this.adapter = new CloudStorage(config)
     // Sets empty path type
     if (!path) path = []
     this.path = path
@@ -104,7 +101,7 @@ export default class NearDB {
    * Gets document data from the path provided in the scope.
    * @returns payload of the document requested
    */
-  get(): Promise<object> {
+  get(edge: boolean = true): Promise<object> {
     const lastPathIndex = this.path[this.path.length - 1]
     // Cannot get a sub-collection of a collection
     if (lastPathIndex && lastPathIndex.type !== 'doc') {
@@ -113,7 +110,13 @@ export default class NearDB {
 
     let docPath = buildPath(this.path)
 
-    return this.adapter.get(docPath)
+    // Get document from the if there is a CDN endpoint
+    if (this.config.cdnEndpoint && edge) {
+      return this.getRequest(docPath)
+    } else {
+      // Get it from cloud storage
+      return this.adapter.get(docPath)
+    }
   }
 
   /**
@@ -123,9 +126,9 @@ export default class NearDB {
    * options.merge will merge the data into existing document instead of overwriting.
    * @returns payload of the document requested
    */
-  set(value: Payload, options?: ISetOptions): Promise<object> {
+  set(value: Payload): Promise<object> {
     let docPath = buildPath(this.path)
-    if (options && options.merge) return this.update(value)
+
     return this.adapter.put(value, docPath)
   }
 
@@ -181,5 +184,19 @@ export default class NearDB {
     let newPath = [...this.path]
     let docPath = buildPath(newPath)
     return this.adapter.delete(docPath)
+  }
+
+  private async getRequest(path: string) {
+    try {
+      let http = axios.create({
+        baseURL: this.config.cdnEndpoint,
+        timeout: 1000,
+        headers: { 'X-Custom-Header': 'foobar' }
+      })
+      let { data } = await http.get(path)
+      return data
+    } catch (err) {
+      throw new Error(err)
+    }
   }
 }

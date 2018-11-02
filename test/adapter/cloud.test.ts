@@ -1,9 +1,10 @@
 import { config } from '../config'
+import CloudStorage from '../../src/adapter/cloud'
 
 jest.setTimeout(5000)
 
 describe('cloudstorage', () => {
-  const storage = config.storage.init(config)
+  const storage = CloudStorage.init(config)
 
   let value = {
     test: true,
@@ -13,7 +14,7 @@ describe('cloudstorage', () => {
   let path = 'data.json'
 
   it('Could not init CloudStorage', () => {
-    expect(storage).toBeInstanceOf(config.storage)
+    expect(storage).toBeInstanceOf(CloudStorage)
   })
 
   it('Save document', async () => {

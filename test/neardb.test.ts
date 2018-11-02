@@ -20,20 +20,23 @@ const data = {
 beforeAll(async () => {
   firstColRef = NearDB.database(config).collection('oneCol')
   firstDocRef = firstColRef.doc('oneDoc')
-  try {
-    let exists = await config.storage.init(config).bucketExists()
-    return
-  } catch (err) {
-    console.log(err)
-  }
+  // try {
+  //   let exists = await CloudStorage.init(config).bucketExists()
+  //   return
+  // } catch (err) {
+  //   console.log(err)
+  // }
 
-  await config.storage.init(config).createBucket()
+  // try {
+  //   await CloudStorage.init(config).createBucket()
+  // } catch (err) {
+  //   throw new Error(err)
+  // }
 })
 
 afterAll(async () => {
-  // await firstDocRef.delete()
   // await firstColRef.delete()
-  // return config.storage.init(config).deleteBucket()
+  // return CloudStorage.init(config).deleteBucket()
 })
 
 /**
@@ -46,19 +49,6 @@ describe('.database', () => {
 
   it('Config is set properly', () => {
     expect(config).toEqual(NearDB.database(config).config)
-  })
-
-  it('Cannot initialize without storage', () => {
-    const newConfig = Object.assign(config)
-    delete newConfig.storage
-
-    expect.assertions(1)
-
-    try {
-      NearDB.database(newConfig)
-    } catch (err) {
-      expect(err).toEqual(new Error('No storage adapter configured'))
-    }
   })
 })
 
@@ -102,10 +92,11 @@ describe('.doc', () => {
 
 describe('.set', async () => {
   it('Value can be set on new document', async () => {
-    expect.assertions(1)
-    let payload: any
-    payload = await firstDocRef.set(data)
+    expect.assertions(2)
+    let payload = await firstDocRef.set(data)
+    let result = await firstDocRef.get()
     expect(payload.ETag).toBeTruthy()
+    expect(result).toEqual(data)
   })
 
   it('Value can be set on existing document', async () => {
@@ -129,6 +120,12 @@ describe('.get', async () => {
     } catch (err) {
       expect(err).toEqual(new Error('Can only use get() method for documents'))
     }
+  })
+
+  it('Can get a document from cdn', async () => {
+    expect.assertions(1)
+    let payload = await firstDocRef.get()
+    expect(payload).toEqual(data)
   })
 })
 

@@ -1,12 +1,10 @@
-import CloudStorage from '../src/adapter/cloud'
 import { IConfig } from '../src/types'
 
 export const config: IConfig = {
-  type: 'cloud',
+  cdnEndpoint: 'https://d1jtmj5ipaftp0.cloudfront.net',
   database: 'testdb',
-  storage: CloudStorage,
   options: {
-    endpoint: 'https://play.minio.io:9000',
+    endpoint: 'play.minio.io:9000',
     useSSL: true,
     s3ForcePathStyle: true,
     signatureVersion: 'v4',
@@ -14,3 +12,16 @@ export const config: IConfig = {
     secretAccessKey: 'zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG'
   }
 }
+
+// export const config: IConfig = {
+//   cdnEndpoint: 'https://d1jtmj5ipaftp0.cloudfront.net',
+//   database: 'testdb',
+//   options: {
+//     endpoint: 'http://192.168.86.24:9000',
+//     useSSL: false,
+//     s3ForcePathStyle: true,
+//     signatureVersion: 'v4',
+//     accessKeyId: 'LC02CKR2P36U9098AQ98',
+//     secretAccessKey: 'e9WMdVjn_XtbrjjBEbdGg5kUEphmTIVhNgoBEKpT'
+//   }
+// }

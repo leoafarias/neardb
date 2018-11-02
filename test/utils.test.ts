@@ -16,6 +16,13 @@ describe('buildPath', () => {
     { type: 'collection', key: 'colTwo' }
   ]
 
+  it('Does not add .json to first document', () => {
+    const newPath = buildPath(docPath).split('/')
+    const item = newPath[newPath.length - 3].split('.')
+    expect(item[0]).toBe(docPath[docPath.length - 3].key)
+    expect(item[1]).toBe(undefined)
+  })
+
   it('Adds .json to last document', () => {
     const newPath = buildPath(docPath).split('/')
     const item = newPath[newPath.length - 1].split('.')

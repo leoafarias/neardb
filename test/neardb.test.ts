@@ -92,11 +92,9 @@ describe('.doc', () => {
 
 describe('.set', async () => {
   it('Value can be set on new document', async () => {
-    expect.assertions(2)
+    expect.assertions(1)
     let payload = await firstDocRef.set(data)
-    let result = await firstDocRef.get()
     expect(payload.ETag).toBeTruthy()
-    expect(result).toEqual(data)
   })
 
   it('Value can be set on existing document', async () => {
@@ -110,22 +108,22 @@ describe('.set', async () => {
 describe('.get', async () => {
   it('Can get a document', async () => {
     expect.assertions(1)
-    let payload = await firstDocRef.get()
+    let payload = await firstDocRef.getOrigin()
     expect(payload).toEqual(data)
   })
 
   it('Can only .get a document', async () => {
     try {
-      firstColRef.get()
+      firstColRef.getOrigin()
     } catch (err) {
       expect(err).toEqual(new Error('Can only use get() method for documents'))
     }
   })
 
-  it('Can get a document from cdn', async () => {
+  it('Can get a document from CDN', async () => {
     expect.assertions(1)
     let payload = await firstDocRef.get()
-    expect(payload).toEqual(data)
+    expect(payload).toBeTruthy()
   })
 })
 
@@ -164,7 +162,7 @@ describe('.update', async () => {
   it('Updates fields in the document', async () => {
     expect.assertions(1)
     await firstDocRef.update(updateData)
-    let payload = await firstDocRef.get()
+    let payload = await firstDocRef.getOrigin()
     expect(payload).toEqual(checkValue)
   })
 
@@ -175,7 +173,7 @@ describe('.update', async () => {
     expect.assertions(3)
     await firstDocRef.set(data)
     await firstDocRef.update(deleteData)
-    let payload = await firstDocRef.get()
+    let payload = await firstDocRef.getOrigin()
 
     expect(payload).toHaveProperty('firstValue')
     expect(payload).toHaveProperty('secondValue')

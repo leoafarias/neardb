@@ -101,7 +101,7 @@ export default class NearDB {
    * Gets document data from the path provided in the scope.
    * @returns payload of the document requested
    */
-  get(edge: boolean = true): Promise<object> {
+  get(origin?: boolean): Promise<object> {
     const lastPathIndex = this.path[this.path.length - 1]
     // Cannot get a sub-collection of a collection
     if (lastPathIndex && lastPathIndex.type !== 'doc') {
@@ -111,12 +111,20 @@ export default class NearDB {
     let docPath = buildPath(this.path)
 
     // Get document from the if there is a CDN endpoint
-    if (this.config.cdnEndpoint && edge) {
+    if (this.config.cdnEndpoint && !origin) {
       return this.getRequest(docPath)
     } else {
       // Get it from cloud storage
       return this.adapter.get(docPath)
     }
+  }
+
+  /**
+   * Gets document from origin from the path provided in the scope.
+   * @returns payload of the document requested
+   */
+  getOrigin() {
+    return this.get(true)
   }
 
   /**
@@ -141,7 +149,7 @@ export default class NearDB {
     // TODO: add ability to delete specific fields
     try {
       let doc: Payload
-      doc = await this.get()
+      doc = await this.getOrigin()
 
       for (let prop in value) {
         if (value && value[prop] === NearDB.field.deleteValue) {
@@ -186,14 +194,22 @@ export default class NearDB {
     return this.adapter.delete(docPath)
   }
 
+  /**
+   * Makes a get request to the CDN url
+   * @param path path to attach to cdn url on the request
+   * @returns json object from the request
+   */
+
   private async getRequest(path: string) {
     try {
       let http = axios.create({
         baseURL: this.config.cdnEndpoint,
-        timeout: 1000,
-        headers: { 'X-Custom-Header': 'foobar' }
+        timeout: 15000,
+        headers: { 'Accept-Encoding': 'gzip' }
       })
+
       let { data } = await http.get(path)
+
       return data
     } catch (err) {
       throw new Error(err)

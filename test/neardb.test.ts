@@ -108,13 +108,13 @@ describe('.set', async () => {
 describe('.get', async () => {
   it('Can get a document', async () => {
     expect.assertions(1)
-    let payload = await firstDocRef.getOrigin()
+    let payload = await firstDocRef.get({ source: 'origin' })
     expect(payload).toEqual(data)
   })
 
   it('Can only .get a document', async () => {
     try {
-      firstColRef.getOrigin()
+      firstColRef.get({ source: 'origin' })
     } catch (err) {
       expect(err).toEqual(new Error('Can only use get() method for documents'))
     }
@@ -162,7 +162,7 @@ describe('.update', async () => {
   it('Updates fields in the document', async () => {
     expect.assertions(1)
     await firstDocRef.update(updateData)
-    let payload = await firstDocRef.getOrigin()
+    let payload = await firstDocRef.get({ source: 'origin' })
     expect(payload).toEqual(checkValue)
   })
 
@@ -173,7 +173,7 @@ describe('.update', async () => {
     expect.assertions(3)
     await firstDocRef.set(data)
     await firstDocRef.update(deleteData)
-    let payload = await firstDocRef.getOrigin()
+    let payload = await firstDocRef.get({ source: 'origin' })
 
     expect(payload).toHaveProperty('firstValue')
     expect(payload).toHaveProperty('secondValue')

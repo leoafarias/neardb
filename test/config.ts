@@ -1,7 +1,7 @@
 import { IConfig } from '../src/types'
 
 export const config: IConfig = {
-  cdnEndpoint: 'https://d1jtmj5ipaftp0.cloudfront.net',
+  cdnEndpoint: 'http://cdn.bitwild.com',
   database: 'testdb',
   options: {
     endpoint: 'play.minio.io:9000',
@@ -14,7 +14,20 @@ export const config: IConfig = {
 }
 
 // export const config: IConfig = {
-//   cdnEndpoint: 'https://d1jtmj5ipaftp0.cloudfront.net',
+//   cdnEndpoint: 'http://cdn.bitwild.com',
+//   database: 'testdb',
+//   options: {
+//     endpoint: 'neardb-test-sao-paulo.s3.amazonaws.com',
+//     useSSL: true,
+//     s3ForcePathStyle: true,
+//     signatureVersion: 'v4'
+//     // accessKeyId: 'Q3AM3UQ867SPQQA43P2F',
+//     // secretAccessKey: 'zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG'
+//   }
+// }
+
+// export const config: IConfig = {
+//   cdnEndpoint: 'http://cdn.bitwild.com',
 //   database: 'testdb',
 //   options: {
 //     endpoint: 'http://192.168.86.24:9000',

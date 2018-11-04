@@ -4,11 +4,15 @@ export interface IConfig {
   options?: {
     endpoint: string
     useSSL?: boolean
-    accessKeyId: string
-    secretAccessKey: string
+    accessKeyId?: string
+    secretAccessKey?: string
     signatureVersion?: string
     s3ForcePathStyle?: boolean
   }
+}
+
+export type GetOptions = {
+  source: string
 }
 
 export type PathList = PathItem[]

@@ -6,7 +6,11 @@ import { uuid } from '../src/utils'
 
 config.database = 'testdb'
 
-jest.setTimeout(5000)
+function timeout(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+jest.setTimeout(15000)
 
 let setDB: any
 let firstColRef: any
@@ -114,7 +118,7 @@ describe('.get', async () => {
 
   it('Can only .get a document', async () => {
     try {
-      firstColRef.get({ source: 'origin' })
+      await firstColRef.get({ source: 'origin' })
     } catch (err) {
       expect(err).toEqual(new Error('Can only use get() method for documents'))
     }
@@ -184,11 +188,10 @@ describe('.update', async () => {
     expect.assertions(1)
 
     try {
-      await firstColRef.doc('newDoc').update(updateData)
+      let data = await firstColRef.doc(uuid()).update(updateData)
+      console.log(data)
     } catch (err) {
-      expect(err).toEqual(
-        new Error('NearDB.update: NoSuchKey: The specified key does not exist.')
-      )
+      expect(err.code).toEqual('NoSuchKey')
     }
   })
 })
@@ -198,5 +201,23 @@ describe('.delete', async () => {
     expect.assertions(1)
     let payload = await firstDocRef.delete()
     expect(payload).toEqual({})
+  })
+})
+
+describe('cache', async () => {
+  it('.setCache', async () => {
+    expect.assertions(2)
+    let payload = await firstDocRef.get()
+    expect(firstDocRef.cache.store).toEqual(payload)
+    expect(firstDocRef.cache.expires).toBeGreaterThan(new Date().getTime())
+  })
+
+  it('.hasCache', async () => {
+    expect.assertions(2)
+    await firstDocRef.get()
+    expect(firstDocRef.hasCache()).toEqual(true)
+    // TODO: make it dynamic
+    await timeout(51)
+    expect(firstDocRef.hasCache()).toEqual(false)
   })
 })

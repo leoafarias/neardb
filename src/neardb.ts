@@ -1,7 +1,7 @@
-import { IConfig, Payload, PathList, GetOptions } from './types'
+import { IConfig, Payload, Cache, PathList, GetOptions } from './types'
 import { uuid, buildPath } from './utils'
 import CloudStorage from './adapter/cloud'
-import axios, { AxiosInstance } from 'axios'
+import axios from 'axios'
 
 const defaultConfig = {
   database: 'testdb'
@@ -13,6 +13,9 @@ export default class NearDB {
 
   /** Data path that is used to interact with storage */
   path: PathList
+
+  /** Offline cache of data */
+  cache: Cache
 
   adapter: any
 
@@ -37,6 +40,9 @@ export default class NearDB {
     // Sets empty path type
     if (!path) path = []
     this.path = path
+
+    // Sets default cache values
+    this.cache = { store: {} as Payload, expires: 0 }
   }
 
   /**
@@ -102,7 +108,7 @@ export default class NearDB {
    * @param options sets options on how to get documents
    * @returns payload of the document requested
    */
-  get(options?: GetOptions): Promise<object> {
+  async get(options?: GetOptions): Promise<object> {
     const lastPathIndex = this.path[this.path.length - 1]
     // Cannot get a sub-collection of a collection
     if (lastPathIndex && lastPathIndex.type !== 'doc') {
@@ -110,13 +116,34 @@ export default class NearDB {
     }
 
     let docPath = buildPath(this.path)
+    let data: Payload
 
-    // Get document from the if there is a CDN endpoint
-    if (!this.config.cdnEndpoint || (options && options.source === 'origin')) {
-      return this.adapter.get(docPath)
-    } else {
-      // Get it from cloud storage
-      return this.getRequest(docPath)
+    try {
+      // Get document from the if there is a CDN endpoint
+
+      if (options && options.source === 'origin') {
+        // Source as origin
+        data = await this.adapter.get(docPath)
+        this.setCache(data)
+      } else if (this.hasCache()) {
+        // Get from in memory storage
+        data = this.cache.store
+      } else if (
+        // Edge and has cdn endpoint
+        (options && options.source === 'edge') ||
+        this.config.cdnEndpoint
+      ) {
+        // Get it from cloud storage
+        data = await this.getRequest(docPath)
+        this.setCache(data)
+      } else {
+        // Default case get from the origin
+        data = await this.adapter.get(docPath)
+      }
+
+      return data
+    } catch (err) {
+      throw err
     }
   }
 
@@ -138,12 +165,13 @@ export default class NearDB {
    * @param value expects payload to be stored for the document
    * @returns a promise for the payload requested
    */
-  async update(value: Payload): Promise<object> {
-    // TODO: add ability to delete specific fields
+  async update(value: Payload): Promise<Payload> {
     try {
       let doc: Payload
+      // Get the latest document from the origin
       doc = await this.get({ source: 'origin' })
 
+      // Loop through all property for custom object actions
       for (let prop in value) {
         if (value && value[prop] === NearDB.field.deleteValue) {
           delete value[prop]
@@ -153,9 +181,14 @@ export default class NearDB {
         }
       }
 
-      return await this.set(Object.assign(doc, value))
+      // Updates document
+      let payload = await this.set(Object.assign(doc, value))
+
+      // Stores payload in local cache
+      this.setCache(payload)
+      return payload
     } catch (err) {
-      throw new Error('NearDB.update: ' + err)
+      throw err
     }
   }
 
@@ -193,18 +226,54 @@ export default class NearDB {
    * @returns json object from the request
    */
 
-  private async getRequest(path: string) {
+  private async getRequest(path: string): Promise<Payload> {
     try {
       let http = axios.create({
         baseURL: this.config.cdnEndpoint,
         timeout: 15000
+        // headers: {
+        //   'Accept-Encoding': 'br'
+        // }
       })
 
       let { data } = await http.get(path)
 
       return data
     } catch (err) {
-      throw new Error(err)
+      throw err
+    }
+  }
+
+  /**
+   * Stores payload in NearDB instance
+   * @param data payload to store in memory
+   */
+  private setCache(data: Payload): void {
+    let expiration =
+      this.config && this.config.cacheExpiration
+        ? this.config.cacheExpiration
+        : 10000
+    this.cache = {
+      store: data,
+      expires: new Date().getTime() + expiration
+    }
+  }
+
+  /**
+   * Checks if there a valid cached payload
+   * @returns boolean
+   */
+  private hasCache() {
+    if (this.cache.store && this.cache.expires > new Date().getTime()) {
+      // Checks if there is a stored object, and that has not expired yet
+      return true
+    } else {
+      // Sets cache to default value
+      this.cache = {
+        store: {} as Payload,
+        expires: 0
+      }
+      return false
     }
   }
 }

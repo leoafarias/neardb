@@ -1,6 +1,7 @@
 export interface IConfig {
   database: string
   cdnEndpoint?: string
+  cacheExpiration?: number
   options?: {
     endpoint: string
     useSSL?: boolean
@@ -24,4 +25,9 @@ export type PathItem = {
 
 export type Payload = {
   [key: string]: any
+}
+
+export type Cache = {
+  store: Payload
+  expires: number
 }

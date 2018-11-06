@@ -3,6 +3,7 @@ import { IConfig } from '../src/types'
 export const config: IConfig = {
   cdnEndpoint: 'http://cdn.bitwild.com',
   database: 'testdb',
+  cacheExpiration: 50,
   options: {
     endpoint: 'play.minio.io:9000',
     useSSL: true,

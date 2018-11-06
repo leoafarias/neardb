@@ -7,5 +7,4 @@
 [![Coverage Status](https://coveralls.io/repos/github/leoafarias/neardb/badge.svg?branch=master)](https://coveralls.io/github/leoafarias/neardb?branch=master)
 
 Purpose: 
-NearDB is a simple document database, that leverages cloud storage, and cdn to deliver a database obtimized for edge computing.
-
+NearDB is a simple document database, that leverages cloud storage and CDN to deliver a database optimized for edge computing.

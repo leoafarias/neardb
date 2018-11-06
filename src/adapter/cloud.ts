@@ -43,19 +43,20 @@ export default class CloudStorage {
     })
   }
 
-  get(path: string) {
-    return new Promise((resolve, reject) => {
-      let params = {
-        Bucket: this.config.database,
-        Key: path
-      }
-      this.client.getObject(params, function(err, data) {
-        if (err) reject(err)
-        let payload = data && data.Body ? JSON.parse(data.Body.toString()) : {}
+  async get(path: string) {
+    let params = {
+      Bucket: this.config.database,
+      Key: path
+    }
 
-        resolve(payload)
-      })
-    })
+    let data: any
+
+    try {
+      data = await this.client.getObject(params).promise()
+      return data && data.Body ? JSON.parse(data.Body.toString()) : {}
+    } catch (err) {
+      throw err
+    }
   }
 
   delete(path: string) {
@@ -95,7 +96,7 @@ export default class CloudStorage {
     try {
       await this.createBucket()
     } catch (err) {
-      throw new Error(err)
+      throw err
     }
   }
 

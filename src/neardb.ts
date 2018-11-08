@@ -15,7 +15,7 @@ export default class NearDB {
   path: PathList
 
   /** Offline cache of data */
-  cache: Cache
+  cache: Cache | null
 
   adapter: any
 
@@ -42,7 +42,7 @@ export default class NearDB {
     this.path = path
 
     // Sets default cache values
-    this.cache = { store: {} as Payload, expires: 0 }
+    this.cache = null
   }
 
   /**
@@ -127,7 +127,7 @@ export default class NearDB {
         this.setCache(data)
       } else if (this.hasCache()) {
         // Get from in memory storage
-        data = this.cache.store
+        data = this.cache!.store
       } else if (
         // Edge and has cdn endpoint
         (options && options.source === 'edge') ||
@@ -264,15 +264,12 @@ export default class NearDB {
    * @returns boolean
    */
   private hasCache() {
-    if (this.cache.store && this.cache.expires > new Date().getTime()) {
+    if (this.cache!.store && this.cache!.expires > new Date().getTime()) {
       // Checks if there is a stored object, and that has not expired yet
       return true
     } else {
       // Sets cache to default value
-      this.cache = {
-        store: {} as Payload,
-        expires: 0
-      }
+      this.cache = null
       return false
     }
   }

@@ -6,9 +6,9 @@
 
 ## Motivation
 
-While working on building edge applications for higher performance and lower latency I found a need to store persistent data also on edge.
+While working on building edge applications for higher performance and lower latency there is a need store persistent data also on edge.
 
-During research, I validated multiple distributed database solutions but found they were very involved and costly while not being able to provide a very high global footprint.
+There are multiple distributed database solutions but they are very involved and costly while having a much lower global footprint than a CDN.
 
 The idea came up to leverage ubiquitous and mature infrastructure like cloud storage and CDNs to deliver a persistent data solution from the edge.
 

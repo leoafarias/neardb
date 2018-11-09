@@ -18,10 +18,17 @@ The idea came up to leverage ubiquitous and mature infrastructure like cloud sto
 * [Lambda@Edge](https://aws.amazon.com/lambda/edge/) - Run Lambda functions on CloudFront
 * [Fly.io](https://fly.io) - Javascript at the edge
 
+#### Works with the following for database storage:
+* [AWS S3](https://aws.amazon.com/s3/)
+* [Google Cloud Storage](https://cloud.google.com/storage/)
+* [Digital Ocean Spaces](https://www.digitalocean.com/products/spaces/)
+* [Minio](https://www.minio.io/)
+* any other S3 API compatible storage service
+
 
 #### Who is this for?
 
-This is perfect for persistent data that is read frequently and  needs to be avaialble on the edge application to deliver very low while keeping the costs low. Some examples of the best uses are:
+This is perfect for persistent data that is read frequently and  needs to be avaialble on the edge application to deliver dynamic data while keeping the costs low. Some examples of the best uses are:
 - Key-value
 - Configuration
 - Cached data
@@ -30,13 +37,10 @@ This is perfect for persistent data that is read frequently and  needs to be ava
 
 - You plan on using this as your primary database for an app that has complex data needs. 
 - You need transactions. (I have some ideas on how to accomplish this, but its currently not implemented.)
-- Do many writes/sec in the same document. Reads are incredibly efficient, fast and inexpensive; however, writes are always in the origin.
+- Do many writes/sec in the same document. Reads are incredibly efficient, fast and inexpensive; however, writes are always at the origin.
 
 
 ### Installing
-
-A step by step series of examples that tell you how to get a development env running
-
 
 ```bash
 npm install neardb

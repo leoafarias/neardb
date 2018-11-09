@@ -51,6 +51,17 @@ import Neardb from 'neardb'
 const config = {
     database: 'bucketName'
     //...
+    // These options will change by the final release to provide more control
+    // cdnEndpoint?: string
+    // cacheExpiration?: number
+    // options?: {
+    //     endpoint: string
+    //     useSSL?: boolean
+    //     accessKeyId?: string
+    //     secretAccessKey?: string
+    //     signatureVersion?: string
+    //     s3ForcePathStyle?: boolean
+    // }
 }
 
 const neardb = NearDB.database(config);

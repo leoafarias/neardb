@@ -1,5 +1,5 @@
 
-# WIP: NearDB
+# NearDB
 
 >NearDB is a simple database that leverages cloud infrastructure like document storage and CDN to deliver an inexpensive unbelievably scalable document database optimized for reads and perfect for edge applications.
 
@@ -31,7 +31,7 @@ This is perfect for persistent data that is read frequently and  needs to be ava
 
 - You plan on using this as your primary database for an app that has complex data needs. 
 - You need transactions. (I have some ideas on how to accomplish this, but its currently not implemented.)
-- Do many writes/sec in the same document. Reads are incredibly efficient, fast and inexpensive; however, writes are inefficient
+- Do many writes/sec in the same document. Reads are incredibly efficient, fast and inexpensive; however, writes are always in the origin.
 
 
 ### Installing
@@ -91,6 +91,12 @@ nearDB.collection('states').doc('ny').set({
     eastCoast: true
 })
 ```
+If you wish to update fields within a document without overwriting all the data you should use *update*
+```typescript
+nearDB.collection('states').doc('ny').update({
+    eastCoast: true
+})
+```
 
 ### Delete a Document
 By using *set* if the document does not exist it will create it. If it does exist you can use set to overwrite the whole document.
@@ -98,12 +104,6 @@ By using *set* if the document does not exist it will create it. If it does exis
 nearDB.collection('states').doc('ny').delete()
 ```
 
-If you wish to update fields within a document without overwriting all the data you should use *update*
-```typescript
-nearDB.collection('states').doc('ny').update({
-    eastCoast: true
-})
-```
 ### Get a Document
 You can get the content of a single document by using *get*
 ```typescript

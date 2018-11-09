@@ -125,17 +125,17 @@ export default class NearDB {
         // Source as origin
         data = await this.adapter.get(docPath)
         this.setCache(data)
-      } else if (this.hasCache()) {
-        // Get from in memory storage
-        data = this.cache!.store
       } else if (
         // Edge and has cdn endpoint
         (options && options.source === 'edge') ||
-        this.config.cdnEndpoint
+        (this.config.cdnEndpoint && !this.hasCache())
       ) {
         // Get it from cloud storage
         data = await this.getRequest(docPath)
         this.setCache(data)
+      } else if (this.hasCache()) {
+        // Get from in memory storage
+        data = this.cache!.store
       } else {
         // Default case get from the origin
         data = await this.adapter.get(docPath)

@@ -11,7 +11,7 @@ While working on building edge applications for higher performance and lower lat
 
 During research, I validated multiple distributed database solutions but found they were very involved and costly while not being able to provide a very high global footprint.
 
-The idea came up to leverage ubiquitous and mature infrastructure like cloud storage and a content delivery network to deliver a persistent data solution from the edge.
+The idea came up to leverage ubiquitous and mature infrastructure like cloud storage and CDNs to deliver a persistent data solution from the edge.
 
 #### Use with Edge Apps/Functions
 * [Zeit Now](https://zeit.co/now) - Global Serverless Deployments
@@ -41,11 +41,7 @@ A step by step series of examples that tell you how to get a development env run
 
 ```bash
 npm install neardb
-```
-
-or
-
-```bash
+# or
 yarn add neardb
 ```
 
@@ -59,9 +55,81 @@ const config = {
 }
 
 const neardb = NearDB.database(config);
+```
+### References
+You are able to store the reference of a collection or document, and use the reference when interacting with them.
+```typescript
+const statesRef = nearDB.collection('states');
 
+const nyRef = nearDB.collection('states').doc('ny')
+```
+### Add a Document
+By using set for document creation  allows you to *set* the document id
+```typescript
+
+nearDB.collection('states').doc('ny').set({
+    name: 'New York',
+    population: 19849399,
+    largestCity: 'New York City'
+})
+```
+By calling *add* on the collection a document id is auto-generated
+```typescript
+nearDB.collection('states').add({
+    name: 'New York',
+    population: 19849399,
+    largestCity: 'New York City'
+})
+```
+### Update a Document
+By using *set* if the document does not exist it will create it. If it does exist you can use set to overwrite the whole document.
+```typescript
+nearDB.collection('states').doc('ny').set({
+    name: 'New York',
+    population: 19849399,
+    largestCity: 'New York City',
+    eastCoast: true
+})
 ```
 
+### Delete a Document
+By using *set* if the document does not exist it will create it. If it does exist you can use set to overwrite the whole document.
+```typescript
+nearDB.collection('states').doc('ny').delete()
+```
+
+If you wish to update fields within a document without overwriting all the data you should use *update*
+```typescript
+nearDB.collection('states').doc('ny').update({
+    eastCoast: true
+})
+```
+### Get a Document
+You can get the content of a single document by using *get*
+```typescript
+nearDB.collection('states').doc('ny').get()
+```
+
+There a few options that you are able to pass on get depending where you want to get the data from.
+
+By default *get* will try to retrieve the document the following way.
+1.  Get local data if it exists and has not expired
+2. If CDN is configured will get from there
+3. If there is no local cache and CDN is not configured, it will get from the origin. 
+
+There are a few options you are able to pass to force where you get the data from.
+```typescript
+const options = {
+    // Gets data from origin even if 
+    // there is local cache and a cdn configured
+    source: 'origin' 
+
+    // Gets data from edge even if 
+    // there is local cache and a cdn configured
+    // source: 'edge' 
+}
+nearDB.collection('states').doc('ny').get(options)
+```
 ## Running the tests
 
 ```bash
@@ -73,14 +141,12 @@ npm run test
 * [aws sdk](https://github.com/aws/aws-sdk-js) - AWS SDK for JavaScript in the browser and node.js
 * [axios](https://github.com/axios/axios) - Promise based HTTP client for the browser and node.js
 
+## Inspiration
+The design of NearDBs API is heavily inspired by [Firestore](https://firebase.google.com/docs/firestore/).
+
 ## Contributing
 
 Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
-
-
-## Authors
-
-* [leoafarias](https://github.com/leoafarias)
 
 ## License
 

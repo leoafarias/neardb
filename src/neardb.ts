@@ -138,7 +138,7 @@ export default class NearDB {
       } else if (
         // Edge and has cdn endpoint
         (options && options.source === 'edge') ||
-        (this.config.cdn!.url! && !this.hasCache())
+        (this.config.cdn!.url && !this.hasCache())
       ) {
         // Get it from cloud storage
         data = await this.getRequest(docPath)

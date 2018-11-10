@@ -1,8 +1,13 @@
 export interface IConfig {
   database: string
-  cdnEndpoint?: string
+  cdn?: {
+    url: string
+    headers?: {
+      [key: string]: string
+    }
+  }
   cacheExpiration?: number
-  options?: {
+  storage?: {
     endpoint: string
     useSSL?: boolean
     accessKeyId?: string

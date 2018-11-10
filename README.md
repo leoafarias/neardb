@@ -112,8 +112,15 @@ nearDB.collection('states').doc('ny').update({
 })
 ```
 
+To delete a value without overwriting the whole document you the following helper constant
+```typescript
+nearDB.collection('states').doc('ny').update({
+    eastCoast: NearDB.field.deleteValue
+})
+```
+
 ### Delete a Document
-By using *set* if the document does not exist it will create it. If it does exist you can use set to overwrite the whole document.
+By using *delete* the whole document will be deleted from the bucket
 ```typescript
 nearDB.collection('states').doc('ny').delete()
 ```

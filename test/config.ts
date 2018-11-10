@@ -1,41 +1,19 @@
 import { IConfig } from '../src/types'
 
+// TODO: AWS S3 Mocking
+// These are public minio keys
 export const config: IConfig = {
-  cdnEndpoint: 'http://cdn.bitwild.com',
+  cdn: {
+    url: 'https://d1pgfx9dotquaq.cloudfront.net'
+  },
   database: 'testdb',
   cacheExpiration: 50,
-  options: {
+  storage: {
     endpoint: 'play.minio.io:9000',
     useSSL: true,
     s3ForcePathStyle: true,
     signatureVersion: 'v4',
-    accessKeyId: 'Q3AM3UQ867SPQQA43P2F',
-    secretAccessKey: 'zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG'
+    accessKeyId: 'Q3AM3UQ867SPQQA43P2F', // these a public minio keys so dont worry
+    secretAccessKey: 'zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG' // these a public minio secret so dont worry
   }
 }
-
-// export const config: IConfig = {
-//   cdnEndpoint: 'http://cdn.bitwild.com',
-//   database: 'testdb',
-//   options: {
-//     endpoint: 'neardb-test-sao-paulo.s3.amazonaws.com',
-//     useSSL: true,
-//     s3ForcePathStyle: true,
-//     signatureVersion: 'v4'
-//     // accessKeyId: 'Q3AM3UQ867SPQQA43P2F',
-//     // secretAccessKey: 'zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG'
-//   }
-// }
-
-// export const config: IConfig = {
-//   cdnEndpoint: 'http://cdn.bitwild.com',
-//   database: 'testdb',
-//   options: {
-//     endpoint: 'http://192.168.86.24:9000',
-//     useSSL: false,
-//     s3ForcePathStyle: true,
-//     signatureVersion: 'v4',
-//     accessKeyId: 'LC02CKR2P36U9098AQ98',
-//     secretAccessKey: 'e9WMdVjn_XtbrjjBEbdGg5kUEphmTIVhNgoBEKpT'
-//   }
-// }

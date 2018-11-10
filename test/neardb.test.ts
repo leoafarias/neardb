@@ -2,7 +2,7 @@ import NearDB from '../src/neardb'
 import { IConfig, PathList } from '../src/types'
 import CloudStorage from '../src/adapter/cloud'
 import { config } from './config'
-import { uuid } from '../src/utils'
+import { uuid, reservedKey } from '../src/utils'
 
 config.database = 'testdb'
 
@@ -73,9 +73,16 @@ describe('.collection', () => {
     const lastPathIndex = path[path.length - 1]
     expect(lastPathIndex).toEqual({ type: 'collection', key: 'oneCol' })
   })
+
+  it('Cannot create collection wtih reserved key', async () => {
+    const check = () => {
+      NearDB.database(config).collection('collection')
+    }
+    expect(check).toThrowError('collection: is a reserved keyword')
+  })
 })
 
-describe('.doc', () => {
+describe('.doc', async () => {
   it('Returns NearDB instance', () => {
     expect(firstDocRef).toBeInstanceOf(NearDB)
   })
@@ -91,6 +98,13 @@ describe('.doc', () => {
     const { path } = firstDocRef
     const lastPathIndex = path[path.length - 1]
     expect(lastPathIndex).toEqual({ type: 'doc', key: 'oneDoc' })
+  })
+
+  it('Cannot create doc wtih reserved key', async () => {
+    const check = () => {
+      firstDocRef.doc('doc')
+    }
+    expect(check).toThrowError('doc: is a reserved keyword')
   })
 })
 

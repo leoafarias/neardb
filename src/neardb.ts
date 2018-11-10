@@ -1,10 +1,10 @@
 import { IConfig, Payload, Cache, PathList, GetOptions } from './types'
-import { uuid, buildPath } from './utils'
+import { uuid, documentPath, reservedKey } from './utils'
 import CloudStorage from './adapter/cloud'
 import axios from 'axios'
 
 const defaultConfig = {
-  database: 'testdb'
+  database: ''
 }
 
 export default class NearDB {
@@ -19,6 +19,7 @@ export default class NearDB {
 
   adapter: any
 
+  // Constants used for document update
   static field = {
     deleteValue: 'NEARDB.FIELD.DELETE'
   }
@@ -62,6 +63,11 @@ export default class NearDB {
    */
 
   collection(key: string): NearDB {
+    // Check if this is a reserved keyword
+    if (reservedKey(key)) {
+      throw new Error(key + ': is a reserved keyword')
+    }
+
     // Copy value of path before passing, to avoid poluting scope
     let newPath = [...this.path]
 
@@ -86,6 +92,10 @@ export default class NearDB {
    */
 
   doc(key: string): NearDB {
+    // Check if this is a reserved keyword
+    if (reservedKey(key)) {
+      throw new Error(key + ': is a reserved keyword')
+    }
     // Copy value of path before passing, to avoid poluting this scope
     let newPath = [...this.path]
 
@@ -115,7 +125,7 @@ export default class NearDB {
       throw new Error('Can only use get() method for documents')
     }
 
-    let docPath = buildPath(this.path)
+    let docPath = documentPath(this.path)
     let data: Payload
 
     try {
@@ -128,7 +138,7 @@ export default class NearDB {
       } else if (
         // Edge and has cdn endpoint
         (options && options.source === 'edge') ||
-        (this.config.cdnEndpoint && !this.hasCache())
+        (this.config.cdn!.url && !this.hasCache())
       ) {
         // Get it from cloud storage
         data = await this.getRequest(docPath)
@@ -155,7 +165,7 @@ export default class NearDB {
    * @returns payload of the document requested
    */
   set(value: Payload): Promise<object> {
-    let docPath = buildPath(this.path)
+    let docPath = documentPath(this.path)
 
     return this.adapter.put(value, docPath)
   }
@@ -206,7 +216,7 @@ export default class NearDB {
 
     newPath.push({ type: 'doc', key: uuid() })
 
-    let docPath = buildPath(newPath)
+    let docPath = documentPath(newPath)
     return this.adapter.put(value, docPath)
   }
 
@@ -216,7 +226,7 @@ export default class NearDB {
    */
   delete() {
     let newPath = [...this.path]
-    let docPath = buildPath(newPath)
+    let docPath = documentPath(newPath)
     return this.adapter.delete(docPath)
   }
 
@@ -229,11 +239,9 @@ export default class NearDB {
   private async getRequest(path: string): Promise<Payload> {
     try {
       let http = axios.create({
-        baseURL: this.config.cdnEndpoint,
-        timeout: 15000
-        // headers: {
-        //   'Accept-Encoding': 'br'
-        // }
+        baseURL: this.config.cdn!.url,
+        timeout: 15000,
+        headers: this.config.cdn!.headers
       })
 
       let { data } = await http.get(path)

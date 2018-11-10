@@ -11,13 +11,13 @@ export default class CloudStorage {
     if (!config.database) {
       throw new Error('No config database to cloudstorage')
     }
-    if (!config.options) {
+    if (!config.storage) {
       throw new Error('No options options in the config')
     }
 
     this.config = config
 
-    this.client = new S3(config.options)
+    this.client = new S3(config.storage)
   }
 
   static init(config: IConfig) {

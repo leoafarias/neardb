@@ -1,5 +1,5 @@
 import { IConfig, Payload, Cache, PathList, GetOptions } from './types'
-import { uuid, buildPath } from './utils'
+import { uuid, documentPath, reservedKey } from './utils'
 import CloudStorage from './adapter/cloud'
 import axios from 'axios'
 
@@ -62,6 +62,11 @@ export default class NearDB {
    */
 
   collection(key: string): NearDB {
+    // Check if this is a reserved keyword
+    if (reservedKey(key)) {
+      throw new Error(key + ' is a reserved keyword')
+    }
+
     // Copy value of path before passing, to avoid poluting scope
     let newPath = [...this.path]
 
@@ -86,6 +91,10 @@ export default class NearDB {
    */
 
   doc(key: string): NearDB {
+    // Check if this is a reserved keyword
+    if (reservedKey(key)) {
+      throw new Error(key + ' is a reserved keyword')
+    }
     // Copy value of path before passing, to avoid poluting this scope
     let newPath = [...this.path]
 
@@ -115,7 +124,7 @@ export default class NearDB {
       throw new Error('Can only use get() method for documents')
     }
 
-    let docPath = buildPath(this.path)
+    let docPath = documentPath(this.path)
     let data: Payload
 
     try {
@@ -155,7 +164,7 @@ export default class NearDB {
    * @returns payload of the document requested
    */
   set(value: Payload): Promise<object> {
-    let docPath = buildPath(this.path)
+    let docPath = documentPath(this.path)
 
     return this.adapter.put(value, docPath)
   }
@@ -206,7 +215,7 @@ export default class NearDB {
 
     newPath.push({ type: 'doc', key: uuid() })
 
-    let docPath = buildPath(newPath)
+    let docPath = documentPath(newPath)
     return this.adapter.put(value, docPath)
   }
 
@@ -216,7 +225,7 @@ export default class NearDB {
    */
   delete() {
     let newPath = [...this.path]
-    let docPath = buildPath(newPath)
+    let docPath = documentPath(newPath)
     return this.adapter.delete(docPath)
   }
 

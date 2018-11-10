@@ -1,13 +1,6 @@
-import { PathItem, PathList } from './types'
+import { PathList } from './types'
 
-// export function traversePath(key: string) {
-//   const list = path.key.split('/')
-//   if (!list[0]) list.shift()
-//   if (!list[list.length - 1]) list.pop()
-//   return list
-// }
-
-export function buildPath(path: PathList) {
+export function documentPath(path: PathList) {
   let pathArray = path.map((item, index) => {
     if (path.length === index + 1) {
       // This is the last item
@@ -21,6 +14,21 @@ export function buildPath(path: PathList) {
   })
 
   return pathArray.join('/')
+}
+
+export function reservedKey(keyword: string) {
+  const reservedKeyWords: { [key: string]: boolean } = {
+    _meta: true,
+    collection: true,
+    doc: true,
+    indices: true
+  }
+
+  if (reservedKeyWords[keyword]) {
+    return true
+  } else {
+    return false
+  }
 }
 
 export function uuid() {

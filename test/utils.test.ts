@@ -1,8 +1,8 @@
-import { buildPath } from '../src/utils'
+import { documentPath } from '../src/utils'
 
 jest.setTimeout(5000)
 
-describe('buildPath', () => {
+describe('documentPath', () => {
   const docPath = [
     { type: 'collection', key: 'colOne' },
     { type: 'doc', key: 'docOne' },
@@ -17,21 +17,21 @@ describe('buildPath', () => {
   ]
 
   it('Does not add .json to first document', () => {
-    const newPath = buildPath(docPath).split('/')
+    const newPath = documentPath(docPath).split('/')
     const item = newPath[newPath.length - 3].split('.')
     expect(item[0]).toBe(docPath[docPath.length - 3].key)
     expect(item[1]).toBe(undefined)
   })
 
   it('Adds .json to last document', () => {
-    const newPath = buildPath(docPath).split('/')
+    const newPath = documentPath(docPath).split('/')
     const item = newPath[newPath.length - 1].split('.')
     expect(item[0]).toBe(docPath[docPath.length - 1].key)
     expect(item[1]).toBe('json')
   })
 
   it('Does not add .json to collection', () => {
-    const newPath = buildPath(colPath).split('/')
+    const newPath = documentPath(colPath).split('/')
     const item = newPath[newPath.length - 1].split('.')
 
     expect('collection').toBe(colPath[colPath.length - 1].type)

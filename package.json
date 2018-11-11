@@ -1,6 +1,6 @@
 {
   "name": "neardb",
-  "version": "0.0.1-dev",
+  "version": "0.0.3",
   "description": "",
   "keywords": ["database", "edge", "cdn", "s3", "db", "cache", "key-value"],
   "main": "dist/neardb.umd.js",

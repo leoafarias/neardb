@@ -13,32 +13,30 @@ There are multiple distributed database solutions but they are very involved and
 The idea came up to leverage ubiquitous and mature infrastructure like cloud storage and CDNs to deliver a persistent data solution from the edge.
 
 #### Use with Edge Apps/Functions
-* [Zeit Now](https://zeit.co/now) - Global Serverless Deployments
-* [Cloudflare Workers](https://www.cloudflare.com/products/cloudflare-workers/) - Serverless applications on Cloudflare's global network
-* [Lambda@Edge](https://aws.amazon.com/lambda/edge/) - Run Lambda functions on CloudFront
-* [Fly.io](https://fly.io) - Javascript at the edge
+*   [Zeit Now](https://zeit.co/now) - Global Serverless Deployments
+*   [Cloudflare Workers](https://www.cloudflare.com/products/cloudflare-workers/) - Serverless applications on Cloudflare's global network
+*   [Lambda@Edge](https://aws.amazon.com/lambda/edge/) - Run Lambda functions on CloudFront
+*   [Fly.io](https://fly.io) - Javascript at the edge
 
-#### Works with the following for database storage:
-* [AWS S3](https://aws.amazon.com/s3/)
-* [Google Cloud Storage](https://cloud.google.com/storage/)
-* [Digital Ocean Spaces](https://www.digitalocean.com/products/spaces/)
-* [Minio](https://www.minio.io/)
-* any other S3 API compatible storage service
-
+#### Works with the following for database storage
+*   [AWS S3](https://aws.amazon.com/s3/)
+*   [Google Cloud Storage](https://cloud.google.com/storage/)
+*   [Digital Ocean Spaces](https://www.digitalocean.com/products/spaces/)
+*   [Minio](https://www.minio.io/)
+*   any S3 API compatible storage service
 
 #### Who is this for?
 
 This is perfect for persistent data that is read frequently and  needs to be avaialble on the edge application to deliver dynamic data while keeping the costs low. Some examples of the best uses are:
-- Key-value
-- Configuration
-- Cached data
+*   Key-value
+*   Configuration
+*   Cached data
 
-#### Probably not for you if...
+#### Probably not for you if
 
-- You plan on using this as your primary database for an app that has complex data needs. 
-- You need transactions. (I have some ideas on how to accomplish this, but its currently not implemented.)
-- Do many writes/sec in the same document. Reads are incredibly efficient, fast and inexpensive; however, writes are always at the origin.
-
+*   You plan on using this as your primary database for an app that has complex data needs. 
+*   You need transactions. (I have some ideas on how to accomplish this, but its currently not implemented.)
+*   Do many writes/sec in the same document. Reads are incredibly efficient, fast and inexpensive; however, writes are always at the origin.
 
 ### Installing
 

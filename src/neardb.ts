@@ -19,6 +19,9 @@ export default class NearDB {
 
   adapter: any
 
+  // Adds private functions for testing purposes
+  __PRIVATE__: object
+
   // Constants used for document update
   static field = {
     deleteValue: 'NEARDB.FIELD.DELETE'
@@ -44,6 +47,13 @@ export default class NearDB {
 
     // Sets default cache values
     this.cache = null
+
+    // Sets private methods for testing usage
+    this.__PRIVATE__ = {
+      hasCache: this.hasCache,
+      setCache: this.setCache,
+      getRequest: this.getRequest
+    }
   }
 
   /**

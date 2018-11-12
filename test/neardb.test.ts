@@ -235,3 +235,5 @@ describe('cache', async () => {
     expect(firstDocRef.hasCache()).toEqual(false)
   })
 })
+
+describe('getRequest', async () => {})

@@ -24,6 +24,7 @@ const data = {
 beforeAll(async () => {
   firstColRef = NearDB.database(config).collection('oneCol')
   firstDocRef = firstColRef.doc('oneDoc')
+  await firstDocRef.set(data)
   // try {
   //   let exists = await CloudStorage.init(config).bucketExists()
   //   return
@@ -36,10 +37,6 @@ beforeAll(async () => {
   // } catch (err) {
   //   throw new Error(err)
   // }
-})
-
-beforeEach(async () => {
-  await firstDocRef.set(data)
 })
 
 afterAll(async () => {

@@ -140,7 +140,6 @@ export default class NearDB {
 
     try {
       // Get document from the if there is a CDN endpoint
-
       if (options && options.source === 'origin') {
         // Source as origin
         data = await this.adapter.get(docPath)
@@ -155,7 +154,7 @@ export default class NearDB {
         this.setCache(data)
       } else if (this.hasCache()) {
         // Get from in memory storage
-        data = this.cache && this.cache.store ? this.cache.store : {}
+        data = this.cache!.store
       } else {
         // Default case get from the origin
         data = await this.adapter.get(docPath)
@@ -194,6 +193,7 @@ export default class NearDB {
       // Loop through all property for custom object actions
       for (let prop in value) {
         if (value && value[prop] === NearDB.field.deleteValue) {
+          // If has delevalue action, delete the prop
           delete value[prop]
           if (doc && doc[prop]) {
             delete doc[prop]

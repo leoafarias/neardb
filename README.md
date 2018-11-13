@@ -54,9 +54,16 @@ const config = {
     database: 'bucketName'
     //...
     // These options will change by the final release to provide more control
-    // cdnEndpoint?: string
+    
+    // database: string
+    // cdn?: {
+    //     url: string
+    //     headers?: {
+    //     [key: string]: string
+    //     }
+    // }
     // cacheExpiration?: number
-    // options?: {
+    // storage?: {
     //     endpoint: string
     //     useSSL?: boolean
     //     accessKeyId?: string

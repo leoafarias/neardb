@@ -155,7 +155,7 @@ export default class NearDB {
         this.setCache(data)
       } else if (this.hasCache()) {
         // Get from in memory storage
-        data = this.cache!.store
+        data = this.cache && this.cache.store ? this.cache.store : {}
       } else {
         // Default case get from the origin
         data = await this.adapter.get(docPath)
@@ -282,7 +282,11 @@ export default class NearDB {
    * @returns boolean
    */
   private hasCache() {
-    if (this.cache!.store && this.cache!.expires > new Date().getTime()) {
+    if (
+      this.cache &&
+      this.cache.store &&
+      this.cache.expires > new Date().getTime()
+    ) {
       // Checks if there is a stored object, and that has not expired yet
       return true
     } else {

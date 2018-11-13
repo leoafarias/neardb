@@ -38,6 +38,10 @@ beforeAll(async () => {
   // }
 })
 
+beforeEach(async () => {
+  await firstDocRef.set(data)
+})
+
 afterAll(async () => {
   // await firstColRef.delete()
   // return CloudStorage.init(config).deleteBucket()
@@ -236,4 +240,18 @@ describe('cache', async () => {
   })
 })
 
-describe('getRequest', async () => {})
+describe('getRequest', async () => {
+  it('valid request', async () => {
+    expect.assertions(2)
+    let payload = await firstDocRef.get()
+    expect(firstDocRef.cache.store).toEqual(payload)
+    expect(firstDocRef.cache.expires).toBeGreaterThan(new Date().getTime())
+  })
+
+  it('invalid request', async () => {
+    expect.assertions(2)
+    let payload = await firstDocRef.get()
+    expect(firstDocRef.cache.store).toEqual(payload)
+    expect(firstDocRef.cache.expires).toBeGreaterThan(new Date().getTime())
+  })
+})

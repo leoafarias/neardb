@@ -12,7 +12,7 @@ There are multiple distributed database solutions but they are very involved and
 
 The idea came up to leverage ubiquitous and mature infrastructure like cloud storage and CDNs to deliver a persistent data solution from the edge.
 
-#### Use with Edge Apps/Functions
+### Use with Edge Apps/Functions
 *   [Zeit Now](https://zeit.co/now) - Global Serverless Deployments
 *   [Cloudflare Workers](https://www.cloudflare.com/products/cloudflare-workers/) - Serverless applications on Cloudflare's global network
 *   [Lambda@Edge](https://aws.amazon.com/lambda/edge/) - Run Lambda functions on CloudFront
@@ -25,7 +25,7 @@ The idea came up to leverage ubiquitous and mature infrastructure like cloud sto
 *   [Minio](https://www.minio.io/)
 *   any S3 API compatible storage service
 
-#### Who is this for?
+#### Who is this for
 
 This is perfect for persistent data that is read frequently and  needs to be avaialble on the edge application to deliver dynamic data while keeping the costs low. Some examples of the best uses are:
 *   Key-value
@@ -54,7 +54,7 @@ const config = {
     database: 'bucketName'
     //...
     // These options will change by the final release to provide more control
-    
+
     // database: string
     // cdn?: {
     //     url: string
@@ -164,8 +164,8 @@ npm run test
 
 ## Dependencies
 
-* [aws sdk](https://github.com/aws/aws-sdk-js) - AWS SDK for JavaScript in the browser and node.js
-* [axios](https://github.com/axios/axios) - Promise based HTTP client for the browser and node.js
+*   [aws sdk](https://github.com/aws/aws-sdk-js) - AWS SDK for JavaScript in the browser and node.js
+*   [axios](https://github.com/axios/axios) - Promise based HTTP client for the browser and node.js
 
 ## Inspiration
 The design of NearDBs API is heavily inspired by [Firestore](https://firebase.google.com/docs/firestore/).

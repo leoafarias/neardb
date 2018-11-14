@@ -1,6 +1,11 @@
 import { PathList } from './types'
 
-export function documentPath(path: PathList) {
+/**
+ * Builds a document url out of the array of path item
+ * @param path an array of the path, to build final url
+ * @returns string of the final path with extension of the document
+ */
+export function documentPath(path: PathList): string {
   let pathArray = path.map((item, index) => {
     if (path.length === index + 1) {
       // This is the last item
@@ -16,6 +21,11 @@ export function documentPath(path: PathList) {
   return pathArray.join('/')
 }
 
+/**
+ * Check if key that is used for document or collection is reserved
+ * @param keyword to check
+ * @returns true if its a reserved key
+ */
 export function reservedKey(keyword: string) {
   const reservedKeyWords: { [key: string]: boolean } = {
     _meta: true,
@@ -31,6 +41,10 @@ export function reservedKey(keyword: string) {
   }
 }
 
+/**
+ * Creates a random uuid
+ * @returns an uuid
+ */
 export function uuid() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
     const r = (Math.random() * 16) | 0

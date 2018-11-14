@@ -167,10 +167,8 @@ export default class NearDB {
   }
 
   /**
-   * Gets document data from the path provided in the scope.
+   * Sets document data from the path provided in the scope.
    * @param value expects payload to be stored for the document
-   * @param options that can be passed on how you want to store the data
-   * options.merge will merge the data into existing document instead of overwriting.
    * @returns payload of the document requested
    */
   set(value: Payload): Promise<object> {

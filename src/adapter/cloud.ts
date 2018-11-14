@@ -24,23 +24,22 @@ export default class CloudStorage {
     return new CloudStorage(config)
   }
 
-  put(value: object, path: string): Promise<object> {
-    return new Promise((resolve, reject) => {
+  async put(value: object, path: string): Promise<object> {
+    try {
       let params = {
         Body: JSON.stringify(value),
         Bucket: this.config.database,
         Key: path,
         Metadata: {
-          ContentType: 'application/json'
-          // ContentEncoding: 'gzip'
+          ContentType: 'application/json',
+          ContentEncoding: 'gzip'
         }
       }
-      this.client.putObject(params, function(err, data) {
-        if (err) reject(err)
-
-        resolve(data)
-      })
-    })
+      let data = await this.client.putObject(params).promise()
+      return data
+    } catch (err) {
+      throw err
+    }
   }
 
   async get(path: string) {
@@ -59,30 +58,30 @@ export default class CloudStorage {
     }
   }
 
-  delete(path: string) {
-    return new Promise((resolve, reject) => {
+  async delete(path: string) {
+    try {
       let params = {
         Bucket: this.config.database,
         Key: path
       }
-      this.client.deleteObject(params, function(err, data) {
-        if (err) reject(err)
-        resolve(data)
-      })
-    })
+      let data = await this.client.deleteObject(params).promise()
+      return data
+    } catch (err) {
+      throw err
+    }
   }
 
-  stat(path: string) {
-    return new Promise((resolve, reject) => {
+  async stat(path: string) {
+    try {
       let params = {
         Bucket: this.config.database,
         Key: path
       }
-      this.client.headObject(params, function(err, data) {
-        if (err) reject(err)
-        resolve(data)
-      })
-    })
+      let data = await this.client.headObject(params).promise()
+      return data
+    } catch (err) {
+      throw err
+    }
   }
 
   async setupBucket() {
@@ -100,39 +99,39 @@ export default class CloudStorage {
     }
   }
 
-  bucketExists() {
-    return new Promise((resolve, reject) => {
+  async bucketExists() {
+    try {
       let params = {
         Bucket: this.config.database
       }
-      this.client.headBucket(params, function(err, data) {
-        if (err) reject(err)
-        resolve(data)
-      })
-    })
+      let data = await this.client.headBucket(params).promise()
+      return data
+    } catch (err) {
+      throw err
+    }
   }
 
-  createBucket() {
-    return new Promise((resolve, reject) => {
+  async createBucket() {
+    try {
       let params = {
         Bucket: this.config.database
       }
-      this.client.createBucket(params, function(err, data) {
-        if (err) reject(err)
-        resolve(data)
-      })
-    })
+      let data = await this.client.createBucket(params).promise()
+      return data
+    } catch (err) {
+      throw err
+    }
   }
 
-  deleteBucket() {
-    return new Promise((resolve, reject) => {
+  async deleteBucket() {
+    try {
       let params = {
         Bucket: this.config.database
       }
-      this.client.deleteBucket(params, function(err, data) {
-        if (err) reject(err)
-        resolve(data)
-      })
-    })
+      let data = await this.client.deleteBucket(params).promise()
+      return data
+    } catch (err) {
+      throw err
+    }
   }
 }

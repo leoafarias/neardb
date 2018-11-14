@@ -4,6 +4,9 @@ import CloudStorage from '../src/adapter/cloud'
 import { config } from './config'
 import { uuid, reservedKey } from '../src/utils'
 
+// Mocks axios
+jest.mock('axios')
+
 config.database = 'testdb'
 
 function timeout(ms: number) {
@@ -12,7 +15,6 @@ function timeout(ms: number) {
 
 jest.setTimeout(15000)
 
-let setDB: any
 let firstColRef: any
 let firstDocRef: any
 

@@ -1,5 +1,4 @@
 import { IConfig } from '../types'
-
 import * as S3 from 'aws-sdk/clients/s3'
 
 export default class CloudStorage {
@@ -18,6 +17,8 @@ export default class CloudStorage {
     this.config = config
 
     this.client = new S3(config.storage)
+
+    // this.setupBucket()
   }
 
   static init(config: IConfig) {

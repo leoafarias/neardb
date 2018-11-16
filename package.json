@@ -56,6 +56,8 @@
     "transform": {
       ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
+    "globalSetup": "<rootDir>/test/global_setup_hook.js",
+    "globalTeardown":"<rootDir>/test/global_teardown_hook.js",
     "testEnvironment": "node",
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
     "moduleFileExtensions": [
@@ -93,9 +95,7 @@
     "@commitlint/cli": "^7.1.2",
     "@commitlint/config-conventional": "^7.1.2",
     "@types/jest": "^23.3.2",
-    "@types/minio": "^7.0.0",
     "@types/node": "^10.11.0",
-    "axios-mock-adapter": "^1.15.0",
     "colors": "^1.3.2",
     "commitizen": "^3.0.0",
     "coveralls": "^3.0.2",
@@ -116,6 +116,7 @@
     "rollup-plugin-node-resolve": "^3.4.0",
     "rollup-plugin-sourcemaps": "^0.4.2",
     "rollup-plugin-typescript2": "^0.17.0",
+    "s3rver": "^2.2.6",
     "semantic-release": "^15.10.6",
     "ts-jest": "^23.10.2",
     "ts-node": "^7.0.1",

@@ -19,9 +19,6 @@ export default class NearDB {
 
   adapter: any
 
-  // Adds private functions for testing purposes
-  __PRIVATE__: object
-
   // Constants used for document update
   static field = {
     deleteValue: 'NEARDB.FIELD.DELETE'
@@ -42,18 +39,10 @@ export default class NearDB {
     // TODO: define the type of storage in the config
     this.adapter = new CloudStorage(config)
     // Sets empty path type
-    if (!path) path = []
-    this.path = path
+    this.path = path ? path : []
 
-    // Sets default cache values
+    // Sets default cache value
     this.cache = null
-
-    // Sets private methods for testing usage
-    this.__PRIVATE__ = {
-      hasCache: this.hasCache,
-      setCache: this.setCache,
-      getRequest: this.getRequest
-    }
   }
 
   /**
@@ -150,7 +139,8 @@ export default class NearDB {
         (this.config.cdn!.url && !this.hasCache())
       ) {
         // Get it from cloud storage
-        data = await this.getRequest(docPath)
+        let payload = await this.getRequest(docPath)
+        data = payload.data
         this.setCache(data)
       } else if (this.hasCache()) {
         // Get from in memory storage
@@ -244,17 +234,17 @@ export default class NearDB {
    * @returns json object from the request
    */
 
-  private async getRequest(path: string): Promise<Payload> {
+  private async getRequest(path: string, baseURL?: string): Promise<Payload> {
     try {
       let http = axios.create({
-        baseURL: this.config.cdn!.url,
+        baseURL: baseURL ? baseURL : this.config.cdn!.url,
         timeout: 15000,
-        headers: this.config.cdn!.headers
+        headers: baseURL ? {} : this.config.cdn!.headers
       })
 
-      let { data } = await http.get(path)
+      let payload = await http.get(path)
 
-      return data
+      return payload
     } catch (err) {
       throw err
     }
@@ -279,7 +269,7 @@ export default class NearDB {
    * Checks if there a valid cached payload
    * @returns boolean
    */
-  private hasCache() {
+  private hasCache(): boolean {
     if (
       this.cache &&
       this.cache.store &&
@@ -291,6 +281,14 @@ export default class NearDB {
       // Sets cache to default value
       this.cache = null
       return false
+    }
+  }
+
+  __PRIVATE__() {
+    return {
+      setCache: this.setCache,
+      hasCache: this.hasCache,
+      getRequest: this.getRequest
     }
   }
 }

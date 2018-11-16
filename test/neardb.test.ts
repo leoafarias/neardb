@@ -23,11 +23,6 @@ beforeAll(() => {
   firstColRef = NearDB.database(config).collection('oneCol')
   firstDocRef = firstColRef.doc('oneDoc')
 })
-
-// afterAll(done => {
-//   instance.close(done)
-// })
-
 /**
  * NearDB
  */
@@ -134,6 +129,13 @@ describe('.get', async () => {
     let payload = await firstDocRef.get()
     expect(payload).toBeTruthy()
   })
+
+  // it('Can get a document from local', async () => {
+  //   expect.assertions(1)
+  //   await firstDocRef.__PRIVATE__().setCache(data)
+  //   let payload = await firstDocRef.get()
+  //   expect(payload).toBe(data)
+  // })
 })
 
 describe('.add', async () => {
@@ -228,9 +230,9 @@ describe('cache', async () => {
 })
 
 describe('getRequest', async () => {
+  let getRequest = firstDocRef.__PRIVATE__().getRequest
   it('Makes a valid request', async () => {
     expect.assertions(1)
-    let getRequest = firstDocRef.__PRIVATE__().getRequest
 
     let payload = await getRequest('', 'https://www.google.com')
     expect(payload.status).toEqual(200)
@@ -238,8 +240,7 @@ describe('getRequest', async () => {
 
   it('Makes a invalid request', async () => {
     expect.assertions(1)
-    let getRequest = firstDocRef.__PRIVATE__().getRequest
-    let payload: any
+
     try {
       await getRequest('neardb404', 'https://google.com')
     } catch (err) {

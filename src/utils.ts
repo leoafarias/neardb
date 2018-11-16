@@ -9,9 +9,12 @@ export function documentPath(path: PathList): string {
   let pathArray = path.map((item, index) => {
     if (path.length === index + 1) {
       // This is the last item
-      if (item.type === 'doc') return item.key + '.json'
-      // if (item.type === 'collection') return item.key + '.json'
-      return item.key
+      if (item.type === 'doc') {
+        return item.key + '.json'
+      } else {
+        // if (item.type === 'collection') return item.key + '.json'
+        return item.key
+      }
     } else {
       // not the last item
       return item.key

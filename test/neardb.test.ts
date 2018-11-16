@@ -130,12 +130,12 @@ describe('.get', async () => {
     expect(payload).toBeTruthy()
   })
 
-  // it('Can get a document from local', async () => {
-  //   expect.assertions(1)
-  //   await firstDocRef.__PRIVATE__().setCache(data)
-  //   let payload = await firstDocRef.get()
-  //   expect(payload).toBe(data)
-  // })
+  it('Can get a document from origin when there is no cache', async () => {
+    expect.assertions(1)
+    await firstDocRef._privateMethods().clearCache()
+    let payload = await firstDocRef.get()
+    expect(payload).toBeTruthy()
+  })
 })
 
 describe('.add', async () => {
@@ -211,26 +211,12 @@ describe('.delete', async () => {
   })
 })
 
-describe('cache', async () => {
-  it('.setCache', async () => {
-    expect.assertions(2)
-    let payload = await firstDocRef.get()
-    expect(firstDocRef.cache.store).toEqual(payload)
-    expect(firstDocRef.cache.expires).toBeGreaterThan(new Date().getTime())
-  })
+describe('.getRequest', async () => {
+  // TODO: losing reference to firstDocRef
+  firstColRef = NearDB.database(config).collection('oneCol')
+  firstDocRef = firstColRef.doc('oneDoc')
+  let { getRequest } = firstDocRef._privateMethods()
 
-  it('.hasCache', async () => {
-    expect.assertions(2)
-    await firstDocRef.get()
-    expect(firstDocRef.hasCache()).toEqual(true)
-    // TODO: make it dynamic
-    await timeout(51)
-    expect(firstDocRef.hasCache()).toEqual(false)
-  })
-})
-
-describe('getRequest', async () => {
-  let getRequest = firstDocRef.__PRIVATE__().getRequest
   it('Makes a valid request', async () => {
     expect.assertions(1)
 
@@ -246,5 +232,27 @@ describe('getRequest', async () => {
     } catch (err) {
       expect(err).toEqual(new Error('Request failed with status code 404'))
     }
+  })
+})
+
+describe('.cache', async () => {
+  let cachedData = {
+    cached: true
+  }
+
+  it('.setCache', async () => {
+    expect.assertions(2)
+    await firstDocRef._privateMethods().setCache(cachedData)
+    expect(firstDocRef.cache.store).toEqual(cachedData)
+    expect(firstDocRef.getCache().expires).toBeGreaterThan(new Date().getTime())
+  })
+
+  it('.hasCache', async () => {
+    expect.assertions(2)
+    await firstDocRef._privateMethods().setCache(cachedData)
+
+    expect(firstDocRef._privateMethods().hasCache()).toEqual(true)
+    await timeout(55)
+    expect(firstDocRef._privateMethods().hasCache()).toEqual(false)
   })
 })

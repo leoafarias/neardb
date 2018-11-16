@@ -1,13 +1,7 @@
 import NearDB from '../src/neardb'
-import { IConfig, PathList } from '../src/types'
 import CloudStorage from '../src/adapter/cloud'
 import { config } from './config'
-import { uuid, reservedKey } from '../src/utils'
-
-// Mocks axios
-jest.mock('axios')
-
-config.database = 'testdb'
+import { uuid } from '../src/utils'
 
 function timeout(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms))
@@ -23,28 +17,16 @@ const data = {
   secondValue: 'String'
 }
 
-beforeAll(async () => {
+// let instance: any
+
+beforeAll(() => {
   firstColRef = NearDB.database(config).collection('oneCol')
   firstDocRef = firstColRef.doc('oneDoc')
-  await firstDocRef.set(data)
-  // try {
-  //   let exists = await CloudStorage.init(config).bucketExists()
-  //   return
-  // } catch (err) {
-  //   console.log(err)
-  // }
-
-  // try {
-  //   await CloudStorage.init(config).createBucket()
-  // } catch (err) {
-  //   throw new Error(err)
-  // }
 })
 
-afterAll(async () => {
-  // await firstColRef.delete()
-  // return CloudStorage.init(config).deleteBucket()
-})
+// afterAll(done => {
+//   instance.close(done)
+// })
 
 /**
  * NearDB
@@ -127,7 +109,7 @@ describe('.set', async () => {
 })
 
 describe('.get', async () => {
-  it('Can get a document', async () => {
+  it('Can get a document from origin', async () => {
     expect.assertions(1)
     let payload = await firstDocRef.get({ source: 'origin' })
     expect(payload).toEqual(data)
@@ -141,7 +123,13 @@ describe('.get', async () => {
     }
   })
 
-  it('Can get a document from CDN', async () => {
+  it('Can get document from edge', async () => {
+    expect.assertions(1)
+    let payload = await firstDocRef.get({ source: 'edge' })
+    expect(typeof payload).toBe('object')
+  })
+
+  it('Can get a document', async () => {
     expect.assertions(1)
     let payload = await firstDocRef.get()
     expect(payload).toBeTruthy()
@@ -240,17 +228,22 @@ describe('cache', async () => {
 })
 
 describe('getRequest', async () => {
-  it('valid request', async () => {
-    expect.assertions(2)
-    let payload = await firstDocRef.get()
-    expect(firstDocRef.cache.store).toEqual(payload)
-    expect(firstDocRef.cache.expires).toBeGreaterThan(new Date().getTime())
+  it('Makes a valid request', async () => {
+    expect.assertions(1)
+    let getRequest = firstDocRef.__PRIVATE__().getRequest
+
+    let payload = await getRequest('', 'https://www.google.com')
+    expect(payload.status).toEqual(200)
   })
 
-  it('invalid request', async () => {
-    expect.assertions(2)
-    let payload = await firstDocRef.get()
-    expect(firstDocRef.cache.store).toEqual(payload)
-    expect(firstDocRef.cache.expires).toBeGreaterThan(new Date().getTime())
+  it('Makes a invalid request', async () => {
+    expect.assertions(1)
+    let getRequest = firstDocRef.__PRIVATE__().getRequest
+    let payload: any
+    try {
+      await getRequest('neardb404', 'https://google.com')
+    } catch (err) {
+      expect(err).toEqual(new Error('Request failed with status code 404'))
+    }
   })
 })

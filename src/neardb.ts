@@ -126,28 +126,29 @@ export default class NearDB {
 
     let docPath = documentPath(this.path)
     let data: Payload
+    let source = options && options.source ? options.source : null
 
     try {
       // Get document from the if there is a CDN endpoint
-      if (options && options.source === 'origin') {
+      if (!source && this.hasCache()) {
+        // Get from in memory storage if no cahce get from origin
+        data = this.getStore()
+      } else if (source === 'origin') {
         // Source as origin
         data = await this.adapter.get(docPath)
         this.setCache(data)
       } else if (
         // Edge and has cdn endpoint
-        (options && options.source === 'edge') ||
-        (this.config.cdn!.url && !this.hasCache())
+        source === 'edge' &&
+        this.config.cdn!.url
       ) {
         // Get it from cloud storage
         let payload = await this.getRequest(docPath)
         data = payload.data
         this.setCache(data)
-      } else if (this.hasCache()) {
-        // Get from in memory storage
-        data = this.cache!.store
       } else {
-        // Default case get from the origin
         data = await this.adapter.get(docPath)
+        this.setCache(data)
       }
 
       return data
@@ -181,7 +182,7 @@ export default class NearDB {
       // Loop through all property for custom object actions
       for (let prop in value) {
         if (value && value[prop] === NearDB.field.deleteValue) {
-          // If has delevalue action, delete the prop
+          // If has deleteValue action, delete the prop
           delete value[prop]
           if (doc && doc[prop]) {
             delete doc[prop]
@@ -228,6 +229,16 @@ export default class NearDB {
     return this.adapter.delete(docPath)
   }
 
+  _privateMethods(): object {
+    return {
+      setCache: this.setCache.bind(this),
+      hasCache: this.hasCache.bind(this),
+      getRequest: this.getRequest.bind(this),
+      clearCache: this.clearCache.bind(this),
+      getCache: this.getCache.bind(this)
+    }
+  }
+
   /**
    * Makes a get request to the CDN url
    * @param path path to attach to cdn url on the request
@@ -259,6 +270,7 @@ export default class NearDB {
       this.config && this.config.cacheExpiration
         ? this.config.cacheExpiration
         : 10000
+
     this.cache = {
       store: data,
       expires: new Date().getTime() + expiration
@@ -266,29 +278,34 @@ export default class NearDB {
   }
 
   /**
+   * Gets cached data
+   * @returns payload of the cached data if it exists
+   */
+  private getCache(): Cache | null {
+    return this.cache
+  }
+
+  private clearCache(): void {
+    this.cache = null
+  }
+
+  private getStore(): Payload {
+    return this.cache && this.cache.store ? this.cache.store : {}
+  }
+
+  /**
    * Checks if there a valid cached payload
    * @returns boolean
    */
   private hasCache(): boolean {
-    if (
-      this.cache &&
-      this.cache.store &&
-      this.cache.expires > new Date().getTime()
-    ) {
+    let cache = this.getCache()
+    if (cache && cache.store && cache.expires > new Date().getTime()) {
       // Checks if there is a stored object, and that has not expired yet
       return true
     } else {
       // Sets cache to default value
-      this.cache = null
+      this.clearCache()
       return false
-    }
-  }
-
-  __PRIVATE__() {
-    return {
-      setCache: this.setCache,
-      hasCache: this.hasCache,
-      getRequest: this.getRequest
     }
   }
 }

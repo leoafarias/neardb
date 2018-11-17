@@ -1,9 +1,9 @@
 import { IConfig } from '../types'
-import * as S3 from 'aws-sdk/clients/s3'
+const S3 = require('aws-sdk/clients/s3')
 
 export default class CloudStorage {
   config: IConfig
-  client: S3
+  client: any
 
   constructor(config: IConfig) {
     if (!config) throw new Error('No config was passed to cloudstorage')

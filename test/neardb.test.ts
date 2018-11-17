@@ -179,7 +179,8 @@ describe('.update', async () => {
 
   it('Deletes values from document', async () => {
     const deleteData = {
-      thirdValue: NearDB.field.deleteValue
+      thirdValue: NearDB.field.deleteValue,
+      forthValue: NearDB.field.deleteValue
     }
     expect.assertions(3)
     await firstDocRef.set(data)

@@ -4,7 +4,8 @@ import CloudStorage from './adapter/cloud'
 import axios from 'axios'
 
 const defaultConfig = {
-  database: ''
+  database: '',
+  cacheExpiration: 500
 }
 
 export default class NearDB {
@@ -181,12 +182,10 @@ export default class NearDB {
 
       // Loop through all property for custom object actions
       for (let prop in value) {
-        if (value && value[prop] === NearDB.field.deleteValue) {
+        if (value[prop] === NearDB.field.deleteValue) {
           // If has deleteValue action, delete the prop
           delete value[prop]
-          if (doc && doc[prop]) {
-            delete doc[prop]
-          }
+          delete doc[prop]
         }
       }
 
@@ -269,7 +268,7 @@ export default class NearDB {
     let expiration =
       this.config && this.config.cacheExpiration
         ? this.config.cacheExpiration
-        : 10000
+        : 1000
 
     this.cache = {
       store: data,

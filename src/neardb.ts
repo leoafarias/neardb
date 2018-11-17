@@ -1,6 +1,6 @@
 import { IConfig, Payload, Cache, PathList, GetOptions } from './types'
-import { uuid, documentPath, reservedKey } from './utils'
-import CloudStorage from './adapter/cloud'
+import { uuid, documentPath, reservedKey } from './lib/utils'
+import CloudStorage from './lib/cloud'
 import axios from 'axios'
 
 const defaultConfig = {

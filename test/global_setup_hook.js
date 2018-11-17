@@ -1,7 +1,7 @@
 // Local S3 Server
-const S3rver = require('s3rver')
+import S3rver from 's3rver';
 
-module.exports = async () => {
+export default async () => {
   try {
     global.s3ever = await new S3rver({
       port: 4569,

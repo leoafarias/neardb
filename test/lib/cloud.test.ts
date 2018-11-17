@@ -1,5 +1,5 @@
 import { config } from '../config'
-import CloudStorage from '../../src/adapter/cloud'
+import CloudStorage from '../../src/lib/cloud'
 
 jest.setTimeout(5000)
 

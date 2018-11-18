@@ -1,4 +1,4 @@
-import { IConfig } from '../types'
+import { IConfig } from './types'
 const S3 = require('aws-sdk/clients/s3')
 
 export default class CloudStorage {
@@ -64,70 +64,6 @@ export default class CloudStorage {
         Key: path
       }
       let data = await this.client.deleteObject(params).promise()
-      return data
-    } catch (err) {
-      throw err
-    }
-  }
-
-  async stat(path: string) {
-    try {
-      let params = {
-        Bucket: this.config.database,
-        Key: path
-      }
-      let data = await this.client.headObject(params).promise()
-      return data
-    } catch (err) {
-      throw err
-    }
-  }
-
-  async setupBucket() {
-    try {
-      await this.bucketExists()
-      return true
-    } catch (err) {
-      console.error(err)
-    }
-
-    try {
-      await this.createBucket()
-    } catch (err) {
-      throw err
-    }
-  }
-
-  async bucketExists() {
-    try {
-      let params = {
-        Bucket: this.config.database
-      }
-      let data = await this.client.headBucket(params).promise()
-      return data
-    } catch (err) {
-      throw err
-    }
-  }
-
-  async createBucket() {
-    try {
-      let params = {
-        Bucket: this.config.database
-      }
-      let data = await this.client.createBucket(params).promise()
-      return data
-    } catch (err) {
-      throw err
-    }
-  }
-
-  async deleteBucket() {
-    try {
-      let params = {
-        Bucket: this.config.database
-      }
-      let data = await this.client.deleteBucket(params).promise()
       return data
     } catch (err) {
       throw err

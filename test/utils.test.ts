@@ -1,4 +1,4 @@
-import { documentPath, reservedKey, uuid } from '../../src/lib/utils'
+import { documentPath, reservedKey, uuid } from '../src/utils'
 
 jest.setTimeout(5000)
 

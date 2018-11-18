@@ -1,5 +1,5 @@
-import { config } from '../config'
-import CloudStorage from '../../src/lib/cloud'
+import { config } from './config'
+import CloudStorage from '../src/cloud'
 
 jest.setTimeout(5000)
 
@@ -24,12 +24,6 @@ describe('cloudstorage', () => {
     const etag = payload.ETag ? true : false
 
     expect(etag).toBe(true)
-  })
-
-  it('Document Stats', async () => {
-    expect.assertions(1)
-    const data = await storage.stat(path)
-    expect(typeof data).toBe('object')
   })
 
   it('Get document', async () => {

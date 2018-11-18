@@ -1,4 +1,4 @@
-import { PathList } from '../types'
+import { PathList } from './types'
 
 /**
  * Builds a document url out of the array of path item

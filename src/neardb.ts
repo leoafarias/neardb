@@ -1,5 +1,11 @@
 import { IConfig, Payload, Cache, PathList, GetOptions } from './types'
-import { uuid, documentPath, reservedKey } from './lib/utils'
+import {
+  uuid,
+  documentPath,
+  collectionIndicesPath,
+  reservedKey,
+  documentPathKey
+} from './lib/utils'
 import CloudStorage from './lib/cloud'
 import axios from 'axios'
 
@@ -163,8 +169,18 @@ export default class NearDB {
    * @param value expects payload to be stored for the document
    * @returns payload of the document requested
    */
-  set(value: Payload): Promise<object> {
+  async set(value: Payload): Promise<object> {
     let docPath = documentPath(this.path)
+
+    try {
+      await this.adapter.put(value, docPath)
+      let collectionIndices = await this.updateCollectionIndices(
+        this.path,
+        value
+      )
+    } catch (err) {
+      throw err
+    }
 
     return this.adapter.put(value, docPath)
   }
@@ -284,10 +300,18 @@ export default class NearDB {
     return this.cache
   }
 
+  /**
+   * Clears cached data
+   * @returns payload of the cached data if it exists
+   */
   private clearCache(): void {
     this.cache = null
   }
 
+  /**
+   * Gets store of cached data
+   * @returns payload of the cached data if it exists
+   */
   private getStore(): Payload {
     return this.cache && this.cache.store ? this.cache.store : {}
   }
@@ -305,6 +329,38 @@ export default class NearDB {
       // Sets cache to default value
       this.clearCache()
       return false
+    }
+  }
+
+  /**
+   * Updates indices of collection from a new document
+   * @param path PathList, used to get document key and collection indices path
+   * @param value value that needs to be added to indices
+   * @returns a promise for the adapter put
+   */
+  async updateCollectionIndices(
+    path: PathList,
+    value: Payload
+  ): Promise<Payload> {
+    let collectionIndices: any
+    // Get path where to store collection indices
+    let indicesPath = collectionIndicesPath(path)
+
+    try {
+      // Get current collection indices
+      collectionIndices = await this.adapter.get(indicesPath)
+    } catch (err) {
+      // If there are no collection indices, create one
+      collectionIndices = {}
+    }
+
+    try {
+      // Use document key as key in the object, and store value
+      collectionIndices[documentPathKey(path)] = value
+      // Save object into collection indices document
+      return this.adapter.put(collectionIndices, indicesPath)
+    } catch (err) {
+      throw err
     }
   }
 }

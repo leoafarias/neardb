@@ -1,8 +1,8 @@
 // import NearDB from '../src/neardb'
 import NearDB from '../src/neardb'
-import CloudStorage from '../src/cloud'
+import CloudStorage from '../src/lib/cloud'
 import { config } from './config'
-import { uuid } from '../src/utils'
+import { uuid } from '../src/lib/utils'
 
 function timeout(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms))

@@ -1,4 +1,4 @@
-import { IConfig } from './types'
+import { IConfig } from '../types'
 const S3 = require('aws-sdk/clients/s3')
 
 export default class CloudStorage {

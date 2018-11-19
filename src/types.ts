@@ -1,5 +1,6 @@
 export interface IConfig {
   database: string
+  indices?: boolean
   cdn?: {
     url: string
     headers?: {

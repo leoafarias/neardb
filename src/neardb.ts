@@ -173,16 +173,13 @@ export default class NearDB {
     let docPath = documentPath(this.path)
 
     try {
-      await this.adapter.put(value, docPath)
-      let collectionIndices = await this.updateCollectionIndices(
-        this.path,
-        value
-      )
+      if (this.config.indices) {
+        await this.updateCollectionIndices(this.path, value)
+      }
+      return this.adapter.put(value, docPath)
     } catch (err) {
       throw err
     }
-
-    return this.adapter.put(value, docPath)
   }
 
   /**

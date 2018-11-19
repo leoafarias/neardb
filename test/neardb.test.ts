@@ -102,6 +102,17 @@ describe('.set', async () => {
     payload = await firstDocRef.set(data)
     expect(payload.ETag).toBeTruthy()
   })
+
+  it('Update indices', async () => {
+    config.indices = true
+    let doc = NearDB.database(config)
+      .collection('oneCol')
+      .doc('oneDoc')
+    expect.assertions(1)
+    let payload: any
+    payload = await doc.set(data)
+    expect(payload.ETag).toBeTruthy()
+  })
 })
 
 describe('.get', async () => {

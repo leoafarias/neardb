@@ -1,6 +1,6 @@
 {
   "name": "neardb",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "",
   "keywords": [
     "database",
@@ -11,8 +11,9 @@
     "cache",
     "key-value"
   ],
-  "main": "dist/neardb.umd.js",
+  "main": "dist/neardb.js",
   "module": "dist/neardb.es5.js",
+  "umd": "dist/neardb.umd.js",
   "typings": "dist/types/neardb.d.ts",
   "files": [
     "dist"
@@ -29,7 +30,7 @@
   "scripts": {
     "lint": "tslint --project tsconfig.json -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
     "prebuild": "rimraf dist",
-    "build": "tsc --module commonjs && rollup -c rollup.config.ts && typedoc --out docs --target es6 --theme minimal --mode file src",
+    "build": "tsc --module es2015 && rollup -c rollup.config.ts && typedoc --out docs --target es6 --theme minimal --mode file src",
     "start": "rollup -c rollup.config.ts -w",
     "test": "jest",
     "test:watch": "jest --watch",

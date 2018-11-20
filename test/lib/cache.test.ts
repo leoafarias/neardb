@@ -3,7 +3,7 @@ import { uuid } from '../../src/lib/utils'
 import { config } from '../config'
 import { createDummyData, createDoc, timeout } from '../helpers'
 
-jest.setTimeout(5000)
+jest.setTimeout(10000)
 
 describe('.cache', async () => {
   let cachedData = createDummyData()

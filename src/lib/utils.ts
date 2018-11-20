@@ -24,6 +24,16 @@ export const documentPath = (path: PathList): string => {
   return pathArray.join('/')
 }
 
+export const iterationCopy = src => {
+  let target = {}
+  for (let prop in src) {
+    if (src.hasOwnProperty(prop)) {
+      target[prop] = src[prop]
+    }
+  }
+  return target
+}
+
 export const documentPathKey = (path: PathList): string => {
   let lastItem = path[path.length - 1]
   if (lastItem.type === 'doc') {
@@ -47,6 +57,8 @@ export const collectionIndicesPath = (path: PathList): string => {
       if (item.type === 'collection') {
         return item.key + '/_meta/indices.json'
       }
+
+      throw new Error('Cannot create indices with invalid collection')
     } else {
       // not the last item
       return item.key

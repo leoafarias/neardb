@@ -1,7 +1,15 @@
 import NearDB from '../src/neardb'
 import { config } from './config'
 import { uuid } from '../src/lib/utils'
-import { createDummyData, createDoc, timeout } from './helpers'
+import { createDummyData, createDoc } from './helpers'
+import MockAdapter from 'axios-mock-adapter'
+import { getRequestMock } from './mock-data/getRequest'
+import HTTP from '../src/lib/http'
+
+const mock = new MockAdapter(HTTP)
+// Returns a failed promise with Error('Network Error');
+mock.onGet('/networkError').networkError()
+mock.onGet().reply(200, getRequestMock)
 
 jest.setTimeout(15000)
 
@@ -20,10 +28,6 @@ beforeAll(() => {
 describe('.database', () => {
   it('NearDB is instantiable', () => {
     expect(NearDB.database(config)).toBeInstanceOf(NearDB)
-  })
-
-  it('Config is set properly', () => {
-    expect(config).toEqual(NearDB.database(config).config)
   })
 })
 
@@ -112,37 +116,28 @@ describe('.set', async () => {
 
   it('Update indices new doc', async () => {
     // Use same key not to trigger a new
-
     expect.assertions(1)
     let payload: any
-    payload = await createDoc(uuid(), { indices: true }).set(createDummyData())
+    payload = await indicesDoc.set(createDummyData())
     expect(payload.ETag).toBeTruthy()
   })
 
   // it('Throw error when cant set document ', async () => {
-  //   // Create copy of object
-  //   let errorConfig = {
-  //     storage: {
-  //       endpoint: 'http://fakestorage.domain.net'
-  //     }
-  //   }
-
-  //   let errorDoc = createDoc(docKey, errorConfig)
   //   expect.assertions(1)
   //   try {
   //     await errorDoc.set(createDummyData())
   //   } catch (err) {
-  //     expect(err.code).toEqual('UnknownEndpoint')
+  //     expect(err).toEqual('UnknownEndpoint')
   //   }
   // })
 
-  it('Creates new indices for new document in collection', async () => {
-    expect.assertions(1)
-    let payload: any
-    await doc.updateCollectionIndices(doc.path, createDummyData())
-    payload = await doc.set(createDummyData())
-    expect(payload.ETag).toBeTruthy()
-  })
+  // it('Creates new indices for new document in collection', async () => {
+  //   expect.assertions(1)
+  //   let payload: any
+  //   await doc.updateCollectionIndices(doc.path, createDummyData())
+  //   payload = await doc.set(createDummyData())
+  //   expect(payload.ETag).toBeTruthy()
+  // })
 })
 
 describe('.get', async () => {
@@ -260,12 +255,14 @@ describe('.delete', async () => {
   let doc = createDoc(uuid(), {})
   let data = createDummyData()
 
-  it('Can get a document', async () => {
-    expect.assertions(1)
+  it('Can delete document', async () => {
+    expect.assertions(2)
     await doc.set(data)
-    let payload = await doc.delete()
+    let payload = await doc.get({ source: 'origin' })
+    let deletedPayload = await doc.delete()
     // TODO: check error on get
-    expect(payload).toEqual({})
+    expect(payload).toEqual(data)
+    expect(deletedPayload).toEqual({})
   })
 })
 
@@ -277,7 +274,7 @@ describe('.getRequest', async () => {
   it('Makes a valid request', async () => {
     expect.assertions(1)
 
-    let payload = await getRequest('', 'https://www.google.com')
+    let payload = await getRequest('/200')
     expect(payload.status).toEqual(200)
   })
 
@@ -285,9 +282,10 @@ describe('.getRequest', async () => {
     expect.assertions(1)
 
     try {
-      await getRequest('neardb404', 'https://google.com')
+      let payload = await getRequest('/networkError')
+      console.log(payload)
     } catch (err) {
-      expect(err).toEqual(new Error('Request failed with status code 404'))
+      expect(err).toEqual(new Error('Network Error'))
     }
   })
 })

@@ -6,7 +6,7 @@ import {
   uuid
 } from '../../src/lib/utils'
 import { isGuid } from '../helpers'
-jest.setTimeout(5000)
+jest.setTimeout(10000)
 
 const docPath = [
   { type: 'collection', key: 'colOne' },
@@ -19,6 +19,12 @@ const colPath = [
   { type: 'collection', key: 'colOne' },
   { type: 'doc', key: 'docOne' },
   { type: 'collection', key: 'colTwo' }
+]
+
+const brokenPath = [
+  { type: 'collection', key: 'colOne' },
+  { type: 'doc', key: 'docOne' },
+  { type: 'documentz', key: 'colTwo' }
 ]
 
 describe('documentPath', () => {
@@ -91,5 +97,15 @@ describe('collectionIndicesPath', () => {
   it('Returns if path is a collection', () => {
     let newColPath = collectionIndicesPath(colPath)
     expect(newColPath).toBe(matchString)
+  })
+
+  it('Cannot get collectionIndices of invalid collection', () => {
+    try {
+      let newColPath = collectionIndicesPath(brokenPath)
+    } catch (err) {
+      expect(err).toEqual(
+        Error('Cannot create indices with invalid collection')
+      )
+    }
   })
 })

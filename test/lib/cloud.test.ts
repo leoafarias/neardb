@@ -3,7 +3,7 @@ import CloudStorage from '../../src/lib/cloud'
 import { uuid } from '../../src/lib/utils'
 import { createDummyData } from '../helpers'
 
-jest.setTimeout(5000)
+jest.setTimeout(10000)
 
 describe('cloudstorage', () => {
   const storage = CloudStorage.init(config)

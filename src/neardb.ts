@@ -6,10 +6,11 @@ import {
   documentPath,
   collectionIndicesPath,
   reservedKey,
-  documentPathKey
+  documentPathKey,
+  iterationCopy
 } from './lib/utils'
 import CloudStorage from './lib/cloud'
-import axios from 'axios'
+import HTTP from './lib/http'
 
 const defaultConfig = {
   database: '',
@@ -42,9 +43,9 @@ export default class NearDB {
   constructor(config: IConfig, path?: PathList) {
     /** Check if config exists */
     // if (!config) throw new Error('No config passed to NearDB')
-
     /** Overwrites config param with default configuration */
-    this.config = Object.assign(defaultConfig, config)
+    let defaultCopy: any = iterationCopy(defaultConfig)
+    this.config = Object.assign(defaultCopy, config)
 
     // TODO: define the type of storage in the config
     this.adapter = new CloudStorage(config)
@@ -257,12 +258,12 @@ export default class NearDB {
    * @returns json object from the request
    */
 
-  private async getRequest(path: string, baseURL?: string): Promise<Payload> {
+  private async getRequest(path: string): Promise<Payload> {
     try {
-      let http = axios.create({
-        baseURL: baseURL ? baseURL : this.config.cdn!.url,
+      let http = HTTP.create({
+        baseURL: this.config.cdn!.url,
         timeout: 15000,
-        headers: baseURL ? {} : this.config.cdn!.headers
+        headers: this.config.cdn!.headers
       })
 
       let payload = await http.get(path)

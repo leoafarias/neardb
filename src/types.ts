@@ -1,3 +1,11 @@
+// IConfig interface with defaults
+export interface IDBConfig extends IConfig {
+  database: string
+  indices: boolean
+  cacheExpiration: number
+}
+
+// User passed config interface
 export interface IConfig {
   database: string
   indices?: boolean
@@ -18,6 +26,8 @@ export interface IConfig {
   }
 }
 
+export interface ICache {}
+
 export type GetOptions = {
   source: string
 }
@@ -31,9 +41,4 @@ export type PathItem = {
 
 export type Payload = {
   [key: string]: any
-}
-
-export type Cache = {
-  store: Payload
-  expires: number
 }

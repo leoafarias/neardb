@@ -1,4 +1,6 @@
-import { IConfig, Payload, Cache, PathList, GetOptions } from './types'
+import { IConfig, Payload, PathList, GetOptions, IDBConfig } from './types'
+import Cache from './lib/cache'
+
 import {
   uuid,
   documentPath,
@@ -11,18 +13,19 @@ import axios from 'axios'
 
 const defaultConfig = {
   database: '',
-  cacheExpiration: 500
+  cacheExpiration: 500,
+  indices: false
 }
 
 export default class NearDB {
   /** Config that is used to init NearDB */
-  config: IConfig
+  config: IDBConfig
 
   /** Data path that is used to interact with storage */
   path: PathList
 
   /** Offline cache of data */
-  cache: Cache | null
+  cache: Cache
 
   adapter: any
 
@@ -38,7 +41,7 @@ export default class NearDB {
    */
   constructor(config: IConfig, path?: PathList) {
     /** Check if config exists */
-    if (!config) throw new Error('No config passed to NearDB')
+    // if (!config) throw new Error('No config passed to NearDB')
 
     /** Overwrites config param with default configuration */
     this.config = Object.assign(defaultConfig, config)
@@ -49,7 +52,7 @@ export default class NearDB {
     this.path = path ? path : []
 
     // Sets default cache value
-    this.cache = null
+    this.cache = new Cache(this.config.cacheExpiration)
   }
 
   /**
@@ -59,7 +62,7 @@ export default class NearDB {
    */
 
   static database(config: IConfig): NearDB {
-    return new NearDB(config)
+    return new NearDB(Object.assign(defaultConfig, config))
   }
 
   /**
@@ -137,13 +140,13 @@ export default class NearDB {
 
     try {
       // Get document from the if there is a CDN endpoint
-      if (!source && this.hasCache()) {
+      if (!source && this.cache.exists()) {
         // Get from in memory storage if no cahce get from origin
-        data = this.getStore()
+        data = this.cache.get()
       } else if (source === 'origin') {
         // Source as origin
         data = await this.adapter.get(docPath)
-        this.setCache(data)
+        this.cache.set(data)
       } else if (
         // Edge and has cdn endpoint
         source === 'edge' &&
@@ -152,10 +155,10 @@ export default class NearDB {
         // Get it from cloud storage
         let payload = await this.getRequest(docPath)
         data = payload.data
-        this.setCache(data)
+        this.cache.set(data)
       } else {
         data = await this.adapter.get(docPath)
-        this.setCache(data)
+        this.cache.set(data)
       }
 
       return data
@@ -207,7 +210,7 @@ export default class NearDB {
       let payload = await this.set(Object.assign(doc, value))
 
       // Stores payload in local cache
-      this.setCache(payload)
+      this.cache.set(payload)
       return payload
     } catch (err) {
       throw err
@@ -244,11 +247,7 @@ export default class NearDB {
 
   _privateMethods() {
     return {
-      setCache: this.setCache.bind(this),
-      hasCache: this.hasCache.bind(this),
-      getRequest: this.getRequest.bind(this),
-      clearCache: this.clearCache.bind(this),
-      getCache: this.getCache.bind(this)
+      getRequest: this.getRequest.bind(this)
     }
   }
 
@@ -271,62 +270,6 @@ export default class NearDB {
       return payload
     } catch (err) {
       throw err
-    }
-  }
-
-  /**
-   * Stores payload in NearDB instance
-   * @param data payload to store in memory
-   */
-  private setCache(data: Payload): void {
-    let expiration =
-      this.config && this.config.cacheExpiration
-        ? this.config.cacheExpiration
-        : 1000
-
-    this.cache = {
-      store: data,
-      expires: new Date().getTime() + expiration
-    }
-  }
-
-  /**
-   * Gets cached data
-   * @returns payload of the cached data if it exists
-   */
-  private getCache(): Cache | null {
-    return this.cache
-  }
-
-  /**
-   * Clears cached data
-   * @returns payload of the cached data if it exists
-   */
-  private clearCache(): void {
-    this.cache = null
-  }
-
-  /**
-   * Gets store of cached data
-   * @returns payload of the cached data if it exists
-   */
-  private getStore(): Payload {
-    return this.cache && this.cache.store ? this.cache.store : {}
-  }
-
-  /**
-   * Checks if there a valid cached payload
-   * @returns boolean
-   */
-  private hasCache(): boolean {
-    let cache = this.getCache()
-    if (cache && cache.store && cache.expires > new Date().getTime()) {
-      // Checks if there is a stored object, and that has not expired yet
-      return true
-    } else {
-      // Sets cache to default value
-      this.clearCache()
-      return false
     }
   }
 

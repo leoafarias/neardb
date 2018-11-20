@@ -45,10 +45,8 @@ export const collectionIndicesPath = (path: PathList): string => {
 
       // Is the collection itself
       if (item.type === 'collection') {
-        return '_meta/indices.json'
+        return item.key + '/_meta/indices.json'
       }
-
-      return item.key
     } else {
       // not the last item
       return item.key

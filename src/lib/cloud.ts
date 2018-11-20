@@ -6,13 +6,13 @@ export default class CloudStorage {
   client: any
 
   constructor(config: IConfig) {
-    if (!config) throw new Error('No config was passed to cloudstorage')
-    if (!config.database) {
-      throw new Error('No config database to cloudstorage')
-    }
-    if (!config.storage) {
-      throw new Error('No options options in the config')
-    }
+    // if (!config) throw new Error('No config was passed to cloudstorage')
+    // if (!config.database) {
+    //   throw new Error('No config database to cloudstorage')
+    // }
+    // if (!config.storage) {
+    //   throw new Error('No options options in the config')
+    // }
 
     this.config = config
 
@@ -51,7 +51,7 @@ export default class CloudStorage {
 
     try {
       data = await this.client.getObject(params).promise()
-      return data && data.Body ? JSON.parse(data.Body.toString()) : {}
+      return JSON.parse(data.Body.toString())
     } catch (err) {
       throw err
     }

@@ -9,7 +9,8 @@
     "s3",
     "db",
     "cache",
-    "key-value"
+    "key-value",
+    "lambda"
   ],
   "main": "dist/neardb.js",
   "module": "dist/neardb.es.js",

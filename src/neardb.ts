@@ -171,12 +171,13 @@ export default class NearDB {
    */
   async set(value: Payload): Promise<object> {
     let docPath = documentPath(this.path)
-
+    let payload: Payload
     try {
+      payload = this.adapter.put(value, docPath)
       if (this.config.indices) {
         await this.updateCollectionIndices(this.path, value)
       }
-      return this.adapter.put(value, docPath)
+      return payload
     } catch (err) {
       throw err
     }
@@ -241,7 +242,7 @@ export default class NearDB {
     return this.adapter.delete(docPath)
   }
 
-  _privateMethods(): object {
+  _privateMethods() {
     return {
       setCache: this.setCache.bind(this),
       hasCache: this.hasCache.bind(this),

@@ -1,28 +1,49 @@
-// import NearDB from '../src/neardb'
 import NearDB from '../src/neardb'
-import CloudStorage from '../src/lib/cloud'
 import { config } from './config'
 import { uuid } from '../src/lib/utils'
+import * as Chance from 'chance'
 
-function timeout(ms: number) {
+let chance = new Chance()
+
+const createDummyData = () => {
+  return {
+    firstName: chance.first(),
+    lastName: chance.last(),
+    age: chance.age(),
+    ssn: chance.ssn(),
+    bio: chance.paragraph(),
+    // Basics
+    bool: chance.bool(),
+    character: chance.character(),
+    floating: chance.floating(),
+    interger: chance.integer(),
+    letter: chance.letter(),
+    natural: chance.natural(),
+    string: chance.string()
+  }
+}
+
+const timeout = (ms: number) => {
   return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+const createDoc = (key: string, changeConfig: object) => {
+  let updatedConfig = Object.assign(config, changeConfig)
+  return NearDB.database(updatedConfig)
+    .collection(key + 'Col')
+    .doc(key)
 }
 
 jest.setTimeout(15000)
 
-let firstColRef: any
-let firstDocRef: any
-
-const data = {
-  firstValue: 3,
-  secondValue: 'String'
-}
+let sampleCol: NearDB
+let sampleDoc: NearDB
 
 // let instance: any
 
 beforeAll(() => {
-  firstColRef = NearDB.database(config).collection('oneCol')
-  firstDocRef = firstColRef.doc('oneDoc')
+  sampleCol = NearDB.database(config).collection('oneCol')
+  sampleDoc = sampleCol.doc('oneDoc')
 })
 /**
  * NearDB
@@ -38,21 +59,23 @@ describe('.database', () => {
 })
 
 describe('.collection', () => {
+  let colKey = 'main'
+  let colRef = NearDB.database(config).collection(colKey)
   it('Returns NearDB instance', () => {
-    expect(firstColRef).toBeInstanceOf(NearDB)
+    expect(colRef).toBeInstanceOf(NearDB)
   })
 
   it('Cannot call collections on collections', () => {
     const check = () => {
-      firstColRef.collection('newCol')
+      colRef.collection('subCollection')
     }
     expect(check).toThrowError('Only documents can have sub-collections')
   })
 
   it('Path was set properly', () => {
-    const { path } = firstColRef
+    const { path } = colRef
     const lastPathIndex = path[path.length - 1]
-    expect(lastPathIndex).toEqual({ type: 'collection', key: 'oneCol' })
+    expect(lastPathIndex).toEqual({ type: 'collection', key: colKey })
   })
 
   it('Cannot create collection wtih reserved key', async () => {
@@ -64,67 +87,113 @@ describe('.collection', () => {
 })
 
 describe('.doc', async () => {
+  let docKey = 'main'
+  let doc = createDoc(docKey, {})
+
   it('Returns NearDB instance', () => {
-    expect(firstDocRef).toBeInstanceOf(NearDB)
+    expect(doc).toBeInstanceOf(NearDB)
   })
 
   it('Cannot call documents on document', () => {
     const check = () => {
-      firstDocRef.doc('newDoc')
+      doc.doc('newDoc')
     }
     expect(check).toThrowError('Only collections can have documents')
   })
 
   it('Path was set properly', () => {
-    const { path } = firstDocRef
+    const { path } = doc
     const lastPathIndex = path[path.length - 1]
-    expect(lastPathIndex).toEqual({ type: 'doc', key: 'oneDoc' })
+    expect(lastPathIndex).toEqual({ type: 'doc', key: docKey })
   })
 
   it('Cannot create doc wtih reserved key', async () => {
     const check = () => {
-      firstDocRef.doc('doc')
+      doc.doc('doc')
     }
     expect(check).toThrowError('doc: is a reserved keyword')
   })
 })
 
 describe('.set', async () => {
+  let docKey = uuid()
+  let doc = createDoc(docKey, {})
+  let indicesDoc = createDoc(docKey, { indices: true })
+
   it('Value can be set on new document', async () => {
     expect.assertions(1)
-    let payload = await firstDocRef.set(data)
+    let payload: any = await doc.set(createDummyData())
     expect(payload.ETag).toBeTruthy()
   })
 
   it('Value can be set on existing document', async () => {
     expect.assertions(1)
     let payload: any
-    payload = await firstDocRef.set(data)
+    payload = await doc.set(createDummyData())
     expect(payload.ETag).toBeTruthy()
   })
 
   it('Update indices', async () => {
-    config.indices = true
-    let doc = NearDB.database(config)
-      .collection('oneCol')
-      .doc('oneDoc')
+    // Use same key not to trigger a new
+
     expect.assertions(1)
     let payload: any
-    payload = await doc.set(data)
+    payload = await indicesDoc.set(createDummyData())
+    expect(payload.ETag).toBeTruthy()
+  })
+
+  it('Update indices new doc', async () => {
+    // Use same key not to trigger a new
+
+    expect.assertions(1)
+    let payload: any
+    payload = await createDoc(uuid(), { indices: true }).set(createDummyData())
+    expect(payload.ETag).toBeTruthy()
+  })
+
+  // it('Throw error when cant set document ', async () => {
+  //   // Create copy of object
+  //   let errorConfig = {
+  //     storage: {
+  //       endpoint: 'http://fakestorage.domain.net'
+  //     }
+  //   }
+
+  //   let errorDoc = createDoc(docKey, errorConfig)
+  //   expect.assertions(1)
+  //   try {
+  //     await errorDoc.set(createDummyData())
+  //   } catch (err) {
+  //     expect(err.code).toEqual('UnknownEndpoint')
+  //   }
+  // })
+
+  it('Creates new indices for new document in collection', async () => {
+    expect.assertions(1)
+    let payload: any
+    await doc.updateCollectionIndices(doc.path, createDummyData())
+    payload = await doc.set(createDummyData())
     expect(payload.ETag).toBeTruthy()
   })
 })
 
 describe('.get', async () => {
+  // TODO: Make this dynamic with axios mocks
+  let doc = NearDB.database(config)
+    .collection('oneCol')
+    .doc('oneDoc')
+  let data = createDummyData()
+
   it('Can get a document from origin', async () => {
     expect.assertions(1)
-    let payload = await firstDocRef.get({ source: 'origin' })
+    await doc.set(data)
+    let payload = await doc.get({ source: 'origin' })
     expect(payload).toEqual(data)
   })
 
   it('Can only .get a document', async () => {
     try {
-      await firstColRef.get({ source: 'origin' })
+      await sampleCol.get({ source: 'origin' })
     } catch (err) {
       expect(err).toEqual(new Error('Can only use get() method for documents'))
     }
@@ -132,34 +201,31 @@ describe('.get', async () => {
 
   it('Can get document from edge', async () => {
     expect.assertions(1)
-    let payload = await firstDocRef.get({ source: 'edge' })
+    let payload = await doc.get({ source: 'edge' })
     expect(typeof payload).toBe('object')
   })
 
   it('Can get a document', async () => {
     expect.assertions(1)
-    let payload = await firstDocRef.get()
+    let payload = await doc.get()
     expect(payload).toBeTruthy()
   })
 
   it('Can get a document from origin when there is no cache', async () => {
     expect.assertions(1)
-    await firstDocRef._privateMethods().clearCache()
-    let payload = await firstDocRef.get()
+    await doc._privateMethods().clearCache()
+    let payload = await doc.get()
     expect(payload).toBeTruthy()
   })
 })
 
 describe('.add', async () => {
-  const data = {
-    firstValue: 3,
-    secondValue: 'String'
-  }
+  let data = createDummyData()
 
   it('Check if can .add to collection', async () => {
     expect.assertions(1)
     let payload: any
-    payload = await firstColRef.add(data)
+    payload = await sampleCol.add(data)
     expect(payload.ETag).toBeTruthy()
   })
 
@@ -167,7 +233,7 @@ describe('.add', async () => {
     expect.assertions(1)
 
     try {
-      await firstDocRef.add(data)
+      await sampleDoc.add(data)
     } catch (err) {
       expect(err).toEqual(new Error('Can only add document to collections'))
     }
@@ -175,41 +241,47 @@ describe('.add', async () => {
 })
 
 describe('.update', async () => {
-  const updateData = {
-    firstValue: 2,
-    thirdValue: 'Third Value'
-  }
+  let doc = createDoc(uuid(), {})
+  let data = createDummyData()
+  const updateData = createDummyData()
 
   const checkValue = Object.assign(data, updateData)
 
   it('Updates fields in the document', async () => {
     expect.assertions(1)
-    await firstDocRef.update(updateData)
-    let payload = await firstDocRef.get({ source: 'origin' })
+    await doc.set(data)
+    await doc.update(updateData)
+    let payload = await doc.get({ source: 'origin' })
     expect(payload).toEqual(checkValue)
   })
 
   it('Deletes values from document', async () => {
-    const deleteData = {
-      thirdValue: NearDB.field.deleteValue,
-      forthValue: NearDB.field.deleteValue
-    }
-    expect.assertions(3)
-    await firstDocRef.set(data)
-    await firstDocRef.update(deleteData)
-    let payload = await firstDocRef.get({ source: 'origin' })
+    let firstKey = Object.keys(updateData)[0]
+    let secondKey = Object.keys(updateData)[1]
+    let thirdKey = Object.keys(updateData)[2]
+    let forthKey = Object.keys(updateData)[3]
 
-    expect(payload).toHaveProperty('firstValue')
-    expect(payload).toHaveProperty('secondValue')
-    expect(payload).not.toHaveProperty('thirdValue')
+    let deleteData = {}
+    deleteData[thirdKey] = NearDB.field.deleteValue
+    deleteData[forthKey] = NearDB.field.deleteValue
+
+    expect.assertions(4)
+    await doc.set(updateData)
+    await doc.update(deleteData)
+    let payload = await doc.get({ source: 'origin' })
+
+    expect(payload).toHaveProperty(firstKey)
+    expect(payload).toHaveProperty(secondKey)
+    expect(payload).not.toHaveProperty(thirdKey)
+    expect(payload).not.toHaveProperty(forthKey)
   })
 
   it('Can only update existing documents', async () => {
     expect.assertions(1)
 
     try {
-      let data = await firstColRef.doc(uuid()).update(updateData)
-      console.log(data)
+      // Creates a random document and try to update it
+      await createDoc(uuid(), {}).update(updateData)
     } catch (err) {
       expect(err.code).toEqual('NoSuchKey')
     }
@@ -217,18 +289,22 @@ describe('.update', async () => {
 })
 
 describe('.delete', async () => {
+  let doc = createDoc(uuid(), {})
+  let data = createDummyData()
+
   it('Can get a document', async () => {
     expect.assertions(1)
-    let payload = await firstDocRef.delete()
+    await doc.set(data)
+    let payload = await doc.delete()
+    // TODO: check error on get
     expect(payload).toEqual({})
   })
 })
 
 describe('.getRequest', async () => {
-  // TODO: losing reference to firstDocRef
-  firstColRef = NearDB.database(config).collection('oneCol')
-  firstDocRef = firstColRef.doc('oneDoc')
-  let { getRequest } = firstDocRef._privateMethods()
+  let doc = createDoc(uuid(), {})
+
+  let { getRequest } = doc._privateMethods()
 
   it('Makes a valid request', async () => {
     expect.assertions(1)
@@ -249,23 +325,24 @@ describe('.getRequest', async () => {
 })
 
 describe('.cache', async () => {
-  let cachedData = {
-    cached: true
-  }
+  let cachedData = createDummyData()
+  let doc = createDoc(uuid(), {})
 
   it('.setCache', async () => {
     expect.assertions(2)
-    await firstDocRef._privateMethods().setCache(cachedData)
-    expect(firstDocRef.cache.store).toEqual(cachedData)
-    expect(firstDocRef.getCache().expires).toBeGreaterThan(new Date().getTime())
+    await doc._privateMethods().setCache(cachedData)
+    expect(doc.cache!.store).toEqual(cachedData)
+    expect(doc._privateMethods().getCache().expires).toBeGreaterThan(
+      new Date().getTime()
+    )
   })
 
   it('.hasCache', async () => {
     expect.assertions(2)
-    await firstDocRef._privateMethods().setCache(cachedData)
+    await doc._privateMethods().setCache(cachedData)
 
-    expect(firstDocRef._privateMethods().hasCache()).toEqual(true)
+    expect(doc._privateMethods().hasCache()).toEqual(true)
     await timeout(55)
-    expect(firstDocRef._privateMethods().hasCache()).toEqual(false)
+    expect(doc._privateMethods().hasCache()).toEqual(false)
   })
 })

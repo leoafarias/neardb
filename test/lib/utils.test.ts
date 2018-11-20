@@ -1,29 +1,27 @@
-import { documentPath, reservedKey, uuid } from '../../src/lib/utils'
-
+import {
+  documentPath,
+  documentPathKey,
+  reservedKey,
+  collectionIndicesPath,
+  uuid
+} from '../../src/lib/utils'
+import { isGuid } from '../helpers'
 jest.setTimeout(5000)
 
-function isGuid(uuid: string) {
-  if (uuid[0] === '{') {
-    uuid = uuid.substring(1, uuid.length - 1)
-  }
-  const regexGuid = /^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$/gi
-  return regexGuid.test(uuid)
-}
+const docPath = [
+  { type: 'collection', key: 'colOne' },
+  { type: 'doc', key: 'docOne' },
+  { type: 'collection', key: 'colTwo' },
+  { type: 'doc', key: 'docTwo' }
+]
+
+const colPath = [
+  { type: 'collection', key: 'colOne' },
+  { type: 'doc', key: 'docOne' },
+  { type: 'collection', key: 'colTwo' }
+]
 
 describe('documentPath', () => {
-  const docPath = [
-    { type: 'collection', key: 'colOne' },
-    { type: 'doc', key: 'docOne' },
-    { type: 'collection', key: 'colTwo' },
-    { type: 'doc', key: 'docTwo' }
-  ]
-
-  const colPath = [
-    { type: 'collection', key: 'colOne' },
-    { type: 'doc', key: 'docOne' },
-    { type: 'collection', key: 'colTwo' }
-  ]
-
   it('Does not add .json to first document', () => {
     const newPath = documentPath(docPath).split('/')
     const item = newPath[newPath.length - 3].split('.')
@@ -45,6 +43,16 @@ describe('documentPath', () => {
     expect('collection').toBe(colPath[colPath.length - 1].type)
     expect(item[0]).toBe(colPath[colPath.length - 1].key)
     expect(item[1]).toBeFalsy()
+  })
+
+  it('Cannot get documentPathKey of collection', () => {
+    expect.assertions(1)
+    try {
+      let result = documentPathKey(colPath)
+      console.log(result)
+    } catch (err) {
+      expect(err).toEqual(Error('last Item in path is not a document'))
+    }
   })
 })
 
@@ -70,5 +78,18 @@ describe('uuid', () => {
     } else {
       throw new Error('Not a valid UUID')
     }
+  })
+})
+
+describe('collectionIndicesPath', () => {
+  let matchString = 'colOne/docOne/colTwo/_meta/indices.json'
+  it('Returns if path is a doc', () => {
+    let newDocPath = collectionIndicesPath(docPath)
+    expect(newDocPath).toBe(matchString)
+  })
+
+  it('Returns if path is a collection', () => {
+    let newColPath = collectionIndicesPath(colPath)
+    expect(newColPath).toBe(matchString)
   })
 })

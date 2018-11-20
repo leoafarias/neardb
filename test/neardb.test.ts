@@ -1,38 +1,7 @@
 import NearDB from '../src/neardb'
 import { config } from './config'
 import { uuid } from '../src/lib/utils'
-import * as Chance from 'chance'
-
-let chance = new Chance()
-
-const createDummyData = () => {
-  return {
-    firstName: chance.first(),
-    lastName: chance.last(),
-    age: chance.age(),
-    ssn: chance.ssn(),
-    bio: chance.paragraph(),
-    // Basics
-    bool: chance.bool(),
-    character: chance.character(),
-    floating: chance.floating(),
-    interger: chance.integer(),
-    letter: chance.letter(),
-    natural: chance.natural(),
-    string: chance.string()
-  }
-}
-
-const timeout = (ms: number) => {
-  return new Promise(resolve => setTimeout(resolve, ms))
-}
-
-const createDoc = (key: string, changeConfig: object) => {
-  let updatedConfig = Object.assign(config, changeConfig)
-  return NearDB.database(updatedConfig)
-    .collection(key + 'Col')
-    .doc(key)
-}
+import { createDummyData, createDoc, timeout } from './helpers'
 
 jest.setTimeout(15000)
 
@@ -135,7 +104,6 @@ describe('.set', async () => {
 
   it('Update indices', async () => {
     // Use same key not to trigger a new
-
     expect.assertions(1)
     let payload: any
     payload = await indicesDoc.set(createDummyData())
@@ -213,7 +181,7 @@ describe('.get', async () => {
 
   it('Can get a document from origin when there is no cache', async () => {
     expect.assertions(1)
-    await doc._privateMethods().clearCache()
+    await doc.cache.clear()
     let payload = await doc.get()
     expect(payload).toBeTruthy()
   })
@@ -321,28 +289,5 @@ describe('.getRequest', async () => {
     } catch (err) {
       expect(err).toEqual(new Error('Request failed with status code 404'))
     }
-  })
-})
-
-describe('.cache', async () => {
-  let cachedData = createDummyData()
-  let doc = createDoc(uuid(), {})
-
-  it('.setCache', async () => {
-    expect.assertions(2)
-    await doc._privateMethods().setCache(cachedData)
-    expect(doc.cache!.store).toEqual(cachedData)
-    expect(doc._privateMethods().getCache().expires).toBeGreaterThan(
-      new Date().getTime()
-    )
-  })
-
-  it('.hasCache', async () => {
-    expect.assertions(2)
-    await doc._privateMethods().setCache(cachedData)
-
-    expect(doc._privateMethods().hasCache()).toEqual(true)
-    await timeout(55)
-    expect(doc._privateMethods().hasCache()).toEqual(false)
   })
 })

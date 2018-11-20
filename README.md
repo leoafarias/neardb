@@ -56,6 +56,7 @@ const config = {
     // These options will change by the final release to provide more control
 
     // database: string
+    // indices?: boolean // experimental feature
     // cdn?: {
     //     url: string
     //     headers?: {

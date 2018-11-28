@@ -26,7 +26,23 @@ export interface IConfig {
   }
 }
 
-export interface ICache {}
+export interface ICache {
+  readonly store: Payload
+  readonly cacheExpiration: number
+  readonly expires: number
+  set(data: Payload): void
+  get(): Payload
+  exists(): boolean
+  clear(): void
+}
+
+export interface ICloudStorage {
+  readonly config: IConfig
+  readonly client: any
+  get(path: string): Promise<object>
+  put(value: object, path: string): Promise<object>
+  delete(path: string): Payload
+}
 
 export type GetOptions = {
   source: string

@@ -1,21 +1,12 @@
-import { IConfig } from '../types'
-const S3 = require('aws-sdk/clients/s3')
+import { IConfig, ICloudStorage, Payload } from '../types'
+import * as S3 from 'aws-sdk/clients/s3'
 
-export default class CloudStorage {
-  config: IConfig
-  client: any
+export default class CloudStorage implements ICloudStorage {
+  readonly config: IConfig
+  readonly client: S3
 
   constructor(config: IConfig) {
-    // if (!config) throw new Error('No config was passed to cloudstorage')
-    // if (!config.database) {
-    //   throw new Error('No config database to cloudstorage')
-    // }
-    // if (!config.storage) {
-    //   throw new Error('No options options in the config')
-    // }
-
     this.config = config
-
     this.client = new S3(config.storage)
   }
 
@@ -41,7 +32,7 @@ export default class CloudStorage {
     }
   }
 
-  async get(path: string) {
+  async get(path: string): Promise<Payload> {
     let params = {
       Bucket: this.config.database,
       Key: path

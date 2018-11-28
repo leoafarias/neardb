@@ -1,6 +1,5 @@
 import { IConfig } from '../src/types'
 
-// TODO: AWS S3 Mocking
 // These are public minio keys
 export const cloudConfig: IConfig = {
   cdn: {

@@ -122,18 +122,18 @@ describe('.set', async () => {
     expect(payload.ETag).toBeTruthy()
   })
 
-  it('Cannot set invalid value', async () => {
-    expect.assertions(1)
+  // it('Cannot set invalid value', async () => {
+  //   expect.assertions(1)
 
-    let value: any
-    value = 2
+  //   let value: any
+  //   value = 2
 
-    try {
-      await doc.set(value)
-    } catch (err) {
-      expect(err).toEqual(new Error('Cannot set invalid value'))
-    }
-  })
+  //   try {
+  //     await doc.set(value)
+  //   } catch (err) {
+  //     expect(err).toEqual(new Error('Cannot set invalid value'))
+  //   }
+  // })
 
   // it('Creates new indices for new document in collection', async () => {
   //   expect.assertions(1)

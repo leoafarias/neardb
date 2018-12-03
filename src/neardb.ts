@@ -170,9 +170,6 @@ export default class NearDB {
    */
   async set(value: Payload): Promise<object> {
     try {
-      if (typeof value !== 'object') {
-        throw new Error('Cannot set invalid value')
-      }
       let docPath = documentPath(this.path)
       let payload: Payload = await this.adapter.put(value, docPath)
 

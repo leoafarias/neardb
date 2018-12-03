@@ -42,7 +42,8 @@ export default class CloudStorage implements ICloudStorage {
 
     try {
       data = await this.client.getObject(params).promise()
-      return JSON.parse(data.Body.toString())
+      data.Body = JSON.parse(data.Body.toString())
+      return data
     } catch (err) {
       throw err
     }

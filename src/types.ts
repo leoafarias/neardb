@@ -30,6 +30,7 @@ export interface ICache {
   readonly store: Payload
   readonly cacheExpiration: number
   readonly expires: number
+  readonly etag: string
   set(data: Payload): void
   get(): Payload
   exists(): boolean

@@ -3,9 +3,11 @@ import {
   documentPathKey,
   reservedKey,
   collectionIndicesPath,
-  uuid
+  uuid,
+  iterationCopy
 } from '../../src/lib/utils'
-import { isGuid } from '../helpers'
+import { isGuid, createDummyData } from '../helpers'
+
 jest.setTimeout(10000)
 
 const docPath = [
@@ -26,6 +28,8 @@ const brokenPath = [
   { type: 'doc', key: 'docOne' },
   { type: 'documentz', key: 'colTwo' }
 ]
+
+const sampleObject = createDummyData()
 
 describe('documentPath', () => {
   it('Does not add .json to first document', () => {
@@ -50,16 +54,6 @@ describe('documentPath', () => {
     expect(item[0]).toBe(colPath[colPath.length - 1].key)
     expect(item[1]).toBeFalsy()
   })
-
-  it('Cannot get documentPathKey of collection', () => {
-    expect.assertions(1)
-    try {
-      let result = documentPathKey(colPath)
-      console.log(result)
-    } catch (err) {
-      expect(err).toEqual(Error('last Item in path is not a document'))
-    }
-  })
 })
 
 describe('reservedKey', () => {
@@ -76,13 +70,21 @@ describe('reservedKey', () => {
   })
 })
 
-describe('uuid', () => {
-  it('valid uuid', () => {
-    let uuidValue = uuid()
-    if (isGuid(uuidValue)) {
-      expect(uuidValue).toBeTruthy()
-    } else {
-      throw new Error('Not a valid UUID')
+describe('documentPathKey', () => {
+  it('Can get documentPathKey of document', () => {
+    expect.assertions(1)
+    let docKey = documentPathKey(docPath)
+
+    expect(docKey).toEqual(docPath[docPath.length - 1].key)
+  })
+
+  it('Cannot get documentPathKey of collection', () => {
+    expect.assertions(1)
+    try {
+      let result = documentPathKey(colPath)
+      console.log(result)
+    } catch (err) {
+      expect(err).toEqual(Error('last Item in path is not a document'))
     }
   })
 })
@@ -101,11 +103,29 @@ describe('collectionIndicesPath', () => {
 
   it('Cannot get collectionIndices of invalid collection', () => {
     try {
-      let newColPath = collectionIndicesPath(brokenPath)
+      collectionIndicesPath(brokenPath)
     } catch (err) {
       expect(err).toEqual(
         Error('Cannot create indices with invalid collection')
       )
+    }
+  })
+})
+
+describe('iterationCopy', () => {
+  it('copies object', () => {
+    expect(sampleObject).toEqual(iterationCopy(sampleObject))
+    expect(sampleObject).not.toBe(iterationCopy(sampleObject))
+  })
+})
+
+describe('uuid', () => {
+  it('valid uuid', () => {
+    let uuidValue = uuid()
+    if (isGuid(uuidValue)) {
+      expect(uuidValue).toBeTruthy()
+    } else {
+      throw new Error('Not a valid UUID')
     }
   })
 })

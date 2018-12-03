@@ -8,6 +8,9 @@ export default class Cache implements ICache {
   /** Date when cache expires */
   expires: number
 
+  /** ETag of the object cached */
+  etag: string
+
   /**
    * Constructor sets empty vlaues and sets config expiration
    * @param cacheExpiration configuration expiration to create expires value
@@ -16,15 +19,17 @@ export default class Cache implements ICache {
     this.store = {}
     this.cacheExpiration = cacheExpiration
     this.expires = 0
+    this.etag = ''
   }
 
   /**
    * Sets data as a local value and creates expires date
    * @param data Payload of the data to store locally
    */
-  set(data: Payload): void {
+  set(data: Payload, etag?: string): void {
     this.store = data
     this.expires = new Date().getTime() + this.cacheExpiration
+    this.etag = etag ? etag : ''
   }
 
   /**
@@ -33,6 +38,14 @@ export default class Cache implements ICache {
    */
   get(): Payload {
     return this.store
+  }
+
+  /**
+   * Gets etag from data that is stored in memory
+   * @returns etag of locally stored data
+   */
+  getEtag(): string {
+    return this.etag
   }
 
   /**
@@ -56,5 +69,6 @@ export default class Cache implements ICache {
   clear(): void {
     this.store = {}
     this.expires = 0
+    this.etag = ''
   }
 }

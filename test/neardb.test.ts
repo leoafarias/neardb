@@ -122,14 +122,18 @@ describe('.set', async () => {
     expect(payload.ETag).toBeTruthy()
   })
 
-  // it('Throw error when cant set document ', async () => {
-  //   expect.assertions(1)
-  //   try {
-  //     await errorDoc.set(createDummyData())
-  //   } catch (err) {
-  //     expect(err).toEqual('UnknownEndpoint')
-  //   }
-  // })
+  it('Cannot set invalid value', async () => {
+    expect.assertions(1)
+
+    let value: any
+    value = 2
+
+    try {
+      await doc.set(value)
+    } catch (err) {
+      expect(err).toEqual(new Error('Cannot set invalid value'))
+    }
+  })
 
   // it('Creates new indices for new document in collection', async () => {
   //   expect.assertions(1)
@@ -269,20 +273,20 @@ describe('.delete', async () => {
 describe('.getRequest', async () => {
   let doc = createDoc(uuid(), {})
 
-  let { getRequest } = doc._privateMethods()
+  let { getFromEdge } = doc._privateMethods()
 
   it('Makes a valid request', async () => {
     expect.assertions(1)
 
-    let payload = await getRequest('/200')
-    expect(payload.status).toEqual(200)
+    let payload = await getFromEdge('/200')
+    expect(typeof payload).toEqual('object')
   })
 
   it('Makes a invalid request', async () => {
     expect.assertions(1)
 
     try {
-      let payload = await getRequest('/networkError')
+      let payload = await getFromEdge('/networkError')
       console.log(payload)
     } catch (err) {
       expect(err).toEqual(new Error('Network Error'))

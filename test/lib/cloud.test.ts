@@ -43,7 +43,7 @@ describe('cloudstorage', () => {
     expect.assertions(2)
     await storage.put(value, path)
     const data = await storage.get(path)
-    expect(data).toEqual(value)
+    expect(data.Body).toEqual(value)
     expect(typeof data).toBe('object')
   })
 

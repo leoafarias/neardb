@@ -146,22 +146,17 @@ export default class NearDB {
         data = this.cache.get()
       } else if (source === 'origin') {
         // Source as origin
-        data = await this.adapter.get(docPath)
-        this.cache.set(data)
+        data = await this.getFromOrigin(docPath)
       } else if (
         // Edge and has cdn endpoint
         source === 'edge' &&
         this.config.cdn!.url
       ) {
         // Get it from cloud storage
-        let payload = await this.getRequest(docPath)
-        data = payload.data
-        this.cache.set(data)
+        data = await this.getFromEdge(docPath)
       } else {
-        data = await this.adapter.get(docPath)
-        this.cache.set(data)
+        data = await this.getFromOrigin(docPath)
       }
-
       return data
     } catch (err) {
       throw err
@@ -174,13 +169,13 @@ export default class NearDB {
    * @returns payload of the document requested
    */
   async set(value: Payload): Promise<object> {
-    let docPath = documentPath(this.path)
-    let payload: Payload
     try {
-      payload = this.adapter.put(value, docPath)
-      if (this.config.indices) {
-        await this.updateCollectionIndices(this.path, value)
+      if (typeof value !== 'object') {
+        throw new Error('Cannot set invalid value')
       }
+      let docPath = documentPath(this.path)
+      let payload: Payload = await this.adapter.put(value, docPath)
+
       return payload
     } catch (err) {
       throw err
@@ -248,7 +243,7 @@ export default class NearDB {
 
   _privateMethods() {
     return {
-      getRequest: this.getRequest.bind(this)
+      getFromEdge: this.getFromEdge.bind(this)
     }
   }
 
@@ -258,7 +253,7 @@ export default class NearDB {
    * @returns json object from the request
    */
 
-  private async getRequest(path: string): Promise<Payload> {
+  private async getFromEdge(path: string): Promise<Payload> {
     try {
       let http = HTTP.create({
         baseURL: this.config.cdn!.url,
@@ -267,8 +262,20 @@ export default class NearDB {
       })
 
       let payload = await http.get(path)
+      let etag =
+        payload.headers && payload.headers.ETag ? payload.headers.ETag : null
+      this.cache.set(payload.data, etag)
+      return payload.data
+    } catch (err) {
+      throw err
+    }
+  }
 
-      return payload
+  private async getFromOrigin(path: string): Promise<Payload> {
+    try {
+      let payload = await this.adapter.get(path)
+      this.cache.set(payload.Body, payload.ETag)
+      return payload.Body
     } catch (err) {
       throw err
     }
@@ -280,29 +287,29 @@ export default class NearDB {
    * @param value value that needs to be added to indices
    * @returns a promise for the adapter put
    */
-  async updateCollectionIndices(
-    path: PathList,
-    value: Payload
-  ): Promise<Payload> {
-    let collectionIndices: any
-    // Get path where to store collection indices
-    let indicesPath = collectionIndicesPath(path)
+  // async updateCollectionIndices(
+  //   path: PathList,
+  //   value: Payload
+  // ): Promise<Payload> {
+  //   let collectionIndices: any
+  //   // Get path where to store collection indices
+  //   let indicesPath = collectionIndicesPath(path)
 
-    try {
-      // Get current collection indices
-      collectionIndices = await this.adapter.get(indicesPath)
-    } catch (err) {
-      // If there are no collection indices, create one
-      collectionIndices = {}
-    }
+  //   try {
+  //     // Get current collection indices
+  //     collectionIndices = await this.adapter.get(indicesPath)
+  //   } catch (err) {
+  //     // If there are no collection indices, create one
+  //     collectionIndices = {}
+  //   }
 
-    try {
-      // Use document key as key in the object, and store value
-      collectionIndices[documentPathKey(path)] = value
-      // Save object into collection indices document
-      return this.adapter.put(collectionIndices, indicesPath)
-    } catch (err) {
-      throw err
-    }
-  }
+  //   try {
+  //     // Use document key as key in the object, and store value
+  //     collectionIndices[documentPathKey(path)] = value
+  //     // Save object into collection indices document
+  //     return this.adapter.put(collectionIndices, indicesPath)
+  //   } catch (err) {
+  //     throw err
+  //   }
+  // }
 }

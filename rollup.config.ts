@@ -5,6 +5,8 @@ import sourceMaps from 'rollup-plugin-sourcemaps'
 import camelCase from 'lodash.camelcase'
 import typescript from 'rollup-plugin-typescript2'
 import json from 'rollup-plugin-json'
+import { sizeSnapshot } from 'rollup-plugin-size-snapshot'
+import { terser } from 'rollup-plugin-terser'
 
 const pkg = require('./package.json')
 
@@ -37,6 +39,9 @@ export default {
     // Allow bundling cjs modules (unlike webpack, rollup doesn't understand cjs)
     commonjs(),
     // Resolve source maps to the original source
-    sourceMaps()
+    sourceMaps(),
+    sizeSnapshot()
+    // terser() //waiting for issue with multiple output to be fixed
+    // https://github.com/TrySound/rollup-plugin-terser/pull/16
   ]
 }

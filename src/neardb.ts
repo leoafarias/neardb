@@ -5,9 +5,11 @@ import {
   uuid,
   documentPath,
   collectionIndicesPath,
+  collectionsLockPath,
   reservedKey,
   documentPathKey,
-  iterationCopy
+  iterationCopy,
+  retry
 } from './lib/utils'
 import CloudStorage from './lib/cloud'
 import HTTP from './lib/http'
@@ -15,7 +17,8 @@ import HTTP from './lib/http'
 const defaultConfig = {
   database: '',
   cacheExpiration: 500,
-  indices: false
+  indices: false,
+  retries: 3
 }
 
 export default class NearDB {
@@ -28,7 +31,12 @@ export default class NearDB {
   /** Offline cache of data */
   cache: Cache
 
-  adapter: any
+  instanceId: string
+
+  // TODO: cache collection data locally
+  // collectionData: Payload
+
+  adapter: CloudStorage
 
   // Constants used for document update
   static field = {
@@ -51,6 +59,9 @@ export default class NearDB {
     this.adapter = new CloudStorage(config)
     // Sets empty path type
     this.path = path ? path : []
+
+    // Creates instanceid
+    this.instanceId = uuid()
 
     // Sets default cache value
     this.cache = new Cache(this.config.cacheExpiration)
@@ -135,7 +146,6 @@ export default class NearDB {
       throw new Error('Can only use get() method for documents')
     }
 
-    let docPath = documentPath(this.path)
     let data: Payload
     let source = options && options.source ? options.source : null
 
@@ -146,16 +156,16 @@ export default class NearDB {
         data = this.cache.get()
       } else if (source === 'origin') {
         // Source as origin
-        data = await this.getFromOrigin(docPath)
+        data = await this.getFromOrigin()
       } else if (
         // Edge and has cdn endpoint
         source === 'edge' &&
         this.config.cdn!.url
       ) {
         // Get it from cloud storage
-        data = await this.getFromEdge(docPath)
+        data = await this.getFromEdge()
       } else {
-        data = await this.getFromOrigin(docPath)
+        data = await this.getFromOrigin()
       }
       return data
     } catch (err) {
@@ -171,7 +181,7 @@ export default class NearDB {
   async set(value: Payload): Promise<object> {
     try {
       let docPath = documentPath(this.path)
-      let payload: Payload = await this.adapter.put(value, docPath)
+      let payload = this.adapter.set(value, docPath)
 
       return payload
     } catch (err) {
@@ -225,7 +235,7 @@ export default class NearDB {
     newPath.push({ type: 'doc', key: uuid() })
 
     let docPath = documentPath(newPath)
-    return this.adapter.put(value, docPath)
+    return this.adapter.set(value, docPath)
   }
 
   /**
@@ -235,12 +245,13 @@ export default class NearDB {
   delete() {
     let newPath = [...this.path]
     let docPath = documentPath(newPath)
-    return this.adapter.delete(docPath)
+    return this.adapter.remove(docPath)
   }
 
   _privateMethods() {
     return {
-      getFromEdge: this.getFromEdge.bind(this)
+      getFromEdge: this.getFromEdge.bind(this),
+      collectionLock: this.collectionLock.bind(this)
     }
   }
 
@@ -250,7 +261,7 @@ export default class NearDB {
    * @returns json object from the request
    */
 
-  private async getFromEdge(path: string): Promise<Payload> {
+  private async getFromEdge(): Promise<Payload> {
     try {
       let http = HTTP.create({
         baseURL: this.config.cdn!.url,
@@ -258,21 +269,73 @@ export default class NearDB {
         headers: this.config.cdn!.headers
       })
 
-      let payload = await http.get(path)
-      let etag =
+      let docPath = documentPath(this.path)
+      let payload = await http.get(docPath)
+      let ETag =
         payload.headers && payload.headers.ETag ? payload.headers.ETag : null
-      this.cache.set(payload.data, etag)
+      let VersionId =
+        payload.headers && payload.headers.VersionId
+          ? payload.headers.VersionId
+          : null
+      this.cache.set(payload.data, ETag, VersionId)
       return payload.data
     } catch (err) {
       throw err
     }
   }
 
-  private async getFromOrigin(path: string): Promise<Payload> {
+  private async getFromOrigin(): Promise<Payload> {
     try {
-      let payload = await this.adapter.get(path)
-      this.cache.set(payload.Body, payload.ETag)
+      let docPath = documentPath(this.path)
+      let payload = await this.adapter.get(docPath)
+      this.cache.set(payload.Body, payload.ETag, payload.VersionId)
       return payload.Body
+    } catch (err) {
+      throw err
+    }
+  }
+
+  private async collectionLock() {
+    let colPath = collectionsLockPath(this.path)
+    let colLock: Payload
+    let isOwner: boolean
+    let lockExpired: boolean
+    try {
+      colLock = await this.adapter.head(colPath)
+      lockExpired = colLock.LastModified + 3000 < new Date().getTime()
+      if (lockExpired === true) {
+        await this.adapter.copy(colPath, colLock.ETag, this.instanceId)
+      }
+
+      colLock = await this.adapter.head(colPath)
+      isOwner = colLock.Metadata.instance === this.instanceId
+      lockExpired = colLock.LastModified + 3000 < new Date().getTime()
+
+      if (isOwner && lockExpired === false) {
+        return true
+      }
+
+      if (lockExpired === true) {
+        colLock = await this.adapter.head(colPath)
+      }
+    } catch (err) {
+      // Could not get existing lock create it
+      console.log('Creating collection lock!')
+    }
+
+    // if (isOwner && lockExpired) {
+    // }
+
+    try {
+      colLock = await this.adapter.setLock(colPath, this.instanceId)
+      let checkLock: Payload = await this.adapter.head(colPath)
+      console.log(checkLock)
+      if (
+        colLock.ETag === checkLock.ETag &&
+        checkLock.Metadata.instance === this.instanceId
+      ) {
+        return true
+      }
     } catch (err) {
       throw err
     }
@@ -304,7 +367,7 @@ export default class NearDB {
   //     // Use document key as key in the object, and store value
   //     collectionIndices[documentPathKey(path)] = value
   //     // Save object into collection indices document
-  //     return this.adapter.put(collectionIndices, indicesPath)
+  //     return this.adapter.set(collectionIndices, indicesPath)
   //   } catch (err) {
   //     throw err
   //   }

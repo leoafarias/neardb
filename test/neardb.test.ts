@@ -1,6 +1,6 @@
 import NearDB from '../src/neardb'
 import { config } from './config'
-import { uuid } from '../src/lib/utils'
+import { uuid, documentPath, collectionsLockPath } from '../src/lib/utils'
 import { createDummyData, createDoc } from './helpers'
 import MockAdapter from 'axios-mock-adapter'
 import { getRequestMock } from './mock-data/getRequest'
@@ -278,18 +278,31 @@ describe('.getRequest', async () => {
   it('Makes a valid request', async () => {
     expect.assertions(1)
 
-    let payload = await getFromEdge('/200')
+    let payload = await getFromEdge()
     expect(typeof payload).toEqual('object')
   })
 
-  it('Makes a invalid request', async () => {
-    expect.assertions(1)
+  // it('Makes an invalid request', async () => {
+  //   expect.assertions(1)
 
-    try {
-      let payload = await getFromEdge('/networkError')
-      console.log(payload)
-    } catch (err) {
-      expect(err).toEqual(new Error('Network Error'))
-    }
+  //   try {
+  //     let payload = await getFromEdge('/networkError')
+  //     console.log(payload)
+  //   } catch (err) {
+  //     expect(err).toEqual(new Error('Network Error'))
+  //   }
+  // })
+})
+
+describe('.collectionLock', async () => {
+  let doc = createDoc('colLock', {})
+
+  it('Creates a lock', async () => {
+    expect.assertions(2)
+    let { collectionLock } = doc._privateMethods()
+
+    let colLock = await collectionLock()
+    expect(colLock).toHaveProperty('ETag')
+    // expect(colLock).toHaveProperty('LastModified')
   })
 })

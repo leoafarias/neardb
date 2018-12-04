@@ -23,7 +23,7 @@ describe('cloudstorage', () => {
   it('Save document', async () => {
     expect.assertions(1)
     let payload: any
-    payload = await storage.put(value, path)
+    payload = await storage.set(value, path)
     const etag = payload.ETag ? true : false
 
     expect(etag).toBe(true)
@@ -33,7 +33,7 @@ describe('cloudstorage', () => {
     expect.assertions(1)
 
     try {
-      await brokenStorage.put(value, path)
+      await brokenStorage.set(value, path)
     } catch (err) {
       expect(err.code).toBeTruthy()
     }
@@ -41,7 +41,7 @@ describe('cloudstorage', () => {
 
   it('Get document', async () => {
     expect.assertions(2)
-    await storage.put(value, path)
+    await storage.set(value, path)
     const data = await storage.get(path)
     expect(data.Body).toEqual(value)
     expect(typeof data).toBe('object')
@@ -49,7 +49,7 @@ describe('cloudstorage', () => {
 
   it('Delete document', async () => {
     expect.assertions(2)
-    const data = await storage.delete(path)
+    const data = await storage.remove(path)
     expect(data).toEqual({})
     expect(typeof data).toBe('object')
   })
@@ -58,7 +58,7 @@ describe('cloudstorage', () => {
     expect.assertions(1)
 
     try {
-      let payload = await brokenStorage.delete(path)
+      let payload = await brokenStorage.remove(path)
       return payload
     } catch (err) {
       expect(err.code).toBeTruthy()

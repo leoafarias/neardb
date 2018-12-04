@@ -3,19 +3,21 @@ export interface IDBConfig extends IConfig {
   database: string
   indices: boolean
   cacheExpiration: number
+  retries: number
 }
 
 // User passed config interface
 export interface IConfig {
   database: string
   indices?: boolean
+  retries?: number
+  cacheExpiration?: number
   cdn?: {
     url: string
     headers?: {
       [key: string]: string
     }
   }
-  cacheExpiration?: number
   storage?: {
     endpoint: string
     useSSL?: boolean
@@ -31,18 +33,19 @@ export interface ICache {
   readonly cacheExpiration: number
   readonly expires: number
   readonly etag: string
+  readonly versionId: string
   set(data: Payload): void
   get(): Payload
   exists(): boolean
   clear(): void
 }
 
-export interface ICloudStorage {
+export interface IStorageAdapter {
   readonly config: IConfig
   readonly client: any
   get(path: string): Promise<object>
-  put(value: object, path: string): Promise<object>
-  delete(path: string): Payload
+  set(value: object, path: string): Promise<object>
+  remove(path: string): Payload
 }
 
 export type GetOptions = {

@@ -11,6 +11,9 @@ export default class Cache implements ICache {
   /** ETag of the object cached */
   etag: string
 
+  /** Document version id if versioning is enabled */
+  versionId: string
+
   /**
    * Constructor sets empty vlaues and sets config expiration
    * @param cacheExpiration configuration expiration to create expires value
@@ -20,16 +23,18 @@ export default class Cache implements ICache {
     this.cacheExpiration = cacheExpiration
     this.expires = 0
     this.etag = ''
+    this.versionId = ''
   }
 
   /**
    * Sets data as a local value and creates expires date
    * @param data Payload of the data to store locally
    */
-  set(data: Payload, etag?: string): void {
+  set(data: Payload, etag?: string, versionId?: string): void {
     this.store = data
     this.expires = new Date().getTime() + this.cacheExpiration
     this.etag = etag ? etag : ''
+    this.versionId = versionId ? versionId : ''
   }
 
   /**

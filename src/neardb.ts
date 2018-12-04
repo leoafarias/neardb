@@ -149,25 +149,17 @@ export default class NearDB {
     let data: Payload
     let source = options && options.source ? options.source : null
 
+    // Conditional if there is a cache
+    let isCache = !source && this.cache.exists()
+    // Conditional if its an edge
+    let isEdge = this.config.cdn!.url && (source === 'edge' || !source)
+    // Conditional if its from origin
+    // let isOrigin = source === 'origin'
+
     try {
-      // Get document from the if there is a CDN endpoint
-      if (!source && this.cache.exists()) {
-        // Get from in memory storage if no cahce get from origin
-        data = this.cache.get()
-      } else if (source === 'origin') {
-        // Source as origin
-        data = await this.getFromOrigin()
-      } else if (
-        // Edge and has cdn endpoint
-        source === 'edge' &&
-        this.config.cdn!.url
-      ) {
-        // Get it from cloud storage
-        data = await this.getFromEdge()
-      } else {
-        data = await this.getFromOrigin()
-      }
-      return data
+      if (isCache) return (data = this.cache.get())
+      if (isEdge) return (data = await this.getFromEdge())
+      return (data = await this.getFromOrigin())
     } catch (err) {
       throw err
     }
@@ -181,7 +173,7 @@ export default class NearDB {
   async set(value: Payload): Promise<object> {
     try {
       let docPath = documentPath(this.path)
-      let payload = this.adapter.set(value, docPath)
+      let payload = await this.adapter.set(value, docPath)
 
       return payload
     } catch (err) {
@@ -329,7 +321,7 @@ export default class NearDB {
     try {
       colLock = await this.adapter.setLock(colPath, this.instanceId)
       let checkLock: Payload = await this.adapter.head(colPath)
-      console.log(checkLock)
+
       if (
         colLock.ETag === checkLock.ETag &&
         checkLock.Metadata.instance === this.instanceId

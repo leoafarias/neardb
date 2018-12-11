@@ -1,3 +1,5 @@
+import NearDB from './neardb'
+
 // IConfig interface with defaults
 export interface IDBConfig extends IConfig {
   database: string
@@ -44,8 +46,17 @@ export interface IStorageAdapter {
   readonly config: IConfig
   readonly client: any
   get(path: string): Promise<object>
-  set(value: object, path: string): Promise<object>
+  set(
+    value: object,
+    path: string,
+    metadata?: { [key: string]: any }
+  ): Promise<object>
   remove(path: string): Payload
+}
+
+export interface BaseEntity {
+  instance: NearDB
+  path: PathList
 }
 
 export type GetOptions = {

@@ -27,33 +27,19 @@ export default class CloudStorage implements IStorageAdapter {
     }
   }
 
-  async set(value: object, path: string): Promise<object> {
+  async set(
+    value: object,
+    path: string,
+    metadata?: { [key: string]: any }
+  ): Promise<object> {
     try {
       let params = {
         Body: JSON.stringify(value),
         Bucket: this.config.database,
-        Key: path
-      }
-      let data = await this.client.putObject(params).promise()
-      return data
-    } catch (err) {
-      throw err
-    }
-  }
-
-  async setLock(path: string, instanceId: string): Promise<object> {
-    try {
-      let params = {
-        Body: JSON.stringify({}),
-        Bucket: this.config.database,
         Key: path,
-        Metadata: {
-          instance: instanceId,
-          lockdate: new Date().getTime().toString()
-        }
+        Metadata: metadata
       }
       let data = await this.client.putObject(params).promise()
-
       return data
     } catch (err) {
       throw err
@@ -70,27 +56,11 @@ export default class CloudStorage implements IStorageAdapter {
 
     try {
       data = await this.client.getObject(params).promise()
-      console.log(data.Body.byteLength)
-      if (data.Body && data.Body.byteLength > 0) {
-        data.Body = JSON.parse(data.Body.toString('utf8'))
-      }
-      console.log(data.Body)
-      return data
-    } catch (err) {
-      throw err
-    }
-  }
+      data.Body = JSON.parse(data.Body.toString('utf8'))
+      // if (data.Body && data.Body.byteLength > 1) {
+      //   data.Body = JSON.parse(data.Body.toString('utf8'))
+      // }
 
-  async getLock(path: string): Promise<Payload> {
-    let params = {
-      Bucket: this.config.database,
-      Key: path
-    }
-
-    let data: any
-
-    try {
-      data = await this.client.getObject(params).promise()
       return data
     } catch (err) {
       throw err
@@ -110,23 +80,20 @@ export default class CloudStorage implements IStorageAdapter {
     }
   }
 
-  async copy(path: string, ETag: string, instanceId: string) {
+  async copy(path: string, ETag: string, metadata?: { [key: string]: any }) {
     let params = {
       Bucket: this.config.database,
       Key: path,
       CopySource: this.config.database + '/' + path,
       CopySourceIfMatch: ETag,
       MetadataDirective: 'REPLACE',
-      Metadata: {
-        instanceOwner: instanceId
-      }
+      Metadata: metadata
     }
 
     try {
       let data = await this.client.copyObject(params).promise()
       return data
     } catch (err) {
-      console.error(err)
       throw err
     }
   }

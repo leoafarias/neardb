@@ -1,6 +1,6 @@
 import NearDB from '../neardb'
 import { PathList, BaseEntity, Payload } from '../types'
-import { reservedKey, uuid, documentPath, collectionIndicesPath } from './utils'
+import { reservedKey, uuid, documentPath } from './utils'
 import Document from './document'
 
 export default class Collection implements BaseEntity {
@@ -8,7 +8,7 @@ export default class Collection implements BaseEntity {
   readonly dbPath: string
   readonly instance: NearDB
 
-  constructor(instance: NearDB, key: string, path: PathList) {
+  constructor(instance: NearDB, key: string, path?: PathList) {
     // Check if this is a reserved keyword
     if (reservedKey(key)) {
       throw new Error(key + ': is a reserved keyword')
@@ -17,7 +17,7 @@ export default class Collection implements BaseEntity {
     this.instance = instance
 
     // Copy value of path before passing, to avoid poluting scope
-    let newPath = [...path]
+    let newPath = path ? [...path] : []
 
     newPath.push({
       type: 'collection',

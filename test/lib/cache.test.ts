@@ -9,10 +9,11 @@ describe('.cache', async () => {
   let cachedData = createDummyData()
   let doc = createDoc(uuid(), {})
   let etag = 'asdfaf2331fsd'
+  let versionId = 'asdfaf2331fsd'
 
   it('.setCache', async () => {
     expect.assertions(2)
-    doc.cache.set(cachedData, etag)
+    doc.cache.set(cachedData, etag, versionId)
     expect(doc.cache.expires).toBeGreaterThan(new Date().getTime())
     expect(doc.cache.get()).toEqual(cachedData)
   })

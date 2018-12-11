@@ -1,5 +1,5 @@
 import { IConfig, PathList, IDBConfig } from './types'
-import { uuid, iterationCopy } from './lib/utils'
+import { uuid } from './lib/utils'
 import CloudStorage from './lib/cloud'
 import Collection from './lib/collection'
 
@@ -14,9 +14,6 @@ export default class NearDB {
   /** Config that is used to init NearDB */
   config: IDBConfig
 
-  /** Data path that is used to interact with storage */
-  path: PathList
-
   /** UUID of Instance of NearDB */
   instanceId: string
 
@@ -30,19 +27,18 @@ export default class NearDB {
   /**
    * Constructor to setup config, and path, and required checks.
    * @param config configuration to initiatlize NearDB instance
-   * @param path current path of NearDB, sets to an empty array if nothing is passed
    */
-  constructor(config: IConfig, path?: PathList) {
+  constructor(config: IConfig) {
     /** Check if config exists */
-    // if (!config) throw new Error('No config passed to NearDB')
+
     /** Overwrites config param with default configuration */
-    let defaultCopy: any = iterationCopy(defaultConfig)
-    this.config = Object.assign(defaultCopy, config)
+    this.config = {
+      ...defaultConfig,
+      ...config
+    }
 
     // TODO: define the type of storage in the config
-    this.adapter = new CloudStorage(config)
-    // Sets empty path type
-    this.path = path ? path : []
+    this.adapter = new CloudStorage(this.config)
 
     // Creates instanceid
     this.instanceId = uuid()
@@ -65,6 +61,6 @@ export default class NearDB {
    */
 
   collection(key: string): Collection {
-    return new Collection(this, key, this.path)
+    return new Collection(this, key)
   }
 }

@@ -24,22 +24,24 @@ export const documentPath = (path: PathList): string => {
   return pathArray.join('/')
 }
 
-export const iterationCopy = src => {
-  let target = {}
-  for (let prop in src) {
-    if (src.hasOwnProperty(prop)) {
-      target[prop] = src[prop]
-    }
-  }
-  return target
-}
-
 export const documentPathKey = (path: PathList): string => {
   let lastItem = path[path.length - 1]
   if (lastItem.type === 'document') {
     return lastItem.key
   } else {
     throw new Error('last Item in path is not a document')
+  }
+}
+
+export const checkValidObject = obj => {
+  if (
+    typeof obj === 'object' &&
+    obj instanceof Object &&
+    !(obj instanceof Array)
+  ) {
+    return true
+  } else {
+    throw new Error('Not a valid object')
   }
 }
 

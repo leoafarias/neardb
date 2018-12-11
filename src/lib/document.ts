@@ -1,6 +1,6 @@
 import NearDB from '../neardb'
 import { PathList, BaseEntity, GetOptions, Payload } from '../types'
-import { reservedKey, documentPath } from './utils'
+import { reservedKey, documentPath, checkValidObject } from './utils'
 import Collection from './collection'
 import Cache from './cache'
 import HTTP from './http'
@@ -57,6 +57,7 @@ export default class Document implements BaseEntity {
    */
   async set(value: Payload): Promise<object> {
     try {
+      await checkValidObject(value)
       let payload = await this.instance.adapter.set(value, this.dbPath)
       return payload
     } catch (err) {
@@ -110,7 +111,10 @@ export default class Document implements BaseEntity {
       }
 
       // Updates document
-      let payload = await this.set(Object.assign(doc, value))
+      let payload = await this.set({
+        ...doc,
+        ...value
+      })
 
       // Stores payload in local cache
       this.cache.set(payload)
@@ -143,8 +147,12 @@ export default class Document implements BaseEntity {
       })
 
       let payload = await http.get(this.dbPath)
-      let ETag = payload.headers ? payload.headers.ETag : null
-      let VersionId = payload.headers ? payload.headers.VersionId : null
+      let ETag =
+        payload.headers && payload.headers.ETag ? payload.headers.ETag : null
+      let VersionId =
+        payload.headers && payload.headers.VersionId
+          ? payload.headers.VersionId
+          : null
       this.cache.set(payload.data, ETag, VersionId)
       return payload.data
     } catch (err) {

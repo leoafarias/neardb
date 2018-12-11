@@ -10,17 +10,14 @@ import { getRequestMock } from '../mock-data/getRequest'
 import HTTP from '../../src/lib/http'
 
 const mock = new MockAdapter(HTTP)
-// Returns a failed promise with Error('Network Error');
-mock.onGet('/networkError').networkError()
-mock.onGet().reply(200, getRequestMock)
+mock
+  .onGet()
+  .reply(200, getRequestMock, { ETag: '12371812982', VersionId: '123214123' })
 
 jest.setTimeout(15000)
 
 let sampleCol: Collection
 let sampleDoc: Document
-
-// let instance: any
-
 beforeAll(() => {
   sampleCol = NearDB.database(config).collection('oneCol')
   sampleDoc = sampleCol.doc('oneDoc')
@@ -58,7 +55,6 @@ describe('.collection', async () => {
 describe('.set', async () => {
   let docKey = uuid()
   let doc = createDoc(docKey, {})
-  let indicesDoc = createDoc(docKey, { indices: true })
 
   it('Value can be set on new document', async () => {
     expect.assertions(1)
@@ -71,6 +67,16 @@ describe('.set', async () => {
     let payload: any
     payload = await doc.set(createDummyData())
     expect(payload.ETag).toBeTruthy()
+  })
+
+  it('Cannot set invalid object', async () => {
+    expect.assertions(1)
+    try {
+      let payload: any = 0
+      await doc.set(payload)
+    } catch (err) {
+      expect(err).toEqual(Error('Not a valid object'))
+    }
   })
 })
 
@@ -190,17 +196,27 @@ describe('.getRequest', async () => {
     expect.assertions(1)
 
     let payload = await getFromEdge()
+    mock.reset()
     expect(typeof payload).toEqual('object')
   })
 
-  // it('Makes an invalid request', async () => {
-  //   expect.assertions(1)
+  it('Makes an invalid request', async () => {
+    mock.onGet().networkError()
+    expect.assertions(1)
+    try {
+      await getFromEdge()
+      mock.reset()
+    } catch (err) {
+      expect(err).toEqual(new Error('Network Error'))
+    }
+  })
 
-  //   try {
-  //     let payload = await getFromEdge('/networkError')
-  //     console.log(payload)
-  //   } catch (err) {
-  //     expect(err).toEqual(new Error('Network Error'))
-  //   }
-  // })
+  it('Without headers', async () => {
+    expect.assertions(1)
+    mock.reset()
+    mock.onGet().reply(200, getRequestMock, {})
+    let payload = await getFromEdge()
+    mock.reset()
+    expect(typeof payload).toEqual('object')
+  })
 })

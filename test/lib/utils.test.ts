@@ -2,9 +2,8 @@ import {
   documentPath,
   documentPathKey,
   reservedKey,
-  collectionIndicesPath,
   uuid,
-  iterationCopy
+  checkValidObject
 } from '../../src/lib/utils'
 import { isGuid, createDummyData } from '../helpers'
 
@@ -70,6 +69,19 @@ describe('reservedKey', () => {
   })
 })
 
+describe('checkValidObject', () => {
+  it('Detects valid objects', () => {
+    expect(checkValidObject({})).toEqual(true)
+  })
+
+  it('Detects invalid objects', () => {
+    const check = () => {
+      checkValidObject(0)
+    }
+    expect(check).toThrowError('Not a valid object')
+  })
+})
+
 describe('documentPathKey', () => {
   it('Can get documentPathKey of document', () => {
     expect.assertions(1)
@@ -86,13 +98,6 @@ describe('documentPathKey', () => {
     } catch (err) {
       expect(err).toEqual(Error('last Item in path is not a document'))
     }
-  })
-})
-
-describe('iterationCopy', () => {
-  it('Copies object', () => {
-    expect(sampleObject).toEqual(iterationCopy(sampleObject))
-    expect(sampleObject).not.toBe(iterationCopy(sampleObject))
   })
 })
 

@@ -15,6 +15,7 @@ describe('cloudstorage', () => {
   let value = createDummyData()
 
   let path = 'data.json'
+  let newPath = 'asdfasfd.json'
 
   it('Could not init CloudStorage', () => {
     expect(storage).toBeInstanceOf(CloudStorage)
@@ -47,6 +48,25 @@ describe('cloudstorage', () => {
     expect(typeof data).toBe('object')
   })
 
+  it('Get file info', async () => {
+    expect.assertions(3)
+    await storage.set(value, path)
+    const data = await storage.head(path)
+    expect(data).toHaveProperty('ETag')
+    expect(data).toHaveProperty('LastModified')
+    expect(typeof data).toBe('object')
+  })
+
+  it('Get info from file that doesnt exist', async () => {
+    expect.assertions(1)
+
+    try {
+      await storage.head(newPath)
+    } catch (err) {
+      expect(err.code).toBe('NotFound')
+    }
+  })
+
   it('Delete document', async () => {
     expect.assertions(2)
     const data = await storage.remove(path)
@@ -62,6 +82,25 @@ describe('cloudstorage', () => {
       return payload
     } catch (err) {
       expect(err.code).toBeTruthy()
+    }
+  })
+
+  it('Copy document', async () => {
+    expect.assertions(2)
+    await storage.set(value, path)
+    let doc: any = await storage.head(path)
+    const data = await storage.copy(path, doc.ETag)
+    expect(data.CopyObjectResult).toHaveProperty('ETag')
+    expect(typeof data).toBe('object')
+  })
+
+  it('Cannot copy document that doesnt exist', async () => {
+    expect.assertions(1)
+
+    try {
+      await storage.copy(newPath, 'dummyEtag')
+    } catch (err) {
+      expect(err.code).toBe('NoSuchKey')
     }
   })
 })

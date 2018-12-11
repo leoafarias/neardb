@@ -6,7 +6,7 @@ export const cloudConfig: IConfig = {
     url: 'https://d1pgfx9dotquaq.cloudfront.net'
   },
   database: 'bucket',
-  cacheExpiration: 50,
+  cacheExpiration: 5,
   storage: {
     endpoint: 'play.minio.io:9000',
     useSSL: true,
@@ -17,12 +17,29 @@ export const cloudConfig: IConfig = {
   }
 }
 
+// These are public minio keys
+export const googleConfig: IConfig = {
+  cdn: {
+    url: 'https://storage.googleapis.com/neardb'
+  },
+  database: 'neardb',
+  cacheExpiration: 5,
+  storage: {
+    endpoint: 'https://storage.googleapis.com',
+    useSSL: true,
+    s3ForcePathStyle: true,
+    signatureVersion: 'v4',
+    accessKeyId: 'GOOGBU74SSPE754NCD4WCFVZ', // these a public minio keys so dont worry
+    secretAccessKey: 'ivCfmiGGQu3UbA65Vhs4PTNXMRAD5aUi6d3ikJDw' // these a public minio secret so dont worry
+  }
+}
+
 export const localConfig: IConfig = {
   cdn: {
     url: 'https://d1pgfx9dotquaq.cloudfront.net'
   },
   database: 'bucket',
-  cacheExpiration: 50,
+  cacheExpiration: 5,
   storage: {
     endpoint: 'http://localhost:4569',
     useSSL: false,
@@ -33,4 +50,4 @@ export const localConfig: IConfig = {
   }
 }
 
-export const config = cloudConfig
+export const config = localConfig

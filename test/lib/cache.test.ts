@@ -36,7 +36,7 @@ describe('.cache', async () => {
     expect(doc.cache.get()).toEqual(cachedData)
   })
 
-  it('.existsCache', async () => {
+  it('Cache Exists', async () => {
     let expiration = config.cacheExpiration ? config.cacheExpiration : 0
     expect.assertions(2)
     await doc.cache.set(cachedData)

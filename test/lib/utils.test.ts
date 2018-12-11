@@ -12,20 +12,20 @@ jest.setTimeout(10000)
 
 const docPath = [
   { type: 'collection', key: 'colOne' },
-  { type: 'doc', key: 'docOne' },
+  { type: 'document', key: 'docOne' },
   { type: 'collection', key: 'colTwo' },
-  { type: 'doc', key: 'docTwo' }
+  { type: 'document', key: 'docTwo' }
 ]
 
 const colPath = [
   { type: 'collection', key: 'colOne' },
-  { type: 'doc', key: 'docOne' },
+  { type: 'document', key: 'docOne' },
   { type: 'collection', key: 'colTwo' }
 ]
 
 const brokenPath = [
   { type: 'collection', key: 'colOne' },
-  { type: 'doc', key: 'docOne' },
+  { type: 'document', key: 'docOne' },
   { type: 'documentz', key: 'colTwo' }
 ]
 
@@ -89,31 +89,8 @@ describe('documentPathKey', () => {
   })
 })
 
-describe('collectionIndicesPath', () => {
-  let matchString = 'colOne/docOne/colTwo/_meta/indices.json'
-  it('Returns if path is a doc', () => {
-    let newDocPath = collectionIndicesPath(docPath)
-    expect(newDocPath).toBe(matchString)
-  })
-
-  it('Returns if path is a collection', () => {
-    let newColPath = collectionIndicesPath(colPath)
-    expect(newColPath).toBe(matchString)
-  })
-
-  it('Cannot get collectionIndices of invalid collection', () => {
-    try {
-      collectionIndicesPath(brokenPath)
-    } catch (err) {
-      expect(err).toEqual(
-        Error('Cannot create indices with invalid collection')
-      )
-    }
-  })
-})
-
 describe('iterationCopy', () => {
-  it('copies object', () => {
+  it('Copies object', () => {
     expect(sampleObject).toEqual(iterationCopy(sampleObject))
     expect(sampleObject).not.toBe(iterationCopy(sampleObject))
   })

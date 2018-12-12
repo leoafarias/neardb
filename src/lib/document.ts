@@ -57,7 +57,7 @@ export default class Document implements BaseEntity {
    */
   async set(value: Payload): Promise<object> {
     try {
-      await checkValidObject(value)
+      checkValidObject(value)
       let payload = await this.instance.adapter.set(value, this.dbPath)
       return payload
     } catch (err) {

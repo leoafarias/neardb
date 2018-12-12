@@ -50,4 +50,4 @@ export const localConfig: IConfig = {
   }
 }
 
-export const config = localConfig
+export const config = cloudConfig

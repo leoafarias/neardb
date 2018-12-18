@@ -75,6 +75,9 @@ const neardb = NearDB.database(config);
 | S3ForcePathStyle  | Whether to force path style URLs for S3 objects.                                         | bool   |
 | indices           | Create a collection index when document is stored (experimental)                         | bool   |
 
+### Inspiration
+The design of NearDBs API is heavily inspired by [Firestore](https://firebase.google.com/docs/firestore/).
+
 ### References
 You are able to store the reference of a collection or document, and use the reference when interacting with them.
 ```typescript
@@ -83,7 +86,7 @@ const statesRef = nearDB.collection('states');
 const nyRef = nearDB.collection('states').doc('ny')
 ```
 ### Add a Document
-By using set for document creation  allows you to *set* the document id
+Using *set* for document creation  allows you to set the document id:
 ```typescript
 
 nearDB.collection('states').doc('ny').set({
@@ -92,7 +95,7 @@ nearDB.collection('states').doc('ny').set({
     largestCity: 'New York City'
 })
 ```
-By calling *add* on the collection a document id is auto-generated
+By calling *add* on the collection, a document id is auto-generated:
 ```typescript
 nearDB.collection('states').add({
     name: 'New York',
@@ -101,7 +104,7 @@ nearDB.collection('states').add({
 })
 ```
 ### Update a Document
-By using *set* if the document does not exist it will create it. If it does exist you can use set to overwrite the whole document.
+By using *set*, if the document does not exist, NearDB will create it. If it does exist, `set` will overwrite the whole document.
 ```typescript
 nearDB.collection('states').doc('ny').set({
     name: 'New York',
@@ -110,14 +113,14 @@ nearDB.collection('states').doc('ny').set({
     eastCoast: true
 })
 ```
-If you wish to update fields within a document without overwriting all the data you should use *update*
+If you wish to update fields within a document without overwriting all the data, you should use *update*:
 ```typescript
 nearDB.collection('states').doc('ny').update({
     eastCoast: true
 })
 ```
 
-To delete a value without overwriting the whole document you the following helper constant
+To delete a value without overwriting the whole document, use the following helper constant:
 ```typescript
 nearDB.collection('states').doc('ny').update({
     eastCoast: NearDB.field.deleteValue
@@ -125,25 +128,23 @@ nearDB.collection('states').doc('ny').update({
 ```
 
 ### Delete a Document
-By using *delete* the whole document will be deleted from the bucket
+By using *delete*, the whole document will be deleted from the bucket:
 ```typescript
 nearDB.collection('states').doc('ny').delete()
 ```
 
 ### Get a Document
-You can get the content of a single document by using *get*
+You can get the contents of a single document by using *get*:
 ```typescript
 nearDB.collection('states').doc('ny').get()
 ```
 
-There a few options that you are able to pass on get depending where you want to get the data from.
+*get* takes a few options to specify where you want to get the data from. By default, *get* will try to retrieve the document as follows:
 
-By default *get* will try to retrieve the document the following way.
-1.  Get local data if it exists and has not expired
-2. If CDN is configured will get from there
-3. If there is no local cache and CDN is not configured, it will get from the origin. 
+1. Get local data if it exists and has not expired
+2. If CDN is configured, get from there
+3. If there is no local cache and CDN is not configured, get from the origin. 
 
-There are a few options you are able to pass to force where you get the data from.
 ```typescript
 const options = {
     // Gets data from origin even if 
@@ -163,15 +164,12 @@ npm run test
 ```
 
 ### Documentation
-See documentation generated from TypeDoc [here](https://leoafarias.github.io/neardb/)
+See the [documentation generated from TypeDoc](https://leoafarias.github.io/neardb/).
 
 ## Dependencies
 
 *   [aws sdk](https://github.com/aws/aws-sdk-js) - AWS SDK for JavaScript in the browser and node.js
 *   [axios](https://github.com/axios/axios) - Promise based HTTP client for the browser and node.js
-
-## Inspiration
-The design of NearDBs API is heavily inspired by [Firestore](https://firebase.google.com/docs/firestore/).
 
 ## Contributing
 

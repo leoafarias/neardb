@@ -64,7 +64,7 @@ const neardb = NearDB.database(config);
 | database          | Bucket name that is used to store the data on object storage                             | string |
 | cdn               | CDN configurations for get requests.                                                     | object |
 | - url             | Http endpoint of the CDN that has the bucket as the origin                               | string |
-| - headers         | Configure headers needed for your CDN here. Cache rules, or tokens can be set up through | object |
+| - headers         | Configure headers needed for your CDN here. Cache rules | object |
 | cacheExpiration   | Number in milliseconds which you would like to keep the data cached locally              | number |
 | storage           | Object storage configuration                                                             | object |
 | - endpoint        | Endpoint to object storage                                                               | string |

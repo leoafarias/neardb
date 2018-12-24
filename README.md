@@ -141,9 +141,9 @@ nearDB.collection('states').doc('ny').get()
 
 *get* takes a few options to specify where you want to get the data from. By default, *get* will try to retrieve the document as follows:
 
-1. Get local data if it exists and has not expired
-2. If CDN is configured, get from there
-3. If there is no local cache and CDN is not configured, get from the origin. 
+1.  Get local data if it exists and has not expired
+2.  If CDN is configured, get from there
+3.  If there is no local cache and CDN is not configured, get from the origin. 
 
 ```typescript
 const options = {

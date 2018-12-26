@@ -50,6 +50,8 @@ This is perfect for persistent data that is read frequently and needs to be avai
 
 The design of NearDBs API is heavily inspired by [Firestore](https://firebase.google.com/docs/firestore/).
 
+{% page-ref page="getting-started.md" %}
+
 ## Running the tests
 
 ```bash

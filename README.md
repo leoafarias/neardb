@@ -55,10 +55,6 @@ npm run test
 
 See the [documentation generated from TypeDoc](https://leoafarias.github.io/neardb/).
 
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/leoafarias/neardb/tree/7e9dd64e576316dadfdec2ad51bd7d054ed598c7/LICENSE/README.md) file for details

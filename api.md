@@ -96,5 +96,7 @@ const options = {
 nearDB.collection('states').doc('ny').get(options)
 ```
 
-## 
+### TypeDoc
+
+See the [documentation generated from TypeDoc](https://leoafarias.github.io/neardb/).
 

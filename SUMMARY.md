@@ -4,4 +4,5 @@
 * [Getting Started](getting-started.md)
 * [API](api.md)
 * [Dependencies](dependencies.md)
+* [Contributing](contributing.md)
 

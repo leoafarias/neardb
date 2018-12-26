@@ -55,11 +55,6 @@ npm run test
 
 See the [documentation generated from TypeDoc](https://leoafarias.github.io/neardb/).
 
-## Dependencies
-
-* [aws sdk](https://github.com/aws/aws-sdk-js) - AWS SDK for JavaScript in the browser and node.js
-* [axios](https://github.com/axios/axios) - Promise based HTTP client for the browser and node.js
-
 ## Contributing
 
 Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.

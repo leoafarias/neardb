@@ -1,4 +1,7 @@
 # Table of contents
 
-* [Initial page](README.md)
+* [What is NearDB](README.md)
+* [Getting Started](getting-started.md)
+* [API](api.md)
+* [Dependencies](dependencies.md)
 

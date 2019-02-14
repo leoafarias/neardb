@@ -1,13 +1,10 @@
-import NearDB from '../../src/neardb'
+import { NearDB, Collection, Document, uuid, HTTP } from '../loader'
 
 import { config } from '../config'
 import { createDummyData, createDoc } from '../helpers'
-import Collection from '../../src/lib/collection'
-import Document from '../../src/lib/document'
-import { uuid } from '../../src/lib/utils'
+
 import MockAdapter from 'axios-mock-adapter'
 import { getRequestMock } from '../mock-data/getRequest'
-import HTTP from '../../src/lib/http'
 
 const mock = new MockAdapter(HTTP)
 mock

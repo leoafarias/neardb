@@ -1,4 +1,4 @@
-import NearDB from '../src/neardb'
+import { NearDB } from './loader'
 import * as Chance from 'chance'
 import { config } from './config'
 

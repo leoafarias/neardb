@@ -1,5 +1,4 @@
-import Cache from '../../src/lib/cache'
-import { uuid } from '../../src/lib/utils'
+import { uuid } from '../loader'
 import { config } from '../config'
 import { createDummyData, createDoc, timeout } from '../helpers'
 

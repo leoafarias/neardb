@@ -1,6 +1,5 @@
+import { NearDB, CloudStorage } from '../loader'
 import { config } from '../config'
-import CloudStorage from '../../src/lib/cloud'
-import { uuid } from '../../src/lib/utils'
 import { createDummyData } from '../helpers'
 
 jest.setTimeout(10000)

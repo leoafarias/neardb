@@ -1,5 +1,4 @@
-import NearDB from '../src/neardb'
-import Collection from '../src/lib/collection'
+import { NearDB, Collection } from './loader'
 import { config } from './config'
 
 /**

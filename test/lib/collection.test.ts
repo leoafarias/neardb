@@ -1,6 +1,4 @@
-import NearDB from '../../src/neardb'
-import Collection from '../../src/lib/collection'
-import Document from '../../src/lib/document'
+import { NearDB, Collection, Document } from '../loader'
 import { config } from '../config'
 
 let sampleCol: Collection

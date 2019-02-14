@@ -4,7 +4,7 @@ import {
   reservedKey,
   uuid,
   checkValidObject
-} from '../../src/lib/utils'
+} from '../../src/internal'
 import { isGuid, createDummyData } from '../helpers'
 
 jest.setTimeout(10000)

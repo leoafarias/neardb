@@ -1,9 +1,2 @@
-export {
-  NearDB,
-  Collection,
-  Document,
-  HTTP,
-  Cache,
-  CloudStorage,
-  uuid
-} from './internal'
+export { HTTP, Cache, CloudStorage, uuid } from './internal'
+export { NearDB, Collection, Document } from './lib/core'

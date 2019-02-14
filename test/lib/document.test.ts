@@ -92,8 +92,9 @@ describe('.get', async () => {
 
   it('Can get document from edge', async () => {
     expect.assertions(1)
-    let payload = await doc.get({ source: 'edge' })
-    expect(typeof payload).toBe('object')
+    let payload: any = await doc.get({ source: 'edge' })
+    console.log(payload)
+    expect(payload).toEqual(getRequestMock)
   })
 
   it('Can get a document', async () => {
@@ -104,7 +105,7 @@ describe('.get', async () => {
 
   it('Can get a document from origin when there is no cache', async () => {
     expect.assertions(1)
-    await doc.cache.clear()
+    doc.cache.clear()
     let payload = await doc.get()
     expect(payload).toBeTruthy()
   })

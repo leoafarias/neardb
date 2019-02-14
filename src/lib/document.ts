@@ -1,11 +1,15 @@
-import NearDB from '../neardb'
 import { PathList, BaseEntity, GetOptions, Payload } from '../types'
-import { reservedKey, documentPath, checkValidObject } from './utils'
-import Collection from './collection'
-import Cache from './cache'
-import HTTP from './http'
+import {
+  NearDB,
+  Collection,
+  HTTP,
+  Cache,
+  reservedKey,
+  documentPath,
+  checkValidObject
+} from '../internal'
 
-export default class Document implements BaseEntity {
+export class Document implements BaseEntity {
   /** Data path that is used to interact with storage */
   readonly path: PathList
 

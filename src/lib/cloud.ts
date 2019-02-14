@@ -1,7 +1,7 @@
 import { IConfig, IStorageAdapter, Payload } from '../types'
 import * as S3 from 'aws-sdk/clients/s3'
 
-export default class CloudStorage implements IStorageAdapter {
+export class CloudStorage implements IStorageAdapter {
   readonly config: IConfig
   readonly client: S3
 

@@ -1,4 +1,4 @@
-import NearDB from './neardb'
+import { NearDB } from './internal'
 
 // IConfig interface with defaults
 export interface IDBConfig extends IConfig {

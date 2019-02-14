@@ -1,9 +1,7 @@
-import NearDB from '../neardb'
 import { PathList, BaseEntity, Payload } from '../types'
-import { reservedKey, uuid, documentPath } from './utils'
-import Document from './document'
+import { NearDB, Document, reservedKey, uuid, documentPath } from '../internal'
 
-export default class Collection implements BaseEntity {
+export class Collection implements BaseEntity {
   readonly path: PathList
   readonly dbPath: string
   readonly instance: NearDB

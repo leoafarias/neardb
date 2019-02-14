@@ -1,7 +1,7 @@
 {
   "name": "neardb",
-  "version": "0.1.3",
-  "description": "",
+  "version": "0.1.5",
+  "description": "NearDB is a simple database that leverages cloud infrastructure like document storage and CDN to deliver an inexpensive unbelievably scalable document database optimized for reads and perfect for edge applications",
   "keywords": [
     "database",
     "edge",

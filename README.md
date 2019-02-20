@@ -25,6 +25,11 @@ The idea came up to leverage ubiquitous and mature infrastructure like cloud sto
 *   [Minio](https://www.minio.io/)
 *   any S3 API compatible storage service
 
+#### Client-side compatibility
+Keep in mind while using this for client-side that ACL is done on the bucket/CDN level. It was designed for edge server use so client implementation can be a bit tricky. Open an issue with your specific case, I would love to hear how you plan on using it.
+*   Browser
+*   React Native
+
 #### Who is this for
 
 This is perfect for persistent data that is read frequently and  needs to be avaialble on the edge application to deliver dynamic data while keeping the costs low. Some examples of the best uses are:

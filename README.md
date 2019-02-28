@@ -1,4 +1,4 @@
-<p align="center"><image src="https://raw.githubusercontent.com/leoafarias/neardb/master/logo.png" height="200px" width="200px"/></p>
+<p align="center"><image src="https://raw.githubusercontent.com/leoafarias/neardb/master/logo.png" height="100px" width="100px"/></p>
 
 >NearDB is a simple database that leverages cloud infrastructure like document storage and CDN to deliver an inexpensive unbelievably scalable document database optimized for reads and perfect for edge applications.
 

@@ -196,10 +196,6 @@ export class Document implements BaseEntity {
     // Conditional if its from origin
     // let isOrigin = source === 'origin'
 
-    console.log('source ' + source)
-    console.log(isCache)
-    console.log(isEdge)
-
     try {
       if (isCache) return (data = this.cache.get())
       if (isEdge) return (data = await this.getFromEdge())

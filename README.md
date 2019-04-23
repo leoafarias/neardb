@@ -8,9 +8,9 @@ NearDB is a simple database that leverages cloud infrastructure like document st
 
 While working on building edge applications for higher performance and lower latency there is a need store persistent data also on edge.
 
-There are multiple distributed database solutions but they are very involved and costly while having a much lower global footprint than a CDN.
+Distributed database solutions but they are very involved and costly while having a lower global footprint than a CDN.
 
-The idea came up to leverage ubiquitous and mature infrastructure like cloud storage and CDNs to deliver a persistent data solution from the edge.
+Leverage ubiquitous and mature infrastructure like cloud storage and CDNs to deliver a persistent, performance, and inexpensive db solution from the edge.
 
 ### Use with Edge Apps/Functions
 *   [Zeit Now](https://zeit.co/now) - Global Serverless Deployments
@@ -43,141 +43,13 @@ This is perfect for persistent data that is read frequently and  needs to be ava
 *   You need transactions. (I have some ideas on how to accomplish this, but its currently not implemented.)
 *   Do many writes/sec in the same document. Reads are incredibly efficient, fast and inexpensive; however, writes are always at the origin.
 
-### Installing
+### Documentation & Guides
+See [NearDB.org](https://www.notion.so/NearDB-0d5c6e1b4b344c9cbb77c1ffa08a96ed)
 
-```bash
-npm install neardb
-# or
-yarn add neardb
-```
-
-### Usage
-```typescript
-import Neardb from 'neardb'
-
-const config = {
-    database: 'bucketName'
-    //...
-}
-
-const neardb = NearDB.database(config);
-```
-
-#### Config Options
-| Property          | Description                                                                              | Type   |
-|-------------------|------------------------------------------------------------------------------------------|--------|
-| database          | Bucket name that is used to store the data on object storage                             | string |
-| cdn               | CDN configurations for get requests.                                                     | object |
-| - url             | Http endpoint of the CDN that has the bucket as the origin                               | string |
-| - headers         | Configure headers needed for your CDN here. Cache rules | object |
-| cacheExpiration   | Number in milliseconds which you would like to keep the data cached locally              | number |
-| storage           | Object storage configuration                                                             | object |
-| - endpoint        | Endpoint to object storage                                                               | string |
-| - useSSL          | Set this if you are using a secure connection                                            | bool   |
-| - accessKeyId     | Access Key to object storage service                                                     | string |
-| - secretAccessKey | Secret Key to object storage service                                                     | string |
-| signatureVersion  | Identifies the version of signature that you want to support for authenticated requests  | string |
-| S3ForcePathStyle  | Whether to force path style URLs for S3 objects.                                         | bool   |
-| indices           | Create a collection index when document is stored (experimental)                         | bool   |
-
-### Inspiration
-The design of NearDBs API is heavily inspired by [Firestore](https://firebase.google.com/docs/firestore/).
-
-### References
-You are able to store the reference of a collection or document, and use the reference when interacting with them.
-```typescript
-const statesRef = nearDB.collection('states');
-
-const nyRef = nearDB.collection('states').doc('ny')
-```
-### Add a Document
-Using *set* for document creation  allows you to set the document id:
-```typescript
-
-nearDB.collection('states').doc('ny').set({
-    name: 'New York',
-    population: 19849399,
-    largestCity: 'New York City'
-})
-```
-By calling *add* on the collection, a document id is auto-generated:
-```typescript
-nearDB.collection('states').add({
-    name: 'New York',
-    population: 19849399,
-    largestCity: 'New York City'
-})
-```
-### Update a Document
-By using *set*, if the document does not exist, NearDB will create it. If it does exist, `set` will overwrite the whole document.
-```typescript
-nearDB.collection('states').doc('ny').set({
-    name: 'New York',
-    population: 19849399,
-    largestCity: 'New York City',
-    eastCoast: true
-})
-```
-If you wish to update fields within a document without overwriting all the data, you should use *update*:
-```typescript
-nearDB.collection('states').doc('ny').update({
-    eastCoast: true
-})
-```
-
-To delete a value without overwriting the whole document, use the following helper constant:
-```typescript
-nearDB.collection('states').doc('ny').update({
-    eastCoast: NearDB.field.deleteValue
-})
-```
-
-### Delete a Document
-By using *delete*, the whole document will be deleted from the bucket:
-```typescript
-nearDB.collection('states').doc('ny').delete()
-```
-
-### Get a Document
-You can get the contents of a single document by using *get*:
-```typescript
-nearDB.collection('states').doc('ny').get()
-```
-
-*get* takes a few options to specify where you want to get the data from. By default, *get* will try to retrieve the document as follows:
-
-1.  Get local data if it exists and has not expired
-2.  If CDN is configured, get from there
-3.  If there is no local cache and CDN is not configured, get from the origin. 
-
-```typescript
-const options = {
-    // Gets data from origin even if 
-    // there is local cache and a cdn configured
-    source: 'origin' 
-
-    // Gets data from edge even if 
-    // there is local cache and a cdn configured
-    // source: 'edge' 
-}
-nearDB.collection('states').doc('ny').get(options)
-```
-## Running the tests
-
-```bash
-npm run test
-```
-
-### Documentation
+### TypeDoc
 See the [documentation generated from TypeDoc](https://leoafarias.github.io/neardb/).
 
-## Dependencies
-
-*   [aws sdk](https://github.com/aws/aws-sdk-js) - AWS SDK for JavaScript in the browser and node.js
-*   [axios](https://github.com/axios/axios) - Promise based HTTP client for the browser and node.js
-
 ## Contributing
-
 Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ## License

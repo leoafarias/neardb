@@ -19,10 +19,10 @@ Leverage ubiquitous and mature infrastructure like cloud storage and CDNs to del
 *   [Fly.io](https://fly.io) - Javascript at the edge
 
 #### Works with the following for database storage
-*   [AWS S3](https://aws.amazon.com/s3/)
+*   AWS S3
 *   [Google Cloud Storage](https://www.notion.so/Google-Cloud-Storage-02b21bb5b9e643c39f6845b873f19ef4)
 *   [Digital Ocean Spaces](https://www.notion.so/Digital-Ocean-Spaces-64de88aa20e24af3b48d40b611ebf102)
-*   [Minio](https://www.minio.io/)
+*   Minio
 *   any S3 API compatible storage service
 
 #### Client-side compatibility

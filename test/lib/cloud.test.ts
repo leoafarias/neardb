@@ -93,13 +93,13 @@ describe('cloudstorage', () => {
     expect(typeof data).toBe('object')
   })
 
-  it('Cannot copy document that doesnt exist', async () => {
+  it('Cannot copy document that does not exist', async () => {
     expect.assertions(1)
 
     try {
       await storage.copy(newPath, 'dummyEtag')
     } catch (err) {
-      expect(err.code).toBe('NoSuchKey')
+      expect(err.code).toBeTruthy()
     }
   })
 })

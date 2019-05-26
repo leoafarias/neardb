@@ -15,7 +15,7 @@ export class Cache implements ICache {
   versionId: string
 
   /**
-   * Constructor sets empty vlaues and sets config expiration
+   * Constructor sets empty values and sets config expiration
    * @param cacheExpiration configuration expiration to create expires value
    */
   constructor(cacheExpiration: number) {

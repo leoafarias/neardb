@@ -83,21 +83,8 @@ describe('.get', async () => {
     .doc('oneDoc')
   let data = createDummyData()
 
-  it('Can get a document from origin', async () => {
-    expect.assertions(1)
-    await doc.set(data)
-    let payload = await doc.get({ source: 'origin' })
-    expect(payload).toEqual(data)
-  })
-
-  it('Can get document from edge', async () => {
-    expect.assertions(1)
-    let payload: any = await doc.get({ source: 'edge' })
-    console.log(payload)
-    expect(payload).toEqual(getRequestMock)
-  })
-
   it('Can get a document', async () => {
+    await doc.set(data)
     expect.assertions(1)
     let payload = await doc.get()
     expect(payload).toBeTruthy()
@@ -133,7 +120,7 @@ describe('.update', async () => {
     expect.assertions(1)
     await doc.set(data)
     await doc.update(updateData)
-    let payload = await doc.get({ source: 'origin' })
+    let payload = await doc.get()
     expect(payload).toEqual(checkValue)
   })
 
@@ -150,7 +137,7 @@ describe('.update', async () => {
     expect.assertions(4)
     await doc.set(updateData)
     await doc.update(deleteData)
-    let payload = await doc.get({ source: 'origin' })
+    let payload = await doc.get()
 
     expect(payload).toHaveProperty(firstKey)
     expect(payload).toHaveProperty(secondKey)
@@ -177,44 +164,10 @@ describe('.delete', async () => {
   it('Can delete document', async () => {
     expect.assertions(2)
     await doc.set(data)
-    let payload = await doc.get({ source: 'origin' })
+    let payload = await doc.get()
     let deletedPayload = await doc.delete()
     // TODO: check error on get
     expect(payload).toEqual(data)
     expect(deletedPayload).toEqual({})
-  })
-})
-
-describe('.getRequest', async () => {
-  let doc = createDoc(uuid(), {})
-
-  let { getFromEdge } = doc._privateMethods()
-
-  it('Makes a valid request', async () => {
-    expect.assertions(1)
-
-    let payload = await getFromEdge()
-    mock.reset()
-    expect(typeof payload).toEqual('object')
-  })
-
-  it('Makes an invalid request', async () => {
-    mock.onGet().networkError()
-    expect.assertions(1)
-    try {
-      await getFromEdge()
-      mock.reset()
-    } catch (err) {
-      expect(err).toEqual(new Error('Network Error'))
-    }
-  })
-
-  it('Without headers', async () => {
-    expect.assertions(1)
-    mock.reset()
-    mock.onGet().reply(200, getRequestMock, {})
-    let payload = await getFromEdge()
-    mock.reset()
-    expect(typeof payload).toEqual('object')
   })
 })

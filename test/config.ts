@@ -2,12 +2,9 @@ import { IConfig } from '../src/types'
 
 // These are public minio keys
 export const cloudConfig: IConfig = {
-  cdn: {
-    url: 'https://d1pgfx9dotquaq.cloudfront.net'
-  },
-  database: 'bucket',
   cacheExpiration: 5,
   storage: {
+    bucket: 'bucket',
     endpoint: 'play.minio.io:9000',
     useSSL: true,
     s3ForcePathStyle: true,
@@ -18,12 +15,9 @@ export const cloudConfig: IConfig = {
 }
 
 export const localConfig: IConfig = {
-  cdn: {
-    url: 'https://d1pgfx9dotquaq.cloudfront.net'
-  },
-  database: 'bucket',
   cacheExpiration: 5,
   storage: {
+    bucket: 'bucket',
     endpoint: 'http://localhost:4569',
     useSSL: false,
     s3ForcePathStyle: true,
@@ -33,4 +27,7 @@ export const localConfig: IConfig = {
   }
 }
 
-export const config = cloudConfig
+export const config = localConfig
+
+// accessKeyId: 'AKIAX3GEC3TMCEK34NUO',
+//       secretAccessKey: 'GJQq3LVBFlpV9a8fy2WN9q17I'

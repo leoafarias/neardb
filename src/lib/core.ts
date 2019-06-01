@@ -1,27 +1,17 @@
-import {
-  IConfig,
-  PathList,
-  IDBConfig,
-  BaseEntity,
-  GetOptions,
-  Payload
-} from '../types'
+import { IConfig, PathList, IDBConfig, BaseEntity, Payload } from '../types'
+import constants from './constants'
 
 import {
-  CloudStorage,
+  S3Adapter,
   uuid,
-  HTTP,
   Cache,
   reservedKey,
-  documentPath,
   checkValidObject
 } from '../internal'
 
 const defaultConfig = {
   database: '',
-  cacheExpiration: 500,
-  indices: false,
-  retries: 3
+  cacheExpiration: 500
 }
 
 export class NearDB {
@@ -31,11 +21,11 @@ export class NearDB {
   /** UUID of Instance of NearDB */
   instanceId: string
 
-  adapter: CloudStorage
+  adapter: S3Adapter
 
   // Constants used for document update
   static field = {
-    deleteValue: 'NEARDB.FIELD.DELETE'
+    deleteValue: constants.deleteValue
   }
 
   /**
@@ -52,7 +42,7 @@ export class NearDB {
     }
 
     // TODO: define the type of storage in the config
-    this.adapter = new CloudStorage(this.config)
+    this.adapter = new S3Adapter(this.config)
 
     // Creates instanceid
     this.instanceId = uuid()
@@ -60,7 +50,7 @@ export class NearDB {
 
   /**
    * Static method to create a new instance of NearDB class.
-   * @param config configuration to initiatlize NearDB instance
+   * @param config configuration to initialize NearDB instance
    * @returns an initialized instance of NearDB with the config
    */
 
@@ -81,7 +71,6 @@ export class NearDB {
 
 export class Collection implements BaseEntity {
   readonly path: PathList
-  readonly dbPath: string
   readonly instance: NearDB
 
   constructor(instance: NearDB, key: string, path?: PathList) {
@@ -101,7 +90,6 @@ export class Collection implements BaseEntity {
     })
 
     this.path = newPath
-    this.dbPath = documentPath(this.path)
   }
 
   doc(key: string) {
@@ -129,7 +117,6 @@ export class Document implements BaseEntity {
   readonly cache: Cache
 
   /** String path for storage */
-  readonly dbPath: string
 
   constructor(instance: NearDB, key: string, path: PathList) {
     // Check if this is a reserved keyword
@@ -137,7 +124,7 @@ export class Document implements BaseEntity {
       throw new Error(key + ': is a reserved keyword')
     }
 
-    // Copy value of path before passing, to avoid poluting scope
+    // Copy value of path before passing, to avoid polluting scope
     let newPath = [...path]
 
     // Push new pathItem into the path array
@@ -147,7 +134,6 @@ export class Document implements BaseEntity {
     })
 
     this.path = newPath
-    this.dbPath = documentPath(this.path)
     this.instance = instance
 
     // Sets default cache value
@@ -171,7 +157,7 @@ export class Document implements BaseEntity {
   async set(value: Payload): Promise<object> {
     try {
       checkValidObject(value)
-      let payload = await this.instance.adapter.set(value, this.dbPath)
+      let payload = await this.instance.adapter.set(value, this.path)
       return payload
     } catch (err) {
       throw err
@@ -183,24 +169,10 @@ export class Document implements BaseEntity {
    * @param options sets options on how to get documents
    * @returns payload of the document requested
    */
-  async get(options?: GetOptions): Promise<object> {
-    let data: Payload
-    let config = this.instance.config
-    let source = options && options.source ? options.source : null
-    let cdnUrl = config && config.cdn && config.cdn.url
-
-    // Conditional if there is a cache
-    let isCache = source === null && this.cache.exists()
-    // Conditional if its an edge
-    let isEdge = cdnUrl && (source === 'edge' || source === null)
-    // Conditional if its from origin
-    // let isOrigin = source === 'origin'
-
+  async get(): Promise<object> {
     try {
-      if (isCache) return (data = this.cache.get())
-      if (isEdge) return (data = await this.getFromEdge())
-
-      return (data = await this.getFromOrigin())
+      let payload = await this.instance.adapter.get(this.path)
+      return payload
     } catch (err) {
       throw err
     }
@@ -213,27 +185,8 @@ export class Document implements BaseEntity {
    */
   async update(value: Payload): Promise<Payload> {
     try {
-      let doc: Payload
-      // Get the latest document from the origin
-      doc = await this.get({ source: 'origin' })
-
-      // Loop through all property for custom object actions
-      for (let prop in value) {
-        if (value[prop] === NearDB.field.deleteValue) {
-          // If has deleteValue action, delete the prop
-          delete value[prop]
-          delete doc[prop]
-        }
-      }
-
-      // Updates document
-      let payload = await this.set({
-        ...doc,
-        ...value
-      })
-
-      // Stores payload in local cache
-      this.cache.set(payload)
+      checkValidObject(value)
+      let payload = await this.instance.adapter.update(value, this.path)
       return payload
     } catch (err) {
       throw err
@@ -245,53 +198,6 @@ export class Document implements BaseEntity {
    * @returns empty object
    */
   delete() {
-    return this.instance.adapter.remove(this.dbPath)
-  }
-
-  /**
-   * Makes a get request to the CDN url
-   * @param path path to attach to cdn url on the request
-   * @returns json object from the request
-   */
-
-  private async getFromEdge(): Promise<Payload> {
-    try {
-      let http = HTTP.create({
-        baseURL: this.instance.config.cdn!.url,
-        timeout: 15000,
-        headers: this.instance.config.cdn!.headers
-      })
-
-      let payload = await http.get(this.dbPath)
-
-      let ETag =
-        payload.headers && payload.headers.ETag ? payload.headers.ETag : null
-      let VersionId =
-        payload.headers && payload.headers.VersionId
-          ? payload.headers.VersionId
-          : null
-      this.cache.set(payload.data, ETag, VersionId)
-      return payload.data
-    } catch (err) {
-      throw err
-    }
-  }
-
-  private async getFromOrigin(): Promise<Payload> {
-    try {
-      let payload = await this.instance.adapter.get(this.dbPath)
-
-      this.cache.set(payload.Body, payload.ETag, payload.VersionId)
-      return payload.Body
-    } catch (err) {
-      throw err
-    }
-  }
-
-  _privateMethods() {
-    return {
-      getFromEdge: this.getFromEdge.bind(this),
-      getFromOrigin: this.getFromOrigin.bind(this)
-    }
+    return this.instance.adapter.remove(this.path)
   }
 }

@@ -2,31 +2,24 @@ import { NearDB } from './lib/core'
 
 // IConfig interface with defaults
 export interface IDBConfig extends IConfig {
-  database: string
-  indices: boolean
   cacheExpiration: number
-  retries: number
 }
 
 // User passed config interface
 export interface IConfig {
-  database: string
-  indices?: boolean
-  retries?: number
-  cacheExpiration?: number
-  cdn?: {
-    url: string
-    headers?: {
-      [key: string]: string
-    }
+  instanceUrl?: string
+  headers?: {
+    [key: string]: string
   }
+  cacheExpiration: number
   storage?: {
-    endpoint: string
-    useSSL?: boolean
-    accessKeyId?: string
-    secretAccessKey?: string
-    signatureVersion?: string
-    s3ForcePathStyle?: boolean
+    bucket: string
+    endpoint?: string
+    useSSL: boolean
+    s3ForcePathStyle: boolean
+    signatureVersion: string
+    accessKeyId: string // these a public minio keys so don't worry
+    secretAccessKey: string // these a public minio secret so don't worry
   }
 }
 
@@ -45,13 +38,18 @@ export interface ICache {
 export interface IStorageAdapter {
   readonly config: IConfig
   readonly client: any
-  get(path: string): Promise<object>
+  get(path: PathList): Promise<object>
   set(
     value: object,
-    path: string,
+    path: PathList,
     metadata?: { [key: string]: any }
   ): Promise<object>
-  remove(path: string): Payload
+  update(
+    value: object,
+    path: PathList,
+    metadata?: { [key: string]: any }
+  ): Promise<object>
+  remove(path: PathList): Payload
 }
 
 export interface BaseEntity {

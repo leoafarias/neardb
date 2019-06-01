@@ -40,7 +40,7 @@ export class NearDB {
 
   /**
    * Constructor to setup config, and path, and required checks.
-   * @param config configuration to initiatlize NearDB instance
+   * @param config configuration to initialize NearDB instance
    */
   constructor(config: IConfig) {
     /** Check if config exists */
@@ -92,7 +92,7 @@ export class Collection implements BaseEntity {
 
     this.instance = instance
 
-    // Copy value of path before passing, to avoid poluting scope
+    // Copy value of path before passing, to avoid polluting scope
     let newPath = path ? [...path] : []
 
     newPath.push({

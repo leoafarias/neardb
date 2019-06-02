@@ -6,6 +6,10 @@ import { PathList } from '../types'
  * @returns string of the final path with extension of the document
  */
 export const documentPath = (path: PathList): string => {
+  // Needs to be a valid array
+  if (!Array.isArray(path)) {
+    throw new Error('Not a valid path')
+  }
   let pathArray = path.map((item, index) => {
     if (path.length === index + 1) {
       // This is the last item

@@ -23,16 +23,15 @@ export const createDummyData = () => {
     bool: chance.bool(),
     character: chance.character(),
     floating: chance.floating(),
-    interger: chance.integer(),
+    integer: chance.integer(),
     letter: chance.letter(),
     natural: chance.natural(),
     string: chance.string()
   }
 }
 
-export const createDoc = (key: string, changeConfig: object) => {
-  let updatedConfig = Object.assign(config, changeConfig)
-  return NearDB.database(updatedConfig)
+export const createDoc = (key: string) => {
+  return NearDB.database(config)
     .collection(key + 'Col')
     .doc(key)
 }

@@ -6,10 +6,10 @@ import { createDummyData, createDoc } from '../helpers'
 import MockAdapter from 'axios-mock-adapter'
 import { getRequestMock } from '../mock-data/getRequest'
 
-const mock = new MockAdapter(HTTP)
-mock
-  .onGet()
-  .reply(200, getRequestMock, { ETag: '12371812982', VersionId: '123214123' })
+// const mock = new MockAdapter(HTTP)
+// mock
+//   .onGet()
+//   .reply(200, getRequestMock, { ETag: '12371812982', VersionId: '123214123' })
 
 jest.setTimeout(15000)
 
@@ -22,7 +22,7 @@ beforeAll(() => {
 
 describe('.doc', async () => {
   let docKey = 'main'
-  let doc = createDoc(docKey, {})
+  let doc = createDoc(docKey)
 
   it('Returns NearDB instance', () => {
     expect(doc).toBeInstanceOf(Document)
@@ -35,14 +35,14 @@ describe('.doc', async () => {
 
   it('Cannot create doc with reserved key', async () => {
     const check = () => {
-      createDoc('doc', {})
+      createDoc('doc')
     }
     expect(check).toThrowError('doc: is a reserved keyword')
   })
 })
 
 describe('.collection', async () => {
-  let col = createDoc(uuid(), {}).collection('sampleCol')
+  let col = createDoc(uuid()).collection('sampleCol')
 
   it('Create sub-collection', () => {
     expect(col).toBeInstanceOf(Collection)
@@ -51,7 +51,7 @@ describe('.collection', async () => {
 
 describe('.set', async () => {
   let docKey = uuid()
-  let doc = createDoc(docKey, {})
+  let doc = createDoc(docKey)
 
   it('Value can be set on new document', async () => {
     expect.assertions(1)
@@ -87,7 +87,8 @@ describe('.get', async () => {
     await doc.set(data)
     expect.assertions(1)
     let payload = await doc.get()
-    expect(payload).toBeTruthy()
+
+    expect(typeof payload).toBe('object')
   })
 
   it('Can get a document from origin when there is no cache', async () => {
@@ -110,7 +111,7 @@ describe('.add', async () => {
 })
 
 describe('.update', async () => {
-  let doc = createDoc(uuid(), {})
+  let doc = createDoc(uuid())
   let data = createDummyData()
   const updateData = createDummyData()
 
@@ -124,41 +125,41 @@ describe('.update', async () => {
     expect(payload).toEqual(checkValue)
   })
 
-  it('Deletes values from document', async () => {
-    let firstKey = Object.keys(updateData)[0]
-    let secondKey = Object.keys(updateData)[1]
-    let thirdKey = Object.keys(updateData)[2]
-    let forthKey = Object.keys(updateData)[3]
+  // it('Deletes values from document', async () => {
+  //   let firstKey = Object.keys(updateData)[0]
+  //   let secondKey = Object.keys(updateData)[1]
+  //   let thirdKey = Object.keys(updateData)[2]
+  //   let forthKey = Object.keys(updateData)[3]
 
-    let deleteData = {}
-    deleteData[thirdKey] = NearDB.field.deleteValue
-    deleteData[forthKey] = NearDB.field.deleteValue
+  //   let deleteData = {}
+  //   deleteData[thirdKey] = NearDB.field.deleteValue
+  //   deleteData[forthKey] = NearDB.field.deleteValue
 
-    expect.assertions(4)
-    await doc.set(updateData)
-    await doc.update(deleteData)
-    let payload = await doc.get()
+  //   expect.assertions(4)
+  //   await doc.set(updateData)
+  //   await doc.update(deleteData)
+  //   let payload = await doc.get()
 
-    expect(payload).toHaveProperty(firstKey)
-    expect(payload).toHaveProperty(secondKey)
-    expect(payload).not.toHaveProperty(thirdKey)
-    expect(payload).not.toHaveProperty(forthKey)
-  })
+  //   expect(payload).toHaveProperty(firstKey)
+  //   expect(payload).toHaveProperty(secondKey)
+  //   expect(payload).not.toHaveProperty(thirdKey)
+  //   expect(payload).not.toHaveProperty(forthKey)
+  // })
 
-  it('Can only update existing documents', async () => {
-    expect.assertions(1)
+  // it('Can only update existing documents', async () => {
+  //   expect.assertions(1)
 
-    try {
-      // Creates a random document and try to update it
-      await createDoc(uuid(), {}).update(updateData)
-    } catch (err) {
-      expect(err.code).toEqual('NoSuchKey')
-    }
-  })
+  //   try {
+  //     // Creates a random document and try to update it
+  //     await createDoc(uuid(), {}).update(updateData)
+  //   } catch (err) {
+  //     expect(err.code).toEqual('NoSuchKey')
+  //   }
+  // })
 })
 
 describe('.delete', async () => {
-  let doc = createDoc(uuid(), {})
+  let doc = createDoc(uuid())
   let data = createDummyData()
 
   it('Can delete document', async () => {

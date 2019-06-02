@@ -3,6 +3,7 @@ import { IConfig } from '../src/types'
 // These are public minio keys
 export const cloudConfig: IConfig = {
   cacheExpiration: 5,
+  instanceUrl: 'http://localhost:3000',
   storage: {
     bucket: 'bucket',
     endpoint: 'play.minio.io:9000',
@@ -27,7 +28,4 @@ export const localConfig: IConfig = {
   }
 }
 
-export const config = localConfig
-
-// accessKeyId: 'AKIAX3GEC3TMCEK34NUO',
-//       secretAccessKey: 'GJQq3LVBFlpV9a8fy2WN9q17I'
+export const config = cloudConfig

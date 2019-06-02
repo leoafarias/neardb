@@ -2,7 +2,7 @@ import { IConfig, IStorageAdapter, Payload, PathList } from '../types'
 import { HTTP } from '../lib/http'
 import { AxiosInstance } from 'axios'
 
-export class Now implements IStorageAdapter {
+export class NowAdapter implements IStorageAdapter {
   readonly config: IConfig
   readonly client: AxiosInstance
 
@@ -16,13 +16,16 @@ export class Now implements IStorageAdapter {
   }
 
   static init(config: IConfig) {
-    return new Now(config)
+    return new NowAdapter(config)
   }
 
   async set(value: object, path: PathList): Promise<object> {
     try {
-      let data = await this.client.post('', { params: { path }, data: value })
-      return data
+      let payload = await this.client.post('/', null, {
+        params: { path: JSON.stringify(path) },
+        data: value
+      })
+      return payload.data
     } catch (err) {
       throw err
     }
@@ -30,8 +33,11 @@ export class Now implements IStorageAdapter {
 
   async update(value: object, path: PathList): Promise<object> {
     try {
-      let data = await this.client.put('', { params: { path }, data: value })
-      return data
+      let payload = await this.client.put('', null, {
+        params: { path: JSON.stringify(path) },
+        data: value
+      })
+      return payload.data
     } catch (err) {
       throw err
     }
@@ -39,8 +45,10 @@ export class Now implements IStorageAdapter {
 
   async get(path: PathList): Promise<Payload> {
     try {
-      let data = await this.client.get('', { params: { path } })
-      return data
+      let payload = await this.client.get('', {
+        params: { path: JSON.stringify(path) }
+      })
+      return payload.data
     } catch (err) {
       throw err
     }
@@ -48,8 +56,10 @@ export class Now implements IStorageAdapter {
 
   async remove(path: PathList) {
     try {
-      let data = await this.client.delete('', { params: { path } })
-      return data
+      let payload = await this.client.delete('', {
+        params: { path: JSON.stringify(path) }
+      })
+      return payload.data
     } catch (err) {
       throw err
     }

@@ -1,7 +1,15 @@
-import { IConfig, PathList, IDBConfig, BaseEntity, Payload } from '../types'
+import {
+  IConfig,
+  PathList,
+  IDBConfig,
+  BaseEntity,
+  Payload,
+  IStorageAdapter
+} from '../types'
 import constants from './constants'
 
 import {
+  NowAdapter,
   S3Adapter,
   uuid,
   Cache,
@@ -10,9 +18,10 @@ import {
 } from '../internal'
 
 const defaultConfig = {
-  database: '',
   cacheExpiration: 500
 }
+
+const MainAdapter = NowAdapter
 
 export class NearDB {
   /** Config that is used to init NearDB */
@@ -21,7 +30,7 @@ export class NearDB {
   /** UUID of Instance of NearDB */
   instanceId: string
 
-  adapter: S3Adapter
+  adapter: IStorageAdapter
 
   // Constants used for document update
   static field = {
@@ -42,7 +51,7 @@ export class NearDB {
     }
 
     // TODO: define the type of storage in the config
-    this.adapter = new S3Adapter(this.config)
+    this.adapter = new MainAdapter(this.config)
 
     // Creates instanceid
     this.instanceId = uuid()
@@ -192,12 +201,16 @@ export class Document implements BaseEntity {
       throw err
     }
   }
-
   /**
    * Removes document store in the path of instance
-   * @returns empty object
+   * @returns payload of the document requested
    */
-  delete() {
-    return this.instance.adapter.remove(this.path)
+  async delete(): Promise<object> {
+    try {
+      let payload = await this.instance.adapter.remove(this.path)
+      return payload
+    } catch (err) {
+      throw err
+    }
   }
 }

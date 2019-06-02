@@ -45,18 +45,12 @@ export class S3Adapter implements IStorageAdapter {
         }
       }
 
-      let fileKey = documentPath(path)
-      let params = {
-        Body: JSON.stringify({
-          ...doc,
-          ...value
-        }),
-        Bucket: this.config.storage!.bucket,
-        Key: fileKey
+      let updatedValue = {
+        ...doc,
+        ...value
       }
-      let data: any
-      data = await this.client.putObject(params).promise()
-      return data.Body
+
+      return await this.set(updatedValue, path)
     } catch (err) {
       throw err
     }
@@ -72,7 +66,9 @@ export class S3Adapter implements IStorageAdapter {
     let data: any
     try {
       data = await this.client.getObject(params).promise()
-      data.Body = JSON.parse(data.Body.toString('utf8'))
+      // Convert Buffer to object
+      data.Body = data.Body.toString('utf8')
+      data.Body = JSON.parse(data.Body)
 
       return data.Body
     } catch (err) {
@@ -95,5 +91,3 @@ export class S3Adapter implements IStorageAdapter {
     }
   }
 }
-
-// function createSQLQuery(path: PathList) {}

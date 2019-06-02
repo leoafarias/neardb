@@ -49,7 +49,7 @@ export interface IStorageAdapter {
     path: PathList,
     metadata?: { [key: string]: any }
   ): Promise<object>
-  remove(path: PathList): Payload
+  remove(path: PathList): Promise<object>
 }
 
 export interface BaseEntity {

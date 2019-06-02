@@ -134,7 +134,7 @@
     "typescript": "^3.0.3"
   },
   "dependencies": {
-    "aws-sdk": "^2.402.0",
+    "aws-sdk": "^2.466.0",
     "axios": "^0.18.0"
   }
 }

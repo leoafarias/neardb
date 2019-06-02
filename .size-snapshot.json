@@ -1,20 +1,20 @@
 {
   "dist/neardb.umd.js": {
-    "bundled": 1396027,
-    "minified": 503899,
-    "gzipped": 134962
+    "bundled": 1408617,
+    "minified": 508144,
+    "gzipped": 135416
   },
   "dist/neardb.es.js": {
-    "bundled": 1312201,
-    "minified": 552975,
-    "gzipped": 141967,
+    "bundled": 1323923,
+    "minified": 557393,
+    "gzipped": 142297,
     "treeshaked": {
       "rollup": {
-        "code": 498285,
+        "code": 502708,
         "import_statements": 0
       },
       "webpack": {
-        "code": 505542
+        "code": 508632
       }
     }
   }

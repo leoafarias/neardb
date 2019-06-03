@@ -29,3 +29,6 @@ export const localConfig: IConfig = {
 }
 
 export const config = cloudConfig
+
+// accessKeyId: 'AKIAX3GEC3TMCEK34NUO',
+//       secretAccessKey: 'GJQq3LVBFlpV9a8fy2WN9q17I'

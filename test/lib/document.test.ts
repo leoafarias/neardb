@@ -125,37 +125,37 @@ describe('.update', async () => {
     expect(payload).toEqual(checkValue)
   })
 
-  // it('Deletes values from document', async () => {
-  //   let firstKey = Object.keys(updateData)[0]
-  //   let secondKey = Object.keys(updateData)[1]
-  //   let thirdKey = Object.keys(updateData)[2]
-  //   let forthKey = Object.keys(updateData)[3]
+  it('Deletes values from document', async () => {
+    let firstKey = Object.keys(updateData)[0]
+    let secondKey = Object.keys(updateData)[1]
+    let thirdKey = Object.keys(updateData)[2]
+    let forthKey = Object.keys(updateData)[3]
 
-  //   let deleteData = {}
-  //   deleteData[thirdKey] = NearDB.field.deleteValue
-  //   deleteData[forthKey] = NearDB.field.deleteValue
+    let deleteData = {}
+    deleteData[thirdKey] = NearDB.field.deleteValue
+    deleteData[forthKey] = NearDB.field.deleteValue
 
-  //   expect.assertions(4)
-  //   await doc.set(updateData)
-  //   await doc.update(deleteData)
-  //   let payload = await doc.get()
+    expect.assertions(4)
+    await doc.set(updateData)
+    await doc.update(deleteData)
+    let payload = await doc.get()
 
-  //   expect(payload).toHaveProperty(firstKey)
-  //   expect(payload).toHaveProperty(secondKey)
-  //   expect(payload).not.toHaveProperty(thirdKey)
-  //   expect(payload).not.toHaveProperty(forthKey)
-  // })
+    expect(payload).toHaveProperty(firstKey)
+    expect(payload).toHaveProperty(secondKey)
+    expect(payload).not.toHaveProperty(thirdKey)
+    expect(payload).not.toHaveProperty(forthKey)
+  })
 
-  // it('Can only update existing documents', async () => {
-  //   expect.assertions(1)
+  it('Can only update existing documents', async () => {
+    expect.assertions(1)
 
-  //   try {
-  //     // Creates a random document and try to update it
-  //     await createDoc(uuid(), {}).update(updateData)
-  //   } catch (err) {
-  //     expect(err.code).toEqual('NoSuchKey')
-  //   }
-  // })
+    try {
+      // Creates a random document and try to update it
+      await createDoc(uuid()).update(updateData)
+    } catch (err) {
+      expect(err.code).toEqual('NoSuchKey')
+    }
+  })
 })
 
 describe('.delete', async () => {

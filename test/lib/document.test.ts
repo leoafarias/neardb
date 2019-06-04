@@ -153,7 +153,7 @@ describe('.update', async () => {
       // Creates a random document and try to update it
       await createDoc(uuid()).update(updateData)
     } catch (err) {
-      expect(err.code).toEqual('NoSuchKey')
+      expect(err).toBeTruthy()
     }
   })
 })

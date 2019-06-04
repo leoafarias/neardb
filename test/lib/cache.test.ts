@@ -6,7 +6,7 @@ jest.setTimeout(10000)
 
 describe('.cache', async () => {
   let cachedData = createDummyData()
-  let doc = createDoc(uuid(), {})
+  let doc = createDoc(uuid())
   let etag = 'asdfaf2331fsd'
   let versionId = 'asdfaf2331fsd'
 
@@ -39,7 +39,7 @@ describe('.cache', async () => {
   it('Cache Exists', async () => {
     let expiration = config.cacheExpiration ? config.cacheExpiration : 0
     expect.assertions(2)
-    await doc.cache.set(cachedData)
+    doc.cache.set(cachedData)
     expect(doc.cache.exists()).toEqual(true)
     await timeout(expiration + 1)
     expect(doc.cache.exists()).toEqual(false)

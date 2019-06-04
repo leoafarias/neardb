@@ -11,7 +11,7 @@ export class NowAdapter implements IStorageAdapter {
     this.client = HTTP.create({
       baseURL: this.config.instanceUrl,
       timeout: 15000,
-      headers: this.config.headers
+      headers: { 'Content-Type': 'application/json' }
     })
   }
 
@@ -21,9 +21,8 @@ export class NowAdapter implements IStorageAdapter {
 
   async set(value: object, path: PathList): Promise<object> {
     try {
-      let payload = await this.client.post('/', null, {
-        params: { path: JSON.stringify(path) },
-        data: value
+      let payload = await this.client.post('/', value, {
+        params: { path: JSON.stringify(path) }
       })
       return payload.data
     } catch (err) {
@@ -33,9 +32,8 @@ export class NowAdapter implements IStorageAdapter {
 
   async update(value: object, path: PathList): Promise<object> {
     try {
-      let payload = await this.client.put('', null, {
-        params: { path: JSON.stringify(path) },
-        data: value
+      let payload = await this.client.put('', value, {
+        params: { path: JSON.stringify(path) }
       })
       return payload.data
     } catch (err) {

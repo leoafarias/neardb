@@ -96,6 +96,7 @@
   "devDependencies": {
     "@commitlint/cli": "^7.1.2",
     "@commitlint/config-conventional": "^7.1.2",
+    "@types/dotenv": "^6.1.1",
     "@types/jest": "^23.3.2",
     "@types/node": "^10.11.0",
     "axios-mock-adapter": "^1.15.0",
@@ -105,6 +106,7 @@
     "coveralls": "^3.0.2",
     "cross-env": "^5.2.0",
     "cz-conventional-changelog": "^2.1.0",
+    "dotenv": "^8.0.0",
     "husky": "^1.0.1",
     "jest": "^23.6.0",
     "jest-config": "^23.6.0",

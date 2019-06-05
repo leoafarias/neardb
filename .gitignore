@@ -44,6 +44,8 @@ compiled/
 # Dependency directories
 node_modules/
 jspm_packages/
+yarn.lock
+packages.lock
 
 # Typescript v1 declaration files
 typings/

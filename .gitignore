@@ -45,7 +45,7 @@ compiled/
 node_modules/
 jspm_packages/
 yarn.lock
-packages.lock
+packages-lock.json
 
 # Typescript v1 declaration files
 typings/

@@ -73,7 +73,7 @@ export function reservedKey(keyword: string) {
  * Creates a random uuid
  * @returns an uuid
  */
-export function uuid() {
+export function uuid(): string {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
     const r = (Math.random() * 16) | 0
 

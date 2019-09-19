@@ -9,7 +9,7 @@ import {
 import constants from './constants'
 
 import {
-  NowAdapter,
+  // NowAdapter,
   S3Adapter,
   uuid,
   Cache,
@@ -21,7 +21,7 @@ const defaultConfig = {
   cacheExpiration: 500
 }
 
-const MainAdapter = NowAdapter
+const MainAdapter = S3Adapter
 
 export class NearDB {
   /** Config that is used to init NearDB */

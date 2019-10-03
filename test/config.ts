@@ -1,7 +1,7 @@
-import { IConfig } from '../src/types'
+import { Config } from '../src/types'
 
 // These are public minio keys
-export const cloudConfig: IConfig = {
+export const cloudConfig: Config = {
   cdn: {
     url: 'https://d1pgfx9dotquaq.cloudfront.net'
   },
@@ -17,7 +17,7 @@ export const cloudConfig: IConfig = {
   }
 }
 
-export const localConfig: IConfig = {
+export const localConfig: Config = {
   cdn: {
     url: 'https://d1pgfx9dotquaq.cloudfront.net'
   },
@@ -33,4 +33,4 @@ export const localConfig: IConfig = {
   }
 }
 
-export const config = cloudConfig
+export const config = localConfig

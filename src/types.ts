@@ -1,7 +1,7 @@
 import { NearDB } from './lib/core'
 
-// IConfig interface with defaults
-export interface IDBConfig extends IConfig {
+// Config interface with defaults
+export interface DBConfig extends Config {
   database: string
   indices: boolean
   cacheExpiration: number
@@ -9,7 +9,7 @@ export interface IDBConfig extends IConfig {
 }
 
 // User passed config interface
-export interface IConfig {
+export interface Config {
   database: string
   indices?: boolean
   retries?: number
@@ -30,7 +30,7 @@ export interface IConfig {
   }
 }
 
-export interface ICache {
+export interface Cache {
   readonly store: Payload
   readonly cacheExpiration: number
   readonly expires: number
@@ -42,13 +42,15 @@ export interface ICache {
   clear(): void
 }
 
-export interface IStorageAdapter {
-  readonly config: IConfig
+export interface StorageAdapter {
+  readonly config: Config
+  // tslint:disable-next-line:no-any
   readonly client: any
   get(path: string): Promise<object>
   set(
     value: object,
     path: string,
+    // tslint:disable-next-line:no-any
     metadata?: { [key: string]: any }
   ): Promise<object>
   remove(path: string): Payload
@@ -59,17 +61,18 @@ export interface BaseEntity {
   path: PathList
 }
 
-export type GetOptions = {
+export interface GetOptions {
   source: string
 }
 
 export type PathList = PathItem[]
 
-export type PathItem = {
+export interface PathItem {
   type: string
   key: string
 }
 
-export type Payload = {
+export interface Payload {
+  // tslint:disable-next-line:no-any
   [key: string]: any
 }

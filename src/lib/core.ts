@@ -1,7 +1,7 @@
 import {
-  IConfig,
+  Config,
   PathList,
-  IDBConfig,
+  DBConfig,
   BaseEntity,
   GetOptions,
   Payload
@@ -11,7 +11,7 @@ import {
   CloudStorage,
   uuid,
   HTTP,
-  Cache,
+  DBCache,
   reservedKey,
   documentPath,
   checkValidObject
@@ -26,7 +26,7 @@ const defaultConfig = {
 
 export class NearDB {
   /** Config that is used to init NearDB */
-  config: IDBConfig
+  config: DBConfig
 
   /** UUID of Instance of NearDB */
   instanceId: string
@@ -42,7 +42,7 @@ export class NearDB {
    * Constructor to setup config, and path, and required checks.
    * @param config configuration to initialize NearDB instance
    */
-  constructor(config: IConfig) {
+  constructor(config: Config) {
     /** Check if config exists */
 
     /** Overwrites config param with default configuration */
@@ -64,7 +64,7 @@ export class NearDB {
    * @returns an initialized instance of NearDB with the config
    */
 
-  static database(config: IConfig): NearDB {
+  static database(config: Config): NearDB {
     return new NearDB(Object.assign(defaultConfig, config))
   }
 
@@ -93,7 +93,7 @@ export class Collection implements BaseEntity {
     this.instance = instance
 
     // Copy value of path before passing, to avoid polluting scope
-    let newPath = path ? [...path] : []
+    const newPath = path ? [...path] : []
 
     newPath.push({
       type: 'collection',
@@ -126,7 +126,7 @@ export class Document implements BaseEntity {
   readonly instance: NearDB
 
   /** Offline cache of data */
-  readonly cache: Cache
+  readonly cache: DBCache
 
   /** String path for storage */
   readonly dbPath: string
@@ -138,7 +138,7 @@ export class Document implements BaseEntity {
     }
 
     // Copy value of path before passing, to avoid poluting scope
-    let newPath = [...path]
+    const newPath = [...path]
 
     // Push new pathItem into the path array
     newPath.push({
@@ -151,7 +151,7 @@ export class Document implements BaseEntity {
     this.instance = instance
 
     // Sets default cache value
-    this.cache = new Cache(this.instance.config.cacheExpiration)
+    this.cache = new DBCache(this.instance.config.cacheExpiration)
   }
 
   /**
@@ -171,7 +171,7 @@ export class Document implements BaseEntity {
   async set(value: Payload): Promise<object> {
     try {
       checkValidObject(value)
-      let payload = await this.instance.adapter.set(value, this.dbPath)
+      const payload = await this.instance.adapter.set(value, this.dbPath)
       return payload
     } catch (err) {
       throw err
@@ -185,14 +185,14 @@ export class Document implements BaseEntity {
    */
   async get(options?: GetOptions): Promise<object> {
     let data: Payload
-    let config = this.instance.config
-    let source = options && options.source ? options.source : null
-    let cdnUrl = config && config.cdn && config.cdn.url
+    const config = this.instance.config
+    const source = options && options.source ? options.source : null
+    const cdnUrl = config && config.cdn && config.cdn.url
 
     // Conditional if there is a cache
-    let isCache = source === null && this.cache.exists()
+    const isCache = source === null && this.cache.exists()
     // Conditional if its an edge
-    let isEdge = cdnUrl && (source === 'edge' || source === null)
+    const isEdge = cdnUrl && (source === 'edge' || source === null)
     // Conditional if its from origin
     // let isOrigin = source === 'origin'
 
@@ -218,7 +218,7 @@ export class Document implements BaseEntity {
       doc = await this.get({ source: 'origin' })
 
       // Loop through all property for custom object actions
-      for (let prop in value) {
+      for (const prop in value) {
         if (value[prop] === NearDB.field.deleteValue) {
           // If has deleteValue action, delete the prop
           delete value[prop]
@@ -227,7 +227,7 @@ export class Document implements BaseEntity {
       }
 
       // Updates document
-      let payload = await this.set({
+      const payload = await this.set({
         ...doc,
         ...value
       })
@@ -256,21 +256,21 @@ export class Document implements BaseEntity {
 
   private async getFromEdge(): Promise<Payload> {
     try {
-      let http = HTTP.create({
+      const http = HTTP.create({
         baseURL: this.instance.config.cdn!.url,
         timeout: 15000,
         headers: this.instance.config.cdn!.headers
       })
 
-      let payload = await http.get(this.dbPath)
+      const payload = await http.get(this.dbPath)
 
-      let ETag =
+      const eTag =
         payload.headers && payload.headers.ETag ? payload.headers.ETag : null
-      let VersionId =
+      const versionId =
         payload.headers && payload.headers.VersionId
           ? payload.headers.VersionId
           : null
-      this.cache.set(payload.data, ETag, VersionId)
+      this.cache.set(payload.data, eTag, versionId)
       return payload.data
     } catch (err) {
       throw err
@@ -279,7 +279,7 @@ export class Document implements BaseEntity {
 
   private async getFromOrigin(): Promise<Payload> {
     try {
-      let payload = await this.instance.adapter.get(this.dbPath)
+      const payload = await this.instance.adapter.get(this.dbPath)
 
       this.cache.set(payload.Body, payload.ETag, payload.VersionId)
       return payload.Body

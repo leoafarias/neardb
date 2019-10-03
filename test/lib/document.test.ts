@@ -21,8 +21,8 @@ beforeAll(() => {
 })
 
 describe('.doc', async () => {
-  let docKey = 'main'
-  let doc = createDoc(docKey, {})
+  const docKey = 'main'
+  const doc = createDoc(docKey, {})
 
   it('Returns NearDB instance', () => {
     expect(doc).toBeInstanceOf(Document)
@@ -42,7 +42,7 @@ describe('.doc', async () => {
 })
 
 describe('.collection', async () => {
-  let col = createDoc(uuid(), {}).collection('sampleCol')
+  const col = createDoc(uuid(), {}).collection('sampleCol')
 
   it('Create sub-collection', () => {
     expect(col).toBeInstanceOf(Collection)
@@ -50,17 +50,19 @@ describe('.collection', async () => {
 })
 
 describe('.set', async () => {
-  let docKey = uuid()
-  let doc = createDoc(docKey, {})
+  const docKey = uuid()
+  const doc = createDoc(docKey, {})
 
   it('Value can be set on new document', async () => {
     expect.assertions(1)
-    let payload: any = await doc.set(createDummyData())
+    // tslint:disable-next-line:no-any
+    const payload: any = await doc.set(createDummyData())
     expect(payload.ETag).toBeTruthy()
   })
 
   it('Value can be set on existing document', async () => {
     expect.assertions(1)
+    // tslint:disable-next-line:no-any
     let payload: any
     payload = await doc.set(createDummyData())
     expect(payload.ETag).toBeTruthy()
@@ -69,7 +71,8 @@ describe('.set', async () => {
   it('Cannot set invalid object', async () => {
     expect.assertions(1)
     try {
-      let payload: any = 0
+      // tslint:disable-next-line:no-any
+      const payload: any = 0
       await doc.set(payload)
     } catch (err) {
       expect(err).toEqual(Error('Not a valid object'))
@@ -78,44 +81,46 @@ describe('.set', async () => {
 })
 
 describe('.get', async () => {
-  let doc = NearDB.database(config)
+  const doc = NearDB.database(config)
     .collection('oneCol')
     .doc('oneDoc')
-  let data = createDummyData()
+  const data = createDummyData()
 
   it('Can get a document from origin', async () => {
     expect.assertions(1)
     await doc.set(data)
-    let payload = await doc.get({ source: 'origin' })
+    const payload = await doc.get({ source: 'origin' })
     expect(payload).toEqual(data)
   })
 
   it('Can get document from edge', async () => {
     expect.assertions(1)
-    let payload: any = await doc.get({ source: 'edge' })
+    // tslint:disable-next-line:no-any
+    const payload: any = await doc.get({ source: 'edge' })
     console.log(payload)
     expect(payload).toEqual(getRequestMock)
   })
 
   it('Can get a document', async () => {
     expect.assertions(1)
-    let payload = await doc.get()
+    const payload = await doc.get()
     expect(payload).toBeTruthy()
   })
 
   it('Can get a document from origin when there is no cache', async () => {
     expect.assertions(1)
     doc.cache.clear()
-    let payload = await doc.get()
+    const payload = await doc.get()
     expect(payload).toBeTruthy()
   })
 })
 
 describe('.add', async () => {
-  let data = createDummyData()
+  const data = createDummyData()
 
   it('Check if can .add to collection', async () => {
     expect.assertions(1)
+    // tslint:disable-next-line:no-any
     let payload: any
     payload = await sampleCol.add(data)
     expect(payload.ETag).toBeTruthy()
@@ -123,8 +128,8 @@ describe('.add', async () => {
 })
 
 describe('.update', async () => {
-  let doc = createDoc(uuid(), {})
-  let data = createDummyData()
+  const doc = createDoc(uuid(), {})
+  const data = createDummyData()
   const updateData = createDummyData()
 
   const checkValue = Object.assign(data, updateData)
@@ -133,24 +138,24 @@ describe('.update', async () => {
     expect.assertions(1)
     await doc.set(data)
     await doc.update(updateData)
-    let payload = await doc.get({ source: 'origin' })
+    const payload = await doc.get({ source: 'origin' })
     expect(payload).toEqual(checkValue)
   })
 
   it('Deletes values from document', async () => {
-    let firstKey = Object.keys(updateData)[0]
-    let secondKey = Object.keys(updateData)[1]
-    let thirdKey = Object.keys(updateData)[2]
-    let forthKey = Object.keys(updateData)[3]
+    const firstKey = Object.keys(updateData)[0]
+    const secondKey = Object.keys(updateData)[1]
+    const thirdKey = Object.keys(updateData)[2]
+    const forthKey = Object.keys(updateData)[3]
 
-    let deleteData = {}
+    const deleteData = {}
     deleteData[thirdKey] = NearDB.field.deleteValue
     deleteData[forthKey] = NearDB.field.deleteValue
 
     expect.assertions(4)
     await doc.set(updateData)
     await doc.update(deleteData)
-    let payload = await doc.get({ source: 'origin' })
+    const payload = await doc.get({ source: 'origin' })
 
     expect(payload).toHaveProperty(firstKey)
     expect(payload).toHaveProperty(secondKey)
@@ -171,14 +176,14 @@ describe('.update', async () => {
 })
 
 describe('.delete', async () => {
-  let doc = createDoc(uuid(), {})
-  let data = createDummyData()
+  const doc = createDoc(uuid(), {})
+  const data = createDummyData()
 
   it('Can delete document', async () => {
     expect.assertions(2)
     await doc.set(data)
-    let payload = await doc.get({ source: 'origin' })
-    let deletedPayload = await doc.delete()
+    const payload = await doc.get({ source: 'origin' })
+    const deletedPayload = await doc.delete()
     // TODO: check error on get
     expect(payload).toEqual(data)
     expect(deletedPayload).toEqual({})
@@ -186,14 +191,14 @@ describe('.delete', async () => {
 })
 
 describe('.getRequest', async () => {
-  let doc = createDoc(uuid(), {})
+  const doc = createDoc(uuid(), {})
 
-  let { getFromEdge } = doc._privateMethods()
+  const { getFromEdge } = doc._privateMethods()
 
   it('Makes a valid request', async () => {
     expect.assertions(1)
 
-    let payload = await getFromEdge()
+    const payload = await getFromEdge()
     mock.reset()
     expect(typeof payload).toEqual('object')
   })
@@ -213,7 +218,7 @@ describe('.getRequest', async () => {
     expect.assertions(1)
     mock.reset()
     mock.onGet().reply(200, getRequestMock, {})
-    let payload = await getFromEdge()
+    const payload = await getFromEdge()
     mock.reset()
     expect(typeof payload).toEqual('object')
   })

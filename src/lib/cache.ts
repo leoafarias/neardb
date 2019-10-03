@@ -1,6 +1,6 @@
-import { Payload, ICache } from '../types'
+import { Payload, Cache } from '../types'
 
-export class Cache implements ICache {
+export class DBCache implements Cache {
   /** Data that is stored in memory */
   store: Payload
   /** Configuration on how long to keep in memory */

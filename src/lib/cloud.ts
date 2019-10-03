@@ -1,26 +1,26 @@
-import { IConfig, IStorageAdapter, Payload } from '../types'
+import { Config, StorageAdapter, Payload } from '../types'
 import * as S3 from 'aws-sdk/clients/s3'
 
-export class CloudStorage implements IStorageAdapter {
-  readonly config: IConfig
+export class CloudStorage implements StorageAdapter {
+  readonly config: Config
   readonly client: S3
 
-  constructor(config: IConfig) {
+  constructor(config: Config) {
     this.config = config
     this.client = new S3(config.storage)
   }
 
-  static init(config: IConfig) {
+  static init(config: Config) {
     return new CloudStorage(config)
   }
 
   async head(path: string): Promise<object> {
     try {
-      let params = {
+      const params = {
         Bucket: this.config.database,
         Key: path
       }
-      let data = await this.client.headObject(params).promise()
+      const data = await this.client.headObject(params).promise()
       return data
     } catch (err) {
       throw err
@@ -30,16 +30,17 @@ export class CloudStorage implements IStorageAdapter {
   async set(
     value: object,
     path: string,
+    // tslint:disable-next-line:no-any
     metadata?: { [key: string]: any }
   ): Promise<object> {
     try {
-      let params = {
+      const params = {
         Body: JSON.stringify(value),
         Bucket: this.config.database,
         Key: path,
         Metadata: metadata
       }
-      let data = await this.client.putObject(params).promise()
+      const data = await this.client.putObject(params).promise()
       return data
     } catch (err) {
       throw err
@@ -47,11 +48,12 @@ export class CloudStorage implements IStorageAdapter {
   }
 
   async get(path: string): Promise<Payload> {
-    let params = {
+    const params = {
       Bucket: this.config.database,
       Key: path
     }
 
+    // tslint:disable-next-line:no-any
     let data: any
 
     try {
@@ -69,29 +71,29 @@ export class CloudStorage implements IStorageAdapter {
 
   async remove(path: string) {
     try {
-      let params = {
+      const params = {
         Bucket: this.config.database,
         Key: path
       }
-      let data = await this.client.deleteObject(params).promise()
+      const data = await this.client.deleteObject(params).promise()
       return data
     } catch (err) {
       throw err
     }
   }
-
-  async copy(path: string, ETag: string, metadata?: { [key: string]: any }) {
-    let params = {
+  // tslint:disable-next-line:no-any
+  async copy(path: string, eTag: string, metadata?: { [key: string]: any }) {
+    const params = {
       Bucket: this.config.database,
       Key: path,
       CopySource: this.config.database + '/' + path,
-      CopySourceIfMatch: ETag,
+      CopySourceIfMatch: eTag,
       MetadataDirective: 'REPLACE',
       Metadata: metadata
     }
 
     try {
-      let data = await this.client.copyObject(params).promise()
+      const data = await this.client.copyObject(params).promise()
       return data
     } catch (err) {
       throw err

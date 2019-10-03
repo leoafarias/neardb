@@ -12,8 +12,8 @@ beforeAll(() => {
 })
 
 describe('.collection', () => {
-  let colKey = 'main'
-  let colRef = NearDB.database(config).collection(colKey)
+  const colKey = 'main'
+  const colRef = NearDB.database(config).collection(colKey)
   it('Returns NearDB instance', () => {
     expect(colRef).toBeInstanceOf(Collection)
   })
@@ -24,7 +24,7 @@ describe('.collection', () => {
     expect(lastPathIndex).toEqual({ type: 'collection', key: colKey })
   })
 
-  it('Cannot create collection wtih reserved key', async () => {
+  it('Cannot create collection with reserved key', () => {
     const check = () => {
       NearDB.database(config).collection('collection')
     }

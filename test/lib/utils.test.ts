@@ -73,19 +73,12 @@ describe('checkValidObject', () => {
   it('Detects valid objects', () => {
     expect(checkValidObject({})).toEqual(true)
   })
-
-  it('Detects invalid objects', () => {
-    const check = () => {
-      checkValidObject(0)
-    }
-    expect(check).toThrowError('Not a valid object')
-  })
 })
 
 describe('documentPathKey', () => {
   it('Can get documentPathKey of document', () => {
     expect.assertions(1)
-    let docKey = documentPathKey(docPath)
+    const docKey = documentPathKey(docPath)
 
     expect(docKey).toEqual(docPath[docPath.length - 1].key)
   })
@@ -93,7 +86,7 @@ describe('documentPathKey', () => {
   it('Cannot get documentPathKey of collection', () => {
     expect.assertions(1)
     try {
-      let result = documentPathKey(colPath)
+      const result = documentPathKey(colPath)
       console.log(result)
     } catch (err) {
       expect(err).toEqual(Error('last Item in path is not a document'))
@@ -103,7 +96,7 @@ describe('documentPathKey', () => {
 
 describe('uuid', () => {
   it('valid uuid', () => {
-    let uuidValue = uuid()
+    const uuidValue = uuid()
     if (isGuid(uuidValue)) {
       expect(uuidValue).toBeTruthy()
     } else {

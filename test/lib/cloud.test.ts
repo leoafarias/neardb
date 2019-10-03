@@ -6,15 +6,15 @@ jest.setTimeout(10000)
 
 describe('cloudstorage', () => {
   const storage = CloudStorage.init(config)
-  let newConfig = Object.assign(config, {
+  const newConfig = Object.assign(config, {
     storage: { endpoint: 'http://fakestorage.storag.net' }
   })
   const brokenStorage = CloudStorage.init(newConfig)
 
-  let value = createDummyData()
+  const value = createDummyData()
 
-  let path = 'data.json'
-  let newPath = 'asdfasfd.json'
+  const path = 'data.json'
+  const newPath = 'testFile.json'
 
   it('Could not init CloudStorage', () => {
     expect(storage).toBeInstanceOf(CloudStorage)
@@ -22,6 +22,7 @@ describe('cloudstorage', () => {
 
   it('Save document', async () => {
     expect.assertions(1)
+    // tslint:disable-next-line:no-any
     let payload: any
     payload = await storage.set(value, path)
     const etag = payload.ETag ? true : false
@@ -56,7 +57,7 @@ describe('cloudstorage', () => {
     expect(typeof data).toBe('object')
   })
 
-  it('Get info from file that doesnt exist', async () => {
+  it('Get info from file that does not exist', async () => {
     expect.assertions(1)
 
     try {
@@ -77,17 +78,19 @@ describe('cloudstorage', () => {
     expect.assertions(1)
 
     try {
-      let payload = await brokenStorage.remove(path)
+      const payload = await brokenStorage.remove(path)
       return payload
     } catch (err) {
       expect(err.code).toBeTruthy()
+      return err
     }
   })
 
   it('Copy document', async () => {
     expect.assertions(2)
     await storage.set(value, path)
-    let doc: any = await storage.head(path)
+    // tslint:disable-next-line:no-any
+    const doc: any = await storage.head(path)
     const data = await storage.copy(path, doc.ETag)
     expect(data.CopyObjectResult).toHaveProperty('ETag')
     expect(typeof data).toBe('object')

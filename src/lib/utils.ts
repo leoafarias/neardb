@@ -6,7 +6,7 @@ import { PathList } from '../types'
  * @returns string of the final path with extension of the document
  */
 export const documentPath = (path: PathList): string => {
-  let pathArray = path.map((item, index) => {
+  const pathArray = path.map((item, index) => {
     if (path.length === index + 1) {
       // This is the last item
       if (item.type === 'document') {
@@ -25,7 +25,7 @@ export const documentPath = (path: PathList): string => {
 }
 
 export const documentPathKey = (path: PathList): string => {
-  let lastItem = path[path.length - 1]
+  const lastItem = path[path.length - 1]
   if (lastItem.type === 'document') {
     return lastItem.key
   } else {
@@ -33,7 +33,7 @@ export const documentPathKey = (path: PathList): string => {
   }
 }
 
-export const checkValidObject = obj => {
+export const checkValidObject = (obj: object) => {
   if (
     typeof obj === 'object' &&
     obj instanceof Object &&

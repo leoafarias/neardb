@@ -113,8 +113,8 @@
     "cross-env": "^5.2.0",
     "cz-conventional-changelog": "^2.1.0",
     "husky": "^1.0.1",
-    "jest": "^23.6.0",
-    "jest-config": "^23.6.0",
+    "jest": "^24.9.0",
+    "jest-config": "^24.9.0",
     "lint-staged": "^7.3.0",
     "lodash.camelcase": "^4.3.0",
     "prompt": "^1.0.0",
@@ -133,9 +133,8 @@
     "semantic-release": "^15.10.6",
     "ts-jest": "^23.10.2",
     "ts-node": "^7.0.1",
-
     "typedoc": "^0.12.0",
-    "typescript": "^3.0.3",
+    "typescript": "~3.5.0",
     "gts": "^1.1.0"
   },
   "dependencies": {

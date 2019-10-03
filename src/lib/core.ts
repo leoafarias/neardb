@@ -1,7 +1,7 @@
 import {
   Config,
   PathList,
-  IDBConfig,
+  DBConfig,
   BaseEntity,
   GetOptions,
   Payload
@@ -26,7 +26,7 @@ const defaultConfig = {
 
 export class NearDB {
   /** Config that is used to init NearDB */
-  config: IDBConfig
+  config: DBConfig
 
   /** UUID of Instance of NearDB */
   instanceId: string
@@ -137,7 +137,7 @@ export class Document implements BaseEntity {
       throw new Error(key + ': is a reserved keyword')
     }
 
-    // Copy value of path before passing, to avoid polluting scope
+    // Copy value of path before passing, to avoid poluting scope
     const newPath = [...path]
 
     // Push new pathItem into the path array

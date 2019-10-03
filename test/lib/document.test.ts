@@ -148,7 +148,7 @@ describe('.update', async () => {
     const thirdKey = Object.keys(updateData)[2]
     const forthKey = Object.keys(updateData)[3]
 
-    const deleteData: { [k: string]: string } = {}
+    const deleteData = {}
     deleteData[thirdKey] = NearDB.field.deleteValue
     deleteData[forthKey] = NearDB.field.deleteValue
 

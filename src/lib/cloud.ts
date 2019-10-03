@@ -52,6 +52,7 @@ export class CloudStorage implements StorageAdapter {
       Bucket: this.config.database,
       Key: path
     }
+
     // tslint:disable-next-line:no-any
     let data: any
 

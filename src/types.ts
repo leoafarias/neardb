@@ -1,7 +1,7 @@
 import { NearDB } from './lib/core'
 
-// IConfig interface with defaults
-export interface IDBConfig extends Config {
+// Config interface with defaults
+export interface DBConfig extends Config {
   database: string
   indices: boolean
   cacheExpiration: number

@@ -5,10 +5,10 @@ import { createDummyData, createDoc, timeout } from '../helpers'
 jest.setTimeout(10000)
 
 describe('.cache', async () => {
-  let cachedData = createDummyData()
-  let doc = createDoc(uuid(), {})
-  let etag = 'asdfaf2331fsd'
-  let versionId = 'asdfaf2331fsd'
+  const cachedData = createDummyData()
+  const doc = createDoc(uuid(), {})
+  const etag = 'asdfaf2331fsd'
+  const versionId = 'asdfaf2331fsd'
 
   it('.setCache', async () => {
     expect.assertions(2)
@@ -37,7 +37,7 @@ describe('.cache', async () => {
   })
 
   it('Cache Exists', async () => {
-    let expiration = config.cacheExpiration ? config.cacheExpiration : 0
+    const expiration = config.cacheExpiration ? config.cacheExpiration : 0
     expect.assertions(2)
     await doc.cache.set(cachedData)
     expect(doc.cache.exists()).toEqual(true)

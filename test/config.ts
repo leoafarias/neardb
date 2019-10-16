@@ -33,4 +33,4 @@ export const localConfig: Config = {
   }
 }
 
-export const config = localConfig
+export const config = cloudConfig

@@ -1,6 +1,6 @@
 {
   "name": "neardb",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "NearDB is a simple database that leverages cloud infrastructure like document storage and CDN to deliver an inexpensive unbelievably scalable document database optimized for reads and perfect for edge applications",
   "keywords": [
     "database",
@@ -48,7 +48,8 @@
     "fix": "gts fix",
     "prepare": "yarn run compile",
     "pretest": "yarn run compile",
-    "posttest": "yarn run check"
+    "posttest": "yarn run check",
+    "postinstall": "tsc --outDir ./build"
   },
   "lint-staged": {
     "{src,test}/**/*.ts": [

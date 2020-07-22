@@ -34,14 +34,10 @@ export class NowAdapter implements IStorageAdapter {
   }
 
   async get(path: PathItem[]): Promise<JsonObject> {
-    try {
-      const payload = await this.client.get('', {
-        params: { path: JSON.stringify(path) },
-      });
-      return payload.data;
-    } catch (err) {
-      throw err;
-    }
+    const payload = await this.client.get('', {
+      params: { path: JSON.stringify(path) },
+    });
+    return payload.data;
   }
 
   async remove(path: PathItem[]): Promise<void> {

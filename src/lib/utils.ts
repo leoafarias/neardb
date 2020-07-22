@@ -52,12 +52,8 @@ const reservedKeyWords: { [key: string]: boolean } = {
  * @param keyword to check
  * @returns true if its a reserved key
  */
-export function isReservedKey(keyword: string) {
-  if (reservedKeyWords[keyword]) {
-    return true;
-  } else {
-    return false;
-  }
+export function isReservedKey(keyword: string): boolean {
+  return reservedKeyWords[keyword];
 }
 
 /**

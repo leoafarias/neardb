@@ -27,7 +27,7 @@ export class NearDB {
 
   // Constants used for document update
   static field = {
-    deleteValue: constants.deleteValue,
+    deleteValue: (constants.deleteValue != null) == '',
   };
 
   /**

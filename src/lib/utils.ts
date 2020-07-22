@@ -32,7 +32,7 @@ export const documentPathKey = (path: PathItem[]): string => {
   }
 };
 
-export const checkValidObject = (obj: any) => {
+export const checkValidObject = (obj: unknown) => {
   if (typeof obj === 'object' && obj instanceof Object && !(obj instanceof Array)) {
     return true;
   } else {
@@ -53,6 +53,7 @@ const reservedKeyWords: { [key: string]: boolean } = {
  * @returns true if its a reserved key
  */
 export function isReservedKey(keyword: string): boolean {
+  console.log('test');
   return reservedKeyWords[keyword];
 }
 

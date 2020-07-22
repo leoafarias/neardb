@@ -1,6 +1,6 @@
-import { IConfig } from '../src/types'
-import { config as envConfig } from 'dotenv'
-envConfig()
+import { IConfig } from '../src/types';
+import { config as envConfig } from 'dotenv';
+envConfig();
 
 // These are public minio keys
 export const cloudConfig: IConfig = {
@@ -12,9 +12,9 @@ export const cloudConfig: IConfig = {
     s3ForcePathStyle: true,
     signatureVersion: 'v4',
     accessKeyId: process.env.NEARDB_ACCESS_KEY_ID || '', // these a public minio keys so dont worry
-    secretAccessKey: process.env.NEARDB_SECRET_ACCESS_KEY || ''
-  }
-}
+    secretAccessKey: process.env.NEARDB_SECRET_ACCESS_KEY || '',
+  },
+};
 
 export const localConfig: IConfig = {
   cacheExpiration: 5,
@@ -26,8 +26,8 @@ export const localConfig: IConfig = {
     s3ForcePathStyle: true,
     signatureVersion: 'v4',
     accessKeyId: process.env.NEARDB_ACCESS_KEY_ID || '', // these a public minio keys so don't worry
-    secretAccessKey: process.env.NEARDB_SECRET_ACCESS_KEY || ''
-  }
-}
+    secretAccessKey: process.env.NEARDB_SECRET_ACCESS_KEY || '',
+  },
+};
 
-export const config = localConfig
+export const config = localConfig;

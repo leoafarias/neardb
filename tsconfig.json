@@ -1,28 +1,23 @@
 {
+  "include": ["src", "types"],
   "compilerOptions": {
-    "moduleResolution": "node",
-    "target": "es2015",
-    "module": "es2015",
-    "lib": [
-      "es2015",
-      "es2016",
-      "es2017",
-      "dom"
-    ],
-    "strict": true,
-    "sourceMap": true,
+    "module": "esnext",
+    "lib": ["dom", "esnext"],
+    "importHelpers": true,
     "declaration": true,
-    "allowSyntheticDefaultImports": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "declarationDir": "dist/types",
-    "outDir": "dist/",
-    "typeRoots": [
-      "node_modules/@types"
-    ],
-    "noImplicitAny": false,
-  },
-  "include": [
-    "src"
-  ]
+    "sourceMap": true,
+    "rootDir": "./src",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "moduleResolution": "node",
+    "baseUrl": "./",
+    "paths": {
+      "*": ["src/*", "node_modules/*"]
+    },
+    "jsx": "react",
+    "esModuleInterop": true
+  }
 }

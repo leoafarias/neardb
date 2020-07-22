@@ -1,3 +1,3 @@
 export default {
-  deleteValue: 'NEARDB.FIELD.DELETE'
-}
+  deleteValue: 'NEARDB.FIELD.DELETE',
+};

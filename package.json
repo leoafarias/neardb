@@ -1,142 +1,56 @@
 {
-  "name": "neardb",
-  "version": "3.0.0-beta-0",
-  "description": "NearDB is a simple database that leverages cloud infrastructure like document storage and CDN to deliver an inexpensive unbelievably scalable document database optimized for reads and perfect for edge applications",
-  "keywords": [
-    "database",
-    "edge",
-    "cdn",
-    "s3",
-    "db",
-    "cache",
-    "key-value",
-    "lambda"
-  ],
-  "main": "dist/neardb.js",
-  "module": "dist/neardb.es.js",
-  "umd": "dist/neardb.umd.js",
-  "typings": "dist/types/neardb.d.ts",
-  "files": [
-    "dist"
-  ],
-  "author": "leoafarias <leokcta@gmail.com>",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/leoafarias/neardb"
-  },
+  "version": "0.1.0",
   "license": "MIT",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
   "engines": {
-    "node": ">=6.0.0"
+    "node": ">=10"
   },
   "scripts": {
-    "lint": "tslint --project tsconfig.json -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
-    "prebuild": "rimraf dist",
-    "build": "tsc --module commonjs && rollup -c rollup.config.ts && typedoc --out docs --target es6 --theme minimal --mode file src",
-    "start": "rollup -c rollup.config.ts -w",
-    "test": "jest --verbose",
-    "test:watch": "jest --watch",
-    "test:prod": "npm run lint && npm run test -- --coverage --no-cache",
-    "deploy-docs": "ts-node tools/gh-pages-publish",
-    "report-coverage": "cat ./coverage/lcov.info | coveralls",
-    "commit": "git-cz",
-    "semantic-release": "semantic-release",
-    "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "test": "tsdx test",
+    "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
+    "prepare": "tsdx build",
     "precommit": "lint-staged"
   },
+  "peerDependencies": {},
   "lint-staged": {
-    "{src,test}/**/*.ts": [
-      "prettier --write",
+    "*/**/*.{js,ts,tsx}": [
+      "./node_modules/.bin/eslint --fix",
       "git add"
     ]
   },
-  "config": {
-    "commitizen": {
-      "path": "node_modules/cz-conventional-changelog"
+  "husky": {
+    "hooks": {
+      "pre-commit": "./node_modules/.bin/eslint --fix"
     }
   },
-  "jest": {
-    "transform": {
-      ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
-    },
-    "globalSetup": "<rootDir>/test/global_setup_hook.js",
-    "globalTeardown": "<rootDir>/test/global_teardown_hook.js",
-    "testEnvironment": "node",
-    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js"
-    ],
-    "coveragePathIgnorePatterns": [
-      "/node_modules/",
-      "/test/"
-    ],
-    "coverageThreshold": {
-      "global": {
-        "branches": 90,
-        "functions": 95,
-        "lines": 95,
-        "statements": 95
-      }
-    },
-    "collectCoverage": true,
-    "collectCoverageFrom": [
-      "src/**/**.{js,ts}"
-    ]
-  },
-  "prettier": {
-    "semi": false,
-    "singleQuote": true
-  },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
+  "name": "neardb",
+  "author": "leoafarias",
+  "module": "dist/neardb.esm.js",
+  "dependencies": {
+    "aws-sdk": "^2.714.0",
+    "axios": "^0.19.2",
+    "lint-staged": "^10.2.11"
   },
   "devDependencies": {
-    "@commitlint/cli": "^7.1.2",
-    "@commitlint/config-conventional": "^7.1.2",
-    "@types/dotenv": "^6.1.1",
-    "@types/jest": "^23.3.2",
-    "@types/node": "^10.11.0",
-    "axios-mock-adapter": "^1.15.0",
-    "chance": "^1.0.16",
-    "colors": "^1.3.2",
-    "commitizen": "^3.0.0",
-    "coveralls": "^3.0.2",
-    "cross-env": "^5.2.0",
-    "cz-conventional-changelog": "^2.1.0",
-    "dotenv": "^8.0.0",
-    "husky": "^1.0.1",
-    "jest": "^23.6.0",
-    "jest-config": "^23.6.0",
-    "lint-staged": "^7.3.0",
-    "lodash.camelcase": "^4.3.0",
-    "prettier": "^1.14.3",
-    "prompt": "^1.0.0",
-    "replace-in-file": "^3.4.2",
-    "rimraf": "^2.6.2",
-    "rollup": "^0.66.2",
-    "rollup-plugin-commonjs": "^9.1.8",
-    "rollup-plugin-json": "^3.1.0",
-    "rollup-plugin-node-builtins": "^2.1.2",
-    "rollup-plugin-node-resolve": "^3.4.0",
-    "rollup-plugin-size-snapshot": "^0.7.0",
-    "rollup-plugin-sourcemaps": "^0.4.2",
-    "rollup-plugin-terser": "^3.0.0",
-    "rollup-plugin-typescript2": "^0.17.0",
-    "s3rver": "^2.2.6",
-    "semantic-release": "^15.10.6",
-    "ts-jest": "^23.10.2",
-    "ts-node": "^7.0.1",
-    "tslint": "^5.11.0",
-    "tslint-config-prettier": "^1.15.0",
-    "tslint-config-standard": "^8.0.1",
-    "typedoc": "^0.12.0",
-    "typescript": "^3.0.3"
-  },
-  "dependencies": {
-    "aws-sdk": "^2.531.0",
-    "axios": "^0.19.0"
+    "@types/chance": "^1.1.0",
+    "@typescript-eslint/eslint-plugin": "^3.7.0",
+    "@typescript-eslint/parser": "^3.7.0",
+    "chance": "^1.1.6",
+    "dotenv": "^8.2.0",
+    "eslint": "^7.5.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "husky": "^4.2.5",
+    "prettier": "^2.0.5",
+    "tsdx": "^0.13.2",
+    "tslib": "^2.0.0",
+    "typescript": "^3.9.6"
   }
 }

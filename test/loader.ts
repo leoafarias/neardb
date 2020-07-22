@@ -1,2 +1,2 @@
-export * from '../src/neardb'
+export * from '../src/index';
 // export * from '../dist/neardb'

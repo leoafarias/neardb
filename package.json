@@ -14,22 +14,12 @@
     "start": "tsdx watch",
     "build": "tsdx build",
     "test": "tsdx test",
-    "lint": "eslint '*/**/*.{js,ts,tsx}'",
-    "fix": "eslint '*/**/*.{js,ts,tsx}' --fix",
-    "prepare": "tsdx build"
+    "lint": "eslint '*.{js,ts,tsx}'",
+    "fix": "eslint '*.{js,ts,tsx}' --quiet --fix",
+    "prepare": "tsdx build",
+    "precommit": "lint-staged"
   },
   "peerDependencies": {},
-  "lint-staged": {
-    "*/**/*.{js,ts,tsx}": [
-      "./node_modules/.bin/eslint",
-      "git add"
-    ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "yarn lint"
-    }
-  },
   "name": "neardb",
   "author": "leoafarias",
   "module": "dist/neardb.esm.js",

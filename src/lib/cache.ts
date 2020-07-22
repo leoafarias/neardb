@@ -6,13 +6,13 @@ export class Cache implements ICache {
   /** Configuration on how long to keep in memory */
   cacheExpiration: number;
   /** Date when cache expires */
-  // expires: number;
+  expires: number;
 
   /** ETag of the object cached */
   etag: string;
 
   /** Document version id if versioning is enabled */
-  versionId: string;
+  // versionId: string;
 
   /**
    * Constructor sets empty values and sets config expiration

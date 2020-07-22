@@ -53,7 +53,7 @@ const reservedKeyWords: { [key: string]: boolean } = {
  * @returns true if its a reserved key
  */
 export function isReservedKey(keyword: string): boolean {
-  console.log('test');
+  console.log('car');
   return reservedKeyWords[keyword];
 }
 

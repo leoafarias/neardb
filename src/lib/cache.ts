@@ -6,6 +6,7 @@ export class Cache implements ICache {
   /** Configuration on how long to keep in memory */
   cacheExpiration: number;
   /** Date when cache expires */
+  expires: number;
 
   /** ETag of the object cached */
   etag: string;

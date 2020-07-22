@@ -12,7 +12,7 @@ export class Cache implements ICache {
   etag: string;
 
   /** Document version id if versioning is enabled */
-  // versionId: string;
+  versionId: string;
 
   /**
    * Constructor sets empty values and sets config expiration

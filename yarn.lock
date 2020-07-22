@@ -2595,6 +2595,11 @@ eslint-plugin-jsx-a11y@^6.2.3:
     jsx-ast-utils "^2.4.1"
     language-tags "^1.0.5"
 
+eslint-plugin-no-secrets@^0.6.8:
+  version "0.6.8"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-no-secrets/-/eslint-plugin-no-secrets-0.6.8.tgz#cdfdcec78ad0bdf104aa59f36c841b65a477533d"
+  integrity sha512-hX/z+V6oEFBaY6GHRYPv1mXyieq0z3oijE8C3muYhhyjICRS2Uk+RPMwK700ARkQIKFWYsezXc7hmISeqHbEZA==
+
 eslint-plugin-prettier@^3.1.0, eslint-plugin-prettier@^3.1.4:
   version "3.1.4"
   resolved "https://registry.yarnpkg.com/eslint-plugin-prettier/-/eslint-plugin-prettier-3.1.4.tgz#168ab43154e2ea57db992a2cd097c828171f75c2"

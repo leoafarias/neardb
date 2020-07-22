@@ -4,6 +4,7 @@ module.exports = {
     ecmaVersion: 2020, // Allows for the parsing of modern ECMAScript features
     sourceType: 'module', // Allows for the use of imports
   },
+  plugins: ['no-secrets'],
   extends: [
     'plugin:@typescript-eslint/recommended', // Uses the recommended rules from the @typescript-eslint/eslint-plugin
     'prettier/@typescript-eslint', // Uses eslint-config-prettier to disable ESLint rules from @typescript-eslint/eslint-plugin that would conflict with prettier
@@ -12,6 +13,7 @@ module.exports = {
     'plugin:promise/recommended',
   ],
   rules: {
-    'no-console': 1,
+    'no-console': 2,
+    'no-secrets/no-secrets': 'error',
   },
 };

@@ -1,5 +1,5 @@
 import { NearDB } from './lib/core';
-import S3 from 'aws-sdk/clients/s3';
+
 
 // IConfig interface with defaults
 export interface DBConfig extends Config {
@@ -34,8 +34,6 @@ export interface ICache {
   clear(): void;
 }
 
-const s3 = new S3();
-s3.putObject();
 
 export interface IStorageAdapter {
   readonly config: Config;

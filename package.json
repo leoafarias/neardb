@@ -1,8 +1,22 @@
 {
-  "version": "0.1.0",
-  "license": "MIT",
+  "name": "neardb",
+  "version": "0.2.2",
+  "description": "NearDB is a simple database that leverages cloud infrastructure like document storage and CDN to deliver an inexpensive unbelievably scalable document database optimized for reads and perfect for edge applications",
+  "keywords": [
+    "lambda",
+    "key-value",
+    "cache",
+    "db",
+    "s3",
+    "cdn",
+    "edge",
+    "database"
+  ],
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
+  "module": "dist/neardb.esm.js",
+  "author": "leoafarias",
+  "license": "MIT",
   "files": [
     "dist",
     "src"
@@ -20,9 +34,6 @@
     "precommit": "lint-staged"
   },
   "peerDependencies": {},
-  "name": "neardb",
-  "author": "leoafarias",
-  "module": "dist/neardb.esm.js",
   "dependencies": {
     "aws-sdk": "^2.718.0",
     "axios": "^0.19.2"

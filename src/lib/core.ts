@@ -1,4 +1,4 @@
-import { IConfig, PathItem, IDBConfig, Entity, JsonObject, IStorageAdapter } from '../types';
+import { Config, PathItem, DBConfig, Entity, JsonObject, IStorageAdapter } from '../types';
 import constants from './constants';
 
 import {
@@ -14,11 +14,9 @@ const defaultConfig = {
   cacheExpiration: 500,
 };
 
-const MainAdapter = S3Adapter;
-
 export class NearDB {
   /** Config that is used to init NearDB */
-  config: IDBConfig;
+  config: DBConfig;
 
   /** UUID of Instance of NearDB */
   instanceId: string;
@@ -34,7 +32,10 @@ export class NearDB {
    * Constructor to setup config, and path, and required checks.
    * @param config configuration to initialize NearDB instance
    */
-  constructor(config: IConfig) {
+  constructor(config: Config) {
+    // Creates instanceid
+    this.instanceId = uuid();
+
     /** Overwrites config param with default configuration */
     this.config = {
       ...defaultConfig,
@@ -42,10 +43,7 @@ export class NearDB {
     };
 
     // TODO: define the type of storage in the config
-    this.adapter = new MainAdapter(this.config);
-
-    // Creates instanceid
-    this.instanceId = uuid();
+    this.adapter = new S3Adapter(config);
   }
 
   /**
@@ -54,7 +52,7 @@ export class NearDB {
    * @returns an initialized instance of NearDB with the config
    */
 
-  static database(config: IConfig): NearDB {
+  static database(config: Config): NearDB {
     return new NearDB(Object.assign(defaultConfig, config));
   }
 
@@ -97,8 +95,8 @@ export class Collection implements Entity {
    * @param value expects payload to be stored for the document
    * @returns a promise for the payload of the saved doc
    */
-  async add(value: JsonObject): Promise<void> {
-    await new Document(this.instance, uuid(), this.uri).set(value);
+  async add(value: JsonObject): Promise<string> {
+    return new Document(this.instance, uuid(), this.uri).set(value);
   }
 }
 
@@ -147,9 +145,9 @@ export class Document implements Entity {
    * @param value expects payload to be stored for the document
    * @returns payload of the document requested
    */
-  async set(value: JsonObject): Promise<void> {
+  async set(value: JsonObject): Promise<string> {
     checkValidObject(value);
-    await this.instance.adapter.set(value, this.uri);
+    return this.instance.adapter.set(value, this.uri);
   }
 
   /**
@@ -158,7 +156,12 @@ export class Document implements Entity {
    * @returns payload of the document requested
    */
   async get(): Promise<JsonObject | null> {
-    return await this.instance.adapter.get(this.uri);
+    try {
+      return await this.instance.adapter.get(this.uri);
+    } catch (err) {
+      // TODO: log error, but assume doc does not exist
+      return null;
+    }
   }
 
   /**

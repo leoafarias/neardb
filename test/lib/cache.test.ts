@@ -4,7 +4,7 @@ import { createDummyData, createDoc, timeout } from '../helpers';
 
 jest.setTimeout(10000);
 
-describe('.cache', async () => {
+describe('.cache', () => {
   const cachedData = createDummyData();
   const doc = createDoc(uuid());
   const etag = 'asdfaf2331fsd';

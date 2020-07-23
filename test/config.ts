@@ -1,9 +1,9 @@
-import { IConfig } from '../src/types';
+import { Config } from '../src/types';
 import { config as envConfig } from 'dotenv';
 envConfig();
 
 // These are public minio keys
-export const cloudConfig: IConfig = {
+export const cloudConfig: Config = {
   cacheExpiration: 5,
   storage: {
     bucket: process.env.NEARDB_BUCKET_NAME || '',
@@ -16,7 +16,7 @@ export const cloudConfig: IConfig = {
   },
 };
 
-export const localConfig: IConfig = {
+export const localConfig: Config = {
   cacheExpiration: 5,
   instanceUrl: process.env.NEARDB_LOCAL_INSTANCE_URL || '',
   storage: {
@@ -30,4 +30,4 @@ export const localConfig: IConfig = {
   },
 };
 
-export const config = localConfig;
+export const config = cloudConfig;

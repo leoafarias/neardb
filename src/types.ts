@@ -2,23 +2,23 @@ import { NearDB } from './lib/core';
 import S3 from 'aws-sdk/clients/s3';
 
 // IConfig interface with defaults
-export interface IDBConfig extends IConfig {
+export interface DBConfig extends Config {
   cacheExpiration: number;
 }
 
 // User passed config interface
-export interface IConfig {
+export interface Config {
   instanceUrl?: string;
   headers?: JsonObject;
-  cacheExpiration: number;
-  storage?: {
+  cacheExpiration?: number;
+  storage: {
     bucket: string;
-    endpoint?: string;
-    useSSL: boolean;
-    s3ForcePathStyle: boolean;
-    signatureVersion: string;
     accessKeyId: string; // these a public minio keys so don't worry
     secretAccessKey: string; // these a public minio secret so don't worry
+    endpoint?: string;
+    useSSL?: boolean;
+    s3ForcePathStyle?: boolean;
+    signatureVersion?: string;
   };
 }
 
@@ -38,10 +38,10 @@ const s3 = new S3();
 s3.putObject();
 
 export interface IStorageAdapter {
-  readonly config: IConfig;
+  readonly config: Config;
   readonly client: any;
   get(path: PathItem[]): Promise<JsonObject | null>;
-  set(value: JsonObject, path: PathItem[], metadata?: JsonObject): Promise<void>;
+  set(value: JsonObject, path: PathItem[], metadata?: JsonObject): Promise<string>;
   update(value: JsonObject, path: PathItem[], metadata?: JsonObject): Promise<void>;
   remove(path: PathItem[]): Promise<void>;
 }

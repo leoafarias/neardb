@@ -1,12 +1,12 @@
-import { IConfig, IStorageAdapter, JsonObject, PathItem } from '../types';
+import { Config, IStorageAdapter, JsonObject, PathItem } from '../types';
 import { HTTP } from '../lib/http';
 import { AxiosInstance } from 'axios';
 
 export class NowAdapter implements IStorageAdapter {
-  readonly config: IConfig;
+  readonly config: Config;
   readonly client: AxiosInstance;
 
-  constructor(config: IConfig) {
+  constructor(config: Config) {
     this.config = config;
     this.client = HTTP.create({
       baseURL: this.config.instanceUrl,
@@ -15,11 +15,11 @@ export class NowAdapter implements IStorageAdapter {
     });
   }
 
-  static init(config: IConfig): NowAdapter {
+  static init(config: Config): NowAdapter {
     return new NowAdapter(config);
   }
 
-  async set(value: JsonObject, path: PathItem[]): Promise<void> {
+  async set(value: JsonObject, path: PathItem[]): Promise<string> {
     const payload = await this.client.post('/', value, {
       params: { path: JSON.stringify(path) },
     });

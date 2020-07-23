@@ -11,7 +11,7 @@ beforeAll(() => {
   sampleCol = NearDB.database(config).collection('oneCol');
 });
 
-describe('.doc', async () => {
+describe('.doc', () => {
   const docKey = 'main';
   const doc = createDoc(docKey);
 
@@ -32,7 +32,7 @@ describe('.doc', async () => {
   });
 });
 
-describe('.collection', async () => {
+describe('.collection', () => {
   const col = createDoc(uuid()).collection('sampleCol');
 
   it('Create sub-collection', () => {
@@ -40,21 +40,21 @@ describe('.collection', async () => {
   });
 });
 
-describe('.set', async () => {
+describe('.set', () => {
   const docKey = uuid();
   const doc = createDoc(docKey);
 
   it('Value can be set on new document', async () => {
     expect.assertions(1);
     const payload: any = await doc.set(createDummyData());
-    expect(payload.ETag).toBeTruthy();
+    expect(payload).toBeTruthy();
   });
 
   it('Value can be set on existing document', async () => {
     expect.assertions(1);
 
-    const payload = (await doc.set(createDummyData())) as JsonObject;
-    expect(payload.ETag).toBeTruthy();
+    const payload = await doc.set(createDummyData());
+    expect(payload).toBeTruthy();
   });
 
   it('Cannot set invalid object', async () => {
@@ -68,7 +68,7 @@ describe('.set', async () => {
   });
 });
 
-describe('.get', async () => {
+describe('.get', () => {
   const doc = NearDB.database(config).collection('oneCol').doc('oneDoc');
   const data = createDummyData();
 
@@ -88,18 +88,18 @@ describe('.get', async () => {
   });
 });
 
-describe('.add', async () => {
+describe('.add', () => {
   const data = createDummyData();
 
   it('Check if can .add to collection', async () => {
     expect.assertions(1);
 
-    const payload = (await sampleCol.add(data)) as JsonObject;
-    expect(payload.ETag).toBeTruthy();
+    const payload = await sampleCol.add(data);
+    expect(payload).toBeTruthy();
   });
 });
 
-describe('.update', async () => {
+describe('.update', () => {
   const doc = createDoc(uuid());
   const data = createDummyData();
   const updateData = createDummyData();
@@ -120,7 +120,7 @@ describe('.update', async () => {
     const thirdKey = Object.keys(updateData)[2];
     const forthKey = Object.keys(updateData)[3];
 
-    const deleteData = {};
+    const deleteData: JsonObject = {};
     deleteData[thirdKey] = NearDB.field.deleteValue;
     deleteData[forthKey] = NearDB.field.deleteValue;
 
@@ -147,7 +147,7 @@ describe('.update', async () => {
   });
 });
 
-describe('.delete', async () => {
+describe('.delete', () => {
   const doc = createDoc(uuid());
   const data = createDummyData();
 
@@ -155,9 +155,10 @@ describe('.delete', async () => {
     expect.assertions(2);
     await doc.set(data);
     const payload = await doc.get();
-    const deletedPayload = await doc.delete();
+    await doc.delete();
+    const afterDeletePayload = await doc.get();
     // TODO: check error on get
     expect(payload).toEqual(data);
-    expect(deletedPayload).toEqual({});
+    expect(afterDeletePayload).toBe(null);
   });
 });

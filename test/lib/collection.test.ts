@@ -21,13 +21,3 @@ describe('.collection', () => {
     expect(check).toThrowError('collection: is a reserved keyword');
   });
 });
-
-describe('.collectionLock', async () => {
-  // let doc = createDoc('colLock', {})
-  // it('Creates a lock', async () => {
-  //   expect.assertions(2)
-  //   let { isCollectionLocked } = doc._privateMethods()
-  //   let colLock = await isCollectionLocked()
-  //   expect(colLock).toBe(true)
-  // })
-});

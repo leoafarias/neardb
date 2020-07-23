@@ -34,7 +34,6 @@
     "precommit": "lint-staged"
   },
   "peerDependencies": {},
-
   "dependencies": {
     "aws-sdk": "^2.718.0",
     "axios": "^0.19.2"

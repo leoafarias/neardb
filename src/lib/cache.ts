@@ -1,48 +1,48 @@
-import { Payload, Cache } from '../types'
+import { JsonObject, ICache } from '../types';
 
-export class DBCache implements Cache {
+export class Cache implements ICache {
   /** Data that is stored in memory */
-  store: Payload
+  store: JsonObject;
   /** Configuration on how long to keep in memory */
-  cacheExpiration: number
+  cacheExpiration: number;
   /** Date when cache expires */
-  expires: number
+  expires: number;
 
   /** ETag of the object cached */
-  etag: string
+  etag: string;
 
   /** Document version id if versioning is enabled */
-  versionId: string
+  versionId: string;
 
   /**
    * Constructor sets empty values and sets config expiration
    * @param cacheExpiration configuration expiration to create expires value
    */
   constructor(cacheExpiration: number) {
-    this.store = {}
-    this.cacheExpiration = cacheExpiration
-    this.expires = 0
-    this.etag = ''
-    this.versionId = ''
+    this.store = {};
+    this.cacheExpiration = cacheExpiration;
+    this.expires = 0;
+    this.etag = '';
+    this.versionId = '';
   }
 
   /**
    * Sets data as a local value and creates expires date
    * @param data Payload of the data to store locally
    */
-  set(data: Payload, etag?: string, versionId?: string): void {
-    this.store = data
-    this.expires = new Date().getTime() + this.cacheExpiration
-    this.etag = etag ? etag : ''
-    this.versionId = versionId ? versionId : ''
+  set(data: JsonObject, etag?: string, versionId?: string): void {
+    this.store = data;
+    this.expires = new Date().getTime() + this.cacheExpiration;
+    this.etag = etag ? etag : '';
+    this.versionId = versionId ? versionId : '';
   }
 
   /**
    * Gets data that is stored in memory
    * @returns locally stored data
    */
-  get(): Payload {
-    return this.store
+  get(): JsonObject {
+    return this.store;
   }
 
   /**
@@ -50,7 +50,7 @@ export class DBCache implements Cache {
    * @returns etag of locally stored data
    */
   getEtag(): string {
-    return this.etag
+    return this.etag;
   }
 
   /**
@@ -60,11 +60,11 @@ export class DBCache implements Cache {
   exists(): boolean {
     if (this.store && this.expires > new Date().getTime()) {
       // Checks if there is a stored object, and that has not expired yet
-      return true
+      return true;
     } else {
       // Sets store to default value
-      this.clear()
-      return false
+      this.clear();
+      return false;
     }
   }
 
@@ -72,8 +72,8 @@ export class DBCache implements Cache {
    * Clears local cache
    */
   clear(): void {
-    this.store = {}
-    this.expires = 0
-    this.etag = ''
+    this.store = {};
+    this.expires = 0;
+    this.etag = '';
   }
 }

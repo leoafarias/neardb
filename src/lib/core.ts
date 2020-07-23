@@ -1,71 +1,59 @@
-import {
-  Config,
-  PathList,
-  DBConfig,
-  BaseEntity,
-  GetOptions,
-  Payload
-} from '../types'
+import { Config, PathItem, DBConfig, Entity, JsonObject, IStorageAdapter } from '../types';
+import constants from './constants';
 
 import {
-  CloudStorage,
+  // NowAdapter,
+  S3Adapter,
   uuid,
-  HTTP,
-  DBCache,
-  reservedKey,
-  documentPath,
-  checkValidObject
-} from '../internal'
+  Cache,
+  isReservedKey,
+  checkValidObject,
+} from '../internal';
 
 const defaultConfig = {
-  database: '',
   cacheExpiration: 500,
-  indices: false,
-  retries: 3
-}
+};
 
 export class NearDB {
   /** Config that is used to init NearDB */
-  config: DBConfig
+  config: DBConfig;
 
   /** UUID of Instance of NearDB */
-  instanceId: string
+  instanceId: string;
 
-  adapter: CloudStorage
+  adapter: IStorageAdapter;
 
   // Constants used for document update
   static field = {
-    deleteValue: 'NEARDB.FIELD.DELETE'
-  }
+    deleteValue: constants.deleteValue,
+  };
 
   /**
    * Constructor to setup config, and path, and required checks.
    * @param config configuration to initialize NearDB instance
    */
   constructor(config: Config) {
-    /** Check if config exists */
+    // Creates instanceid
+    this.instanceId = uuid();
 
     /** Overwrites config param with default configuration */
     this.config = {
       ...defaultConfig,
-      ...config
-    }
+      ...config,
+    };
 
     // TODO: define the type of storage in the config
-    this.adapter = new CloudStorage(this.config)
-
-    // Creates instanceid
-    this.instanceId = uuid()
+    this.adapter = new S3Adapter(config);
   }
 
   /**
    * Static method to create a new instance of NearDB class.
-   * @param config configuration to initiatlize NearDB instance
+   * @param config configuration to initialize NearDB instance
    * @returns an initialized instance of NearDB with the config
    */
 
   static database(config: Config): NearDB {
-    return new NearDB(Object.assign(defaultConfig, config))
+    return new NearDB(Object.assign(defaultConfig, config));
   }
 
   /**
@@ -75,37 +63,31 @@ export class NearDB {
    */
 
   collection(key: string): Collection {
-    return new Collection(this, key)
+    return new Collection(this, key);
   }
 }
 
-export class Collection implements BaseEntity {
-  readonly path: PathList
-  readonly dbPath: string
-  readonly instance: NearDB
+export class Collection implements Entity {
+  readonly uri: PathItem[];
+  readonly instance: NearDB;
 
-  constructor(instance: NearDB, key: string, path?: PathList) {
+  constructor(instance: NearDB, key: string, path?: PathItem[]) {
     // Check if this is a reserved keyword
-    if (reservedKey(key)) {
-      throw new Error(key + ': is a reserved keyword')
+    if (isReservedKey(key)) {
+      throw Error(key + ': is a reserved keyword');
     }
 
-    this.instance = instance
+    this.instance = instance;
 
     // Copy value of path before passing, to avoid polluting scope
-    const newPath = path ? [...path] : []
+    const newPath = path ? [...path] : [];
 
-    newPath.push({
-      type: 'collection',
-      key
-    })
-
-    this.path = newPath
-    this.dbPath = documentPath(this.path)
+    newPath.push({ type: 'collection', key });
+    this.uri = newPath;
   }
 
-  doc(key: string) {
-    return new Document(this.instance, key, this.path)
+  doc(key: string): Document {
+    return new Document(this.instance, key, this.uri);
   }
 
   /**
@@ -113,45 +95,40 @@ export class Collection implements BaseEntity {
    * @param value expects payload to be stored for the document
    * @returns a promise for the payload of the saved doc
    */
-  add(value: Payload): Promise<object> {
-    return new Document(this.instance, uuid(), this.path).set(value)
+  async add(value: JsonObject): Promise<string> {
+    return new Document(this.instance, uuid(), this.uri).set(value);
   }
 }
 
-export class Document implements BaseEntity {
+export class Document implements Entity {
   /** Data path that is used to interact with storage */
-  readonly path: PathList
+  readonly uri: PathItem[];
 
   /** Instance of NearDB with all the configuration and env settings */
-  readonly instance: NearDB
+  readonly instance: NearDB;
 
   /** Offline cache of data */
-  readonly cache: DBCache
+  readonly cache: Cache;
 
   /** String path for storage */
-  readonly dbPath: string
 
-  constructor(instance: NearDB, key: string, path: PathList) {
+  constructor(instance: NearDB, key: string, path: PathItem[]) {
     // Check if this is a reserved keyword
-    if (reservedKey(key)) {
-      throw new Error(key + ': is a reserved keyword')
+    if (isReservedKey(key)) {
+      throw Error(key + ': is a reserved keyword');
     }
 
-    // Copy value of path before passing, to avoid poluting scope
-    const newPath = [...path]
+    // Copy value of path before passing, to avoid polluting scope
+    const newPath = [...path];
 
     // Push new pathItem into the path array
-    newPath.push({
-      type: 'document',
-      key
-    })
+    newPath.push({ type: 'document', key });
 
-    this.path = newPath
-    this.dbPath = documentPath(this.path)
-    this.instance = instance
+    this.uri = newPath;
+    this.instance = instance;
 
     // Sets default cache value
-    this.cache = new DBCache(this.instance.config.cacheExpiration)
+    this.cache = new Cache(this.instance.config.cacheExpiration);
   }
 
   /**
@@ -159,8 +136,8 @@ export class Document implements BaseEntity {
    * @param key expects key for collection
    * @returns an instance of the collection class
    */
-  collection(key: string) {
-    return new Collection(this.instance, key, this.path)
+  collection(key: string): Collection {
+    return new Collection(this.instance, key, this.uri);
   }
 
   /**
@@ -168,14 +145,9 @@ export class Document implements BaseEntity {
    * @param value expects payload to be stored for the document
    * @returns payload of the document requested
    */
-  async set(value: Payload): Promise<object> {
-    try {
-      checkValidObject(value)
-      const payload = await this.instance.adapter.set(value, this.dbPath)
-      return payload
-    } catch (err) {
-      throw err
-    }
+  async set(value: JsonObject): Promise<string> {
+    checkValidObject(value);
+    return this.instance.adapter.set(value, this.uri);
   }
 
   /**
@@ -183,26 +155,12 @@ export class Document implements BaseEntity {
    * @param options sets options on how to get documents
    * @returns payload of the document requested
    */
-  async get(options?: GetOptions): Promise<object> {
-    let data: Payload
-    const config = this.instance.config
-    const source = options && options.source ? options.source : null
-    const cdnUrl = config && config.cdn && config.cdn.url
-
-    // Conditional if there is a cache
-    const isCache = source === null && this.cache.exists()
-    // Conditional if its an edge
-    const isEdge = cdnUrl && (source === 'edge' || source === null)
-    // Conditional if its from origin
-    // let isOrigin = source === 'origin'
-
+  async get(): Promise<JsonObject | null> {
     try {
-      if (isCache) return (data = this.cache.get())
-      if (isEdge) return (data = await this.getFromEdge())
-
-      return (data = await this.getFromOrigin())
+      return await this.instance.adapter.get(this.uri);
     } catch (err) {
-      throw err
+      // TODO: log error, but assume doc does not exist
+      return null;
     }
   }
 
@@ -211,87 +169,15 @@ export class Document implements BaseEntity {
    * @param value expects payload to be stored for the document
    * @returns a promise for the payload requested
    */
-  async update(value: Payload): Promise<Payload> {
-    try {
-      let doc: Payload
-      // Get the latest document from the origin
-      doc = await this.get({ source: 'origin' })
-
-      // Loop through all property for custom object actions
-      for (const prop in value) {
-        if (value[prop] === NearDB.field.deleteValue) {
-          // If has deleteValue action, delete the prop
-          delete value[prop]
-          delete doc[prop]
-        }
-      }
-
-      // Updates document
-      const payload = await this.set({
-        ...doc,
-        ...value
-      })
-
-      // Stores payload in local cache
-      this.cache.set(payload)
-      return payload
-    } catch (err) {
-      throw err
-    }
+  async update(value: JsonObject): Promise<void> {
+    checkValidObject(value);
+    await this.instance.adapter.update(value, this.uri);
   }
-
   /**
    * Removes document store in the path of instance
-   * @returns empty object
+   * @returns payload of the document requested
    */
-  delete() {
-    return this.instance.adapter.remove(this.dbPath)
-  }
-
-  /**
-   * Makes a get request to the CDN url
-   * @param path path to attach to cdn url on the request
-   * @returns json object from the request
-   */
-
-  private async getFromEdge(): Promise<Payload> {
-    try {
-      const http = HTTP.create({
-        baseURL: this.instance.config.cdn!.url,
-        timeout: 15000,
-        headers: this.instance.config.cdn!.headers
-      })
-
-      const payload = await http.get(this.dbPath)
-
-      const eTag =
-        payload.headers && payload.headers.ETag ? payload.headers.ETag : null
-      const versionId =
-        payload.headers && payload.headers.VersionId
-          ? payload.headers.VersionId
-          : null
-      this.cache.set(payload.data, eTag, versionId)
-      return payload.data
-    } catch (err) {
-      throw err
-    }
-  }
-
-  private async getFromOrigin(): Promise<Payload> {
-    try {
-      const payload = await this.instance.adapter.get(this.dbPath)
-
-      this.cache.set(payload.Body, payload.ETag, payload.VersionId)
-      return payload.Body
-    } catch (err) {
-      throw err
-    }
-  }
-
-  _privateMethods() {
-    return {
-      getFromEdge: this.getFromEdge.bind(this),
-      getFromOrigin: this.getFromOrigin.bind(this)
-    }
+  async delete(): Promise<void> {
+    await this.instance.adapter.remove(this.uri);
   }
 }

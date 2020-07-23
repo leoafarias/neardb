@@ -1,36 +1,33 @@
-import { Config } from '../src/types'
+import { Config } from '../src/types';
+import { config as envConfig } from 'dotenv';
+envConfig();
 
 // These are public minio keys
 export const cloudConfig: Config = {
-  cdn: {
-    url: 'https://d1pgfx9dotquaq.cloudfront.net'
-  },
-  database: 'bucket',
   cacheExpiration: 5,
   storage: {
-    endpoint: 'play.minio.io:9000',
+    bucket: process.env.NEARDB_BUCKET_NAME || '',
+    endpoint: process.env.NEARDB_ENDPOINT || '',
     useSSL: true,
     s3ForcePathStyle: true,
     signatureVersion: 'v4',
-    accessKeyId: 'Q3AM3UQ867SPQQA43P2F', // these a public minio keys so dont worry
-    secretAccessKey: 'zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG' // these a public minio secret so dont worry
-  }
-}
+    accessKeyId: process.env.NEARDB_ACCESS_KEY_ID || '', // these a public minio keys so dont worry
+    secretAccessKey: process.env.NEARDB_SECRET_ACCESS_KEY || '',
+  },
+};
 
 export const localConfig: Config = {
-  cdn: {
-    url: 'https://d1pgfx9dotquaq.cloudfront.net'
-  },
-  database: 'bucket',
   cacheExpiration: 5,
+  instanceUrl: process.env.NEARDB_LOCAL_INSTANCE_URL || '',
   storage: {
-    endpoint: 'http://localhost:4569',
-    useSSL: false,
+    bucket: process.env.NEARDB_BUCKET_NAME || '',
+    endpoint: process.env.NEARDB_LOCAL_INSTANCE_URL || '',
+    useSSL: true,
     s3ForcePathStyle: true,
     signatureVersion: 'v4',
-    accessKeyId: 'Q3AM3UQ867SPQQA43P2F', // these a public minio keys so dont worry
-    secretAccessKey: 'zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG' // these a public minio secret so dont worry
-  }
-}
+    accessKeyId: process.env.NEARDB_ACCESS_KEY_ID || '', // these a public minio keys so don't worry
+    secretAccessKey: process.env.NEARDB_SECRET_ACCESS_KEY || '',
+  },
+};
 
-export const config = cloudConfig
+export const config = cloudConfig;

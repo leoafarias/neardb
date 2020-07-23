@@ -1,3 +1,3 @@
-import { createDummyData } from '../helpers'
+import { createDummyData } from '../helpers';
 
-export const getRequestMock = createDummyData()
+export const getRequestMock = createDummyData();

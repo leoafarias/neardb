@@ -1,5 +1,6 @@
 // Local S3 Server
-const S3rver = require('s3rver')
+
+const S3rver = require('s3rver');
 
 module.exports = async () => {
   try {
@@ -7,16 +8,18 @@ module.exports = async () => {
       port: 4569,
       hostname: 'localhost',
       silent: true,
-      directory: './tmp'
+      directory: './tmp',
     }).run((err, host, port) => {
       if (err) {
-        throw err
+        throw err;
       }
-      return global.s3ever
-    })
-    return global.s3ever
+
+      return global.s3ever;
+    });
+
+    return global.s3ever;
   } catch (err) {
-    global.s3ever.close()
-    throw err
+    global.s3ever.close();
+    throw err;
   }
-}
+};

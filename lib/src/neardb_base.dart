@@ -1,7 +1,7 @@
+import 'package:neardb/src/adapters/base_adapter.dart';
 import 'package:neardb/src/helpers.dart';
 import 'package:neardb/src/models/config.model.dart';
 import 'package:neardb/src/models/fields.model.dart';
-import 'package:neardb/src/models/storage.model.dart';
 
 class NearDB {
   NearDB({
@@ -17,6 +17,6 @@ class NearDB {
 
   final Config config;
   late String instanceId;
-  final StorageAdapter adapter;
+  final BaseStorageAdapter adapter;
   final fields = Fields();
 }

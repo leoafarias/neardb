@@ -1,3 +1,4 @@
+import 'package:neardb/src/models/entity.model.dart';
 import 'package:uuid/uuid.dart';
 
 /// Generates UUID
@@ -17,3 +18,34 @@ Map<String, bool> _redervedKeywords = {
   'document': true,
   'indices': true,
 };
+
+String buildFilePath(List<PathItem> pathList) {
+  // Needs to be a valid array
+  final fileIdx = pathList.lastIndexWhere(
+    (path) => path.type == EntityType.collection,
+  );
+
+  // Build remaining path to file
+  var remainingPathList = <PathItem>[];
+  for (var idx = 0; idx < pathList.length; idx++) {
+    if (idx > fileIdx) {
+      remainingPathList.add(pathList[idx]);
+    }
+  }
+
+  if (pathList is List && pathList.last.type == EntityType.document) {
+    pathList.last = PathItem.addExtension(pathList.last);
+    return pathList.map((e) => e.key).join('/');
+  } else {
+    throw Exception('Not a valid path');
+  }
+}
+
+String documentPathKey(List<PathItem> path) {
+  final lastItem = path.last;
+  if (lastItem.type == EntityType.document) {
+    return lastItem.key;
+  } else {
+    throw Exception('last Item in path is not a document');
+  }
+}

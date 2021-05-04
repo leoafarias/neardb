@@ -1,4 +1,7 @@
+import 'dart:html';
+
 import 'package:neardb/src/helpers.dart';
+import 'package:neardb/src/models/document.model.dart';
 import 'package:neardb/src/models/entity.model.dart';
 
 import '../../neardb.dart';
@@ -25,6 +28,22 @@ class Collection extends Entity {
       instance: instance,
       key: key,
       path: collectionPath,
+    );
+  }
+
+  Document doc(String docKey) {
+    return Document.create(
+      instance: instance,
+      key: docKey,
+      path: path,
+    );
+  }
+
+  Document add(dynamic value) {
+    return Document.create(
+      instance: instance,
+      key: generateUUID(),
+      path: path,
     );
   }
 }

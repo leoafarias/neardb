@@ -1,3 +1,5 @@
+import 'package:neardb/src/helpers.dart';
+
 import '../../neardb.dart';
 
 enum EntityType { collection, document }
@@ -17,6 +19,36 @@ abstract class Entity {
   bool get exists {
     // TODO: exist logic
     return true;
+  }
+}
+
+class NearDBPath {
+  const NearDBPath({
+    required this.pathList,
+    required this.key,
+  });
+
+  final String key;
+  final List<PathItem> pathList;
+
+  NearDBPath document(String key) {
+    final list = [...pathList, PathItem.document(key)];
+    return NearDBPath(
+      pathList: list,
+      key: key,
+    );
+  }
+
+  NearDBPath collection(String key) {
+    final list = [...pathList, PathItem.collection(key)];
+    return NearDBPath(
+      pathList: list,
+      key: key,
+    );
+  }
+
+  String get filePath {
+    return buildFilePath(pathList);
   }
 }
 
@@ -43,5 +75,9 @@ class PathItem {
       type: EntityType.document,
       key: key,
     );
+  }
+
+  factory PathItem.addExtension(PathItem item) {
+    return PathItem._(type: item.type, key: '${item.key}.json');
   }
 }

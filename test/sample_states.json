@@ -1,0 +1,22 @@
+{
+  "ny": {
+    "name": "New York",
+    "eastCoast": true,
+    "info": {
+      "population": 20215751,
+      "capital": "Albany",
+      "largestCity": "New York City",
+      "largestMetro": "New York metropolitan area"
+    }
+  },
+  "fl": {
+    "name": "Florida",
+    "eastCoast": true,
+    "info": {
+      "population": 21570527,
+      "capital": "Tallahassee",
+      "largestCity": "Jacksonville",
+      "largestMetro": "Miami"
+    }
+  }
+}

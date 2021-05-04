@@ -2,13 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:neardb/src/helpers.dart';
-import 'package:neardb/src/models/config.model.dart';
 import 'package:neardb/src/models/entity.model.dart';
 import 'package:neardb/src/models/fields.model.dart';
 
-class LocalStorageAdapter implements BaseStorageAdapter {
-  final Config config;
-  const LocalStorageAdapter(this.config);
+class LocalStorageAdapter implements StorageAdapter {
+  const LocalStorageAdapter();
 
   @override
   Future<Map<String, dynamic>> get(List<PathItem> path) async {
@@ -41,17 +39,16 @@ class LocalStorageAdapter implements BaseStorageAdapter {
   }
 
   @override
-  Future<void> remove(List<PathItem> path) async {
+  Future<void> delete(List<PathItem> path) async {
     await File(buildFilePath(path)).delete();
   }
 }
 
-abstract class BaseStorageAdapter {
-  final Config config;
-  const BaseStorageAdapter(this.config);
+abstract class StorageAdapter {
+  const StorageAdapter();
 
   Future<Map<String, dynamic>> get(List<PathItem> path);
   Future<void> set(Map<String, dynamic> value, List<PathItem> path);
   Future<void> update(Map<String, dynamic> value, List<PathItem> path);
-  Future<void> remove(List<PathItem> path);
+  Future<void> delete(List<PathItem> path);
 }

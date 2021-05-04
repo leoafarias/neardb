@@ -32,4 +32,11 @@ class Document extends Entity {
       path: docPath,
     );
   }
+  void delete(Map<String, dynamic> value) async {
+    await instance.adapter.delete(path);
+  }
+
+  void update(Map<String, dynamic> value) async {
+    await instance.adapter.update(value, path);
+  }
 }

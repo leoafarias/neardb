@@ -6,7 +6,7 @@ import 'package:neardb/src/models/fields.model.dart';
 class NearDB {
   NearDB({
     required this.config,
-    this.adapter = const DefaultStorage(),
+    this.adapter = const LocalStorageAdapter(),
   }) {
     instanceId = generateUUID();
   }
@@ -17,6 +17,6 @@ class NearDB {
 
   final Config config;
   late String instanceId;
-  final BaseStorageAdapter adapter;
+  final StorageAdapter adapter;
   final fields = Fields();
 }

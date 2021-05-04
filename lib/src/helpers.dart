@@ -32,8 +32,9 @@ String buildFilePath(List<PathItem> pathList) {
       remainingPathList.add(pathList[idx]);
     }
   }
-
-  if (pathList is List && pathList.last.type == EntityType.document) {
+  final lastType = pathList.last.type;
+  if (pathList is List &&
+      (lastType == EntityType.document || lastType == EntityType.collection)) {
     pathList.last = PathItem.addExtension(pathList.last);
     return pathList.map((e) => e.key).join('/');
   } else {

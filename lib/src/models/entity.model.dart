@@ -2,7 +2,11 @@ import 'package:neardb/src/helpers.dart';
 
 import '../../neardb.dart';
 
-enum EntityType { collection, document }
+enum EntityType {
+  collection,
+  document,
+  subcollection,
+}
 
 /// Base entity for Beardb
 abstract class Entity {
@@ -47,6 +51,14 @@ class NearDBPath {
     );
   }
 
+  NearDBPath subCollection(String key) {
+    final list = [...pathList, PathItem.collection(key)];
+    return NearDBPath(
+      pathList: list,
+      key: key,
+    );
+  }
+
   String get filePath {
     return buildFilePath(pathList);
   }
@@ -73,6 +85,14 @@ class PathItem {
   factory PathItem.document(String key) {
     return PathItem._(
       type: EntityType.document,
+      key: key,
+    );
+  }
+
+  /// Returns a `PathItem` of type subcollection for [key]
+  factory PathItem.subcollection(String key) {
+    return PathItem._(
+      type: EntityType.subcollection,
       key: key,
     );
   }

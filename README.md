@@ -2,7 +2,7 @@
 
 NearDB is a simple database that leverages cloud infrastructure like document storage and CDN to deliver an inexpensive unbelievably scalable document database optimized for reads and perfect for edge applications.
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/9edcdbf53d47468e9917676d80277188)](https://www.codacy.com/app/leo/neardb?utm_source=github.com&utm_medium=referral&utm_content=leoafarias/neardb&utm_campaign=Badge_Grade) [![Build Status](https://travis-ci.org/leoafarias/neardb.svg?branch=master)](https://travis-ci.org/leoafarias/neardb) [![Coverage Status](https://coveralls.io/repos/github/leoafarias/neardb/badge.svg?branch=master)](https://coveralls.io/github/leoafarias/neardb?branch=master)
+[![CI](https://github.com/leoafarias/neardb/actions/workflows/main.yml/badge.svg)](https://github.com/leoafarias/neardb/actions/workflows/main.yml) [![npm](https://img.shields.io/npm/v/neardb)](https://www.npmjs.com/package/neardb) [![License: MIT](https://img.shields.io/github/license/leoafarias/neardb)](LICENSE)
 
 ## Motivation
 
